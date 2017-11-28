@@ -1,0 +1,6 @@
+[package]
+name = "z3stringnet"
+version = "0.1.0"
+authors = ["OwenMyers <owendalemyers@gmail.com>"]
+
+[dependencies]
