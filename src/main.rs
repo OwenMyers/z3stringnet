@@ -61,33 +61,91 @@ fn write_2d_vec(vec: &Vec<Vec<i32>>) {
     }
 }
 
-struct Lattice {
-    hrz: Vec<u8>,
-    vrt: Vec<u8>,
+enum Link {
+    In,
+    Out,
+    Blank,
+}
+
+struct Vertex {
+    n: Link,
+    e: Link,
+    s: Link,
+    w: Link,
+}
+
+struct Size {
     lx: u64,
     ly: u64,
 }
 
-fn write_lattice(lat: &Lattice) {
-    write_vec(String::from("vrt.txt"), &lat.vrt);
-    write_vec(String::from("hrz.txt"), &lat.hrz);
+struct Lattice {
+    // All links can be defined by the vertices of one sublattice.
+    // This means the len of vertices will always be N/2, where N is the
+    // total number of vertices.
+    // TODO: Do a check or asertation to ensure the length of vertices
+    // is correct given Size.
+    vertices: Vec<Vertex>,
+    size: Size,
 }
+
+fn build_blank_lat(size: Size) -> Lattice {
+    println!("Building blank lattice of size x {}, y {}",
+             size.lx, size.ly);
+
+    let lat: Lattice = Lattice {
+        vertices = Vec::new(),
+        size,
+    }
+
+    // Only need half of N because we only need vertices from one sub
+    // lattice to compleatly define all links.
+    let half_N = lat.size.lx*lat.size.ly
+        
+    println!("Filling vertex array:");
+    for i in (..half_N) {
+        println!("i {}", i)
+        let cur_vertex: Vertex = Vertex{
+            n: Link::Blank,
+            e: Link::Blank,
+            s: Link::Blank,
+            w: Link::Blank,
+        }
+        lat.vertices.push(cur_vertex);
+    }
+
+    lat
+}
+    
 
 fn main() {
 
     let mut lat: Lattice = Lattice {
-        hrz: Vec::new(),
-        vrt: Vec::new(),
+        vertices: Vec::new(),
         lx: 2,
         ly: 2,
     };
-
-    lat.hrz.push(0);
-    lat.hrz.push(0);
-    lat.vrt.push(0);
-    lat.vrt.push(0);
+    let mut v: Vertex = Vertex{
+        n: Link::In,
+        e: Link::In,
+        s: Link::Out,
+        w: Link::Blank,
+    };
     
-    write_lattice(&lat);
+    match v.n {
+        Link::Out => println!("out"),
+        Link::In => println!("in"),
+        Link::Blank => println!("blank"),
+    }
+
+    
+
+//    lat.hrz.push(0);
+//    lat.hrz.push(0);
+//    lat.vrt.push(0);
+//    lat.vrt.push(0);
+//    
+//    write_lattice(&lat);
     
     //let mut vrt = vec![vec![0; 4]; 4];
     //let mut hrz = vec![vec![0; 4]; 4];
