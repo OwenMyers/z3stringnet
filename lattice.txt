@@ -1,0 +1,4 @@
+x,y,N,E,S,W
+0,0,Blank,Blank,Blank,Blank
+0,0,Blank,Blank,Blank,Blank
+
