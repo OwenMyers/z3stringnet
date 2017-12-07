@@ -1,5 +1,7 @@
 //use std::error::Error;
-use datamodel::*
+extern crate z3stringnet;
+use z3stringnet::datamodel::*;
+use z3stringnet::oio::*;
     
 
 fn main() {

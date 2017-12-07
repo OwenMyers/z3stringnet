@@ -1,33 +1,33 @@
-enum Link {
+pub enum Link {
     In,
     Out,
     Blank,
 }
 
-struct Vertex {
-    n: Link,
-    e: Link,
-    s: Link,
-    w: Link,
-    xy: Point,
+pub struct Vertex {
+    pub n: Link,
+    pub e: Link,
+    pub s: Link,
+    pub w: Link,
+    pub xy: Point,
 }
 
-struct Point {
-    x: u64,
-    y: u64,
+pub struct Point {
+    pub x: u64,
+    pub y: u64,
 }
 
-struct Lattice {
+pub struct Lattice {
     // All links can be defined by the vertices of one sublattice.
     // This means the len of vertices will always be N/2, where N is the
     // total number of vertices.
     // TODO: Do a check or asertation to ensure the length of vertices
-    // is correct given Point.
-    vertices: Vec<Vertex>,
-    size: Point,
+    // is correct given Point. 
+    pub vertices: Vec<Vertex>,
+    pub size: Point,
 }
 
-fn build_blank_lat(size: Point) -> Lattice {
+pub fn build_blank_lat(size: Point) -> Lattice {
     println!("Building blank lattice of size x {}, y {}",
              size.x, size.y);
 
@@ -36,12 +36,12 @@ fn build_blank_lat(size: Point) -> Lattice {
         size,
     };
 
-    let half_N = (lat.size.x * lat.size.y)/2;
+    let half_n = (lat.size.x * lat.size.y)/2;
 
     // Only need half of N because we only need vertices from one sub
     // lattice to compleatly define all links.
     println!("Filling vertex array:");
-    for i in (0..half_N) {
+    for i in (0..half_n) {
         println!("i {}", i);
         let cur_vertex: Vertex = Vertex{
             n: Link::Blank,

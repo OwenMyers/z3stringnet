@@ -1,6 +1,9 @@
 use std::io::prelude::*;
 use std::fs::File;
 use std::path::Path;
+use super::datamodel::Link;
+use super::datamodel::Lattice;
+use std::error::Error;
 
 fn get_out_string_from_link(link: &Link) -> &str{
     match link{
@@ -10,7 +13,7 @@ fn get_out_string_from_link(link: &Link) -> &str{
     }
 }
 
-fn write_lattice(f_str: String, lat: &Lattice) {
+pub fn write_lattice(f_str: String, lat: &Lattice) {
     let path = Path::new(&f_str);
     let display = path.display();
 
@@ -48,7 +51,7 @@ fn write_lattice(f_str: String, lat: &Lattice) {
     }
 }
 
-fn write_vec(f_str: String, vec: &Vec<u8>) {
+pub fn write_vec(f_str: String, vec: &Vec<u8>) {
     let path = Path::new(&f_str);
     let display = path.display();
 
@@ -77,7 +80,7 @@ fn write_vec(f_str: String, vec: &Vec<u8>) {
 }
 
 
-fn write_2d_vec(vec: &Vec<Vec<i32>>) {
+pub fn write_2d_vec(vec: &Vec<Vec<i32>>) {
 
 
     let path = Path::new("foo.txt");

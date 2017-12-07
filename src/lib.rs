@@ -1,4 +1,5 @@
 pub mod datamodel;
+pub mod oio;
 
 #[cfg(test)]
 mod tests {
