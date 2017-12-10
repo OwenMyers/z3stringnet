@@ -12,9 +12,23 @@ pub struct Vertex {
     pub xy: Point,
 }
 
+#[derive(Debug)]
 pub struct Point {
     pub x: u64,
     pub y: u64,
+}
+
+
+#[derive(Debug)]
+pub struct Update {
+    pub plaquette: Point,
+}
+impl Default for Update {
+    fn default() -> Update {
+        Update{
+            plaquette: Point{x: None, y: None},
+        }
+    }
 }
 
 pub struct Lattice {
@@ -26,6 +40,7 @@ pub struct Lattice {
     pub vertices: Vec<Vertex>,
     pub size: Point,
 }
+
 
 pub fn build_blank_lat(size: Point) -> Lattice {
     println!("Building blank lattice of size x {}, y {}",

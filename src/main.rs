@@ -17,8 +17,13 @@ fn main() {
 
     write_lattice(String::from("lattice.txt"), &lat);
 
-    let tmpx = x_from_vertex_vec_position(9, &lat.size);
-    println!("tmpx {}", tmpx)
+    let update: Update = Default::default();
+    println!("plaquette {:?}", update);
+
+
+
+    //let tmpx = x_from_vertex_vec_position(9, &lat.size);
+    //println!("tmpx {}", tmpx)
 
 
     //let mut v: Vertex = Vertex{
