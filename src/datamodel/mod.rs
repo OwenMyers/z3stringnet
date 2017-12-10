@@ -60,17 +60,25 @@ pub fn build_blank_lat(size: Point) -> Lattice {
 }
 
 //TODO: check these
-fn x_from_vertex_vec_position(position: u64, size: &Point) -> u64 {
-    let y = position * 2 % size.y;
-    let x = position * 2 % size.x;
+pub fn x_from_vertex_vec_position(position: u64, size: &Point) -> u64 {
+    
+    let y = y_from_vertex_vec_position(position, &size);
+    println!("y is: {}", y);
+    println!("size.x is: {}", size.x);
+
     if y % 2 == 0 {
-        return x
+        return (position * 2) % size.x;
     }
     else {
-        return x + 1;
+        return (position * 2 + 1) % size.x;
     }
 }
-fn y_from_vertex_vec_position(position: u64, size: &Point) -> u64 {
-    let y = position * 2 % size.y;
+
+pub fn y_from_vertex_vec_position(position: u64, size: &Point) -> u64 {
+    if position > (size.x*size.y)/2{
+        panic!("The position specified is greater
+               than the number of unique vetices in the Lattice");
+    }
+    let y = position * 2 / size.x;
     y
 }

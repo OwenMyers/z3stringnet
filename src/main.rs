@@ -7,15 +7,18 @@ use z3stringnet::oio::*;
 fn main() {
 
     let size: Point = Point {
-        x: 2,
-        y: 2,
+        x: 4,
+        y: 4,
     };
 
     let mut lat: Lattice;
+    // lat now owns size -> That is good and intentional
     lat = build_blank_lat(size);
 
     write_lattice(String::from("lattice.txt"), &lat);
 
+    let tmpx = x_from_vertex_vec_position(9, &lat.size);
+    println!("tmpx {}", tmpx)
 
 
     //let mut v: Vertex = Vertex{
