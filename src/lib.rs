@@ -1,3 +1,4 @@
+extern crate rand;
 pub mod datamodel;
 pub mod oio;
 

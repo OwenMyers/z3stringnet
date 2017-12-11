@@ -1,3 +1,6 @@
+use rand;
+use rand::Rng;
+
 pub enum Link {
     In,
     Out,
@@ -21,12 +24,19 @@ pub struct Point {
 
 #[derive(Debug)]
 pub struct Update {
-    pub plaquette: Point,
+    pub lat_size: Point,
 }
-impl Default for Update {
-    fn default() -> Update {
-        Update{
-            plaquette: Point{x: None, y: None},
+impl Update {
+    pub fn orand(&self, up_lim: u64) -> u64 {
+        rand::thread_rng().gen_range(0, up_lim)
+    }
+    pub fn rand_point(&self) -> Point {
+        Point {
+            x: rand::thread_rng()
+                .gen_range(0, self.lat_size.x),
+            y: rand::thread_rng()
+                .gen_range(0, self.lat_size.y)
+                
         }
     }
 }

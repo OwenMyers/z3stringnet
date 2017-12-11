@@ -17,8 +17,19 @@ fn main() {
 
     write_lattice(String::from("lattice.txt"), &lat);
 
-    let update: Update = Default::default();
+    let update: Update = Update {
+        lat_size: Point {
+            x: 4,
+            y: 4,
+        },
+    };
     println!("plaquette {:?}", update);
+    for i in 0..10 {
+        let xy = update
+            .rand_point();
+        println!("rand x {}", xy.x);
+        println!("rand y {}", xy.y);
+    }
 
 
 
