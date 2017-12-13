@@ -17,22 +17,23 @@ fn main() {
 
     write_lattice(String::from("lattice.txt"), &lat);
 
-    let mut update: Update = Update {
-        lat_size: Point {
-            x: 4,
-            y: 4,
-        },
-        working_loc: Point {
-            x: 0,
-            y: 0,
-        }
-    };
-    println!("plaquette {:?}", update);
-    for i in 0..10 {
-        update.get_rand_point();
-        println!("rand x {}", update.working_loc.x);
-        println!("rand y {}", update.working_loc.y);
-    }
+    // Playing with the update struct.
+    //let mut update: Update = Update {
+    //    lat_size: Point {
+    //        x: 4,
+    //        y: 4,
+    //    },
+    //    working_loc: Point {
+    //        x: 0,
+    //        y: 0,
+    //    }
+    //};
+    //println!("plaquette {:?}", update);
+    //for i in 0..10 {
+    //    update.get_rand_point();
+    //    println!("rand x {}", update.working_loc.x);
+    //    println!("rand y {}", update.working_loc.y);
+    //}
 
 
 

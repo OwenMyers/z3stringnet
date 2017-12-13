@@ -6,6 +6,12 @@ pub enum Link {
     Out,
     Blank,
 }
+pub enum Direction {
+    N,
+    E,
+    S,
+    W,
+}
 
 pub struct Vertex {
     pub n: Link,
@@ -37,7 +43,7 @@ impl Update {
                 
         };
     }
-    pub fn update(&self, lat: &mut Lattice) {
+    pub fn update(&mut self, lat: &mut Lattice) {
         // Get a random point.
         // Lets say the random point is the lower left
         // corner of the plaquette.
@@ -60,16 +66,28 @@ impl Lattice {
     // Only storing one sublattice so other verticies are implied.
     // Lets call the ones in our `vertices` vector "real" and the
     // implied ones "fake".
-    pub fn point_real(p: &Point) -> bool {
-        TODO
-        (p.x + p.y) %
+    pub fn point_real(&self, p: &Point) -> bool {
+        ((p.x + p.y) % 2) == 0
     }
-    pub fn get_link_from_point(&mut self, loc: Point) -> &mut Link{
+    pub fn get_link_from_point(&mut self, loc: Point, direction: Direction) -> &mut Link{
         // See if this point is on the sublattice of the stored verticies.
         // Only storing one sublattice so other verticies are implied.
         // Lets call the ones in our `vertices` vector "real" and the
         // implied ones "fake".
-        let is_real = 
+        let is_real = self.point_real(&loc);
+        // The potential location of vertex in the vector
+        let vloc = loc.x + loc.y;
+        if is_real {
+            match direction {
+                Direction::N => return &mut (&mut self.vertices[vloc as usize]).n,
+                Direction::E => return &mut (&mut self.vertices[vloc as usize]).e,
+                Direction::S => return &mut (&mut self.vertices[vloc as usize]).s,
+                Direction::W => return &mut (&mut self.vertices[vloc as usize]).w,
+            }
+        } 
+        else {
+            panic!("Cant handle implied vertices yet.");
+        }
     }
 }
 
