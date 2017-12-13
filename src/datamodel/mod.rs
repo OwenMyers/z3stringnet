@@ -1,6 +1,7 @@
 use rand;
 use rand::Rng;
 
+#[derive(Debug)]
 pub enum Link {
     In,
     Out,
@@ -69,7 +70,7 @@ impl Lattice {
     pub fn point_real(&self, p: &Point) -> bool {
         ((p.x + p.y) % 2) == 0
     }
-    pub fn get_link_from_point(&mut self, loc: Point, direction: Direction) -> &mut Link{
+    pub fn get_link_from_point(&mut self, loc: &Point, direction: &Direction) -> &mut Link{
         // See if this point is on the sublattice of the stored verticies.
         // Only storing one sublattice so other verticies are implied.
         // Lets call the ones in our `vertices` vector "real" and the
@@ -78,7 +79,7 @@ impl Lattice {
         // The potential location of vertex in the vector
         let vloc = loc.x + loc.y;
         if is_real {
-            match direction {
+            match *direction {
                 Direction::N => return &mut (&mut self.vertices[vloc as usize]).n,
                 Direction::E => return &mut (&mut self.vertices[vloc as usize]).e,
                 Direction::S => return &mut (&mut self.vertices[vloc as usize]).s,
@@ -86,6 +87,8 @@ impl Lattice {
             }
         } 
         else {
+            // The edges are the tough part to handle
+            // TODO
             panic!("Cant handle implied vertices yet.");
         }
     }

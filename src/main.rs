@@ -15,6 +15,22 @@ fn main() {
     // lat now owns size -> That is good and intentional
     lat = build_blank_lat(size);
 
+
+    let p: Point = Point {
+        x: 1,
+        y: 1,
+    };
+
+    let d: Direction = Direction::E;
+
+    // Need the mutable reference to go out of scope.
+    {
+        let gotten_link: &mut Link = lat.get_link_from_point(&p, &d);
+        println!("gotten_link {:?}", gotten_link);
+        *gotten_link = Link::Out;
+    }
+
+    
     write_lattice(String::from("lattice.txt"), &lat);
 
     // Playing with the update struct.
