@@ -25,19 +25,25 @@ pub struct Point {
 #[derive(Debug)]
 pub struct Update {
     pub lat_size: Point,
+    pub working_loc: Point,
 }
 impl Update {
-    pub fn orand(&self, up_lim: u64) -> u64 {
-        rand::thread_rng().gen_range(0, up_lim)
-    }
-    pub fn rand_point(&self) -> Point {
-        Point {
+    pub fn get_rand_point(&mut self) {
+        self.working_loc = Point {
             x: rand::thread_rng()
                 .gen_range(0, self.lat_size.x),
             y: rand::thread_rng()
                 .gen_range(0, self.lat_size.y)
                 
-        }
+        };
+    }
+    pub fn update(&self, lat: &mut Lattice) {
+        // Get a random point.
+        // Lets say the random point is the lower left
+        // corner of the plaquette.
+        // Clockwise walk.
+        self.get_rand_point();
+        // TODO
     }
 }
 
@@ -49,6 +55,22 @@ pub struct Lattice {
     // is correct given Point. 
     pub vertices: Vec<Vertex>,
     pub size: Point,
+}
+impl Lattice {
+    // Only storing one sublattice so other verticies are implied.
+    // Lets call the ones in our `vertices` vector "real" and the
+    // implied ones "fake".
+    pub fn point_real(p: &Point) -> bool {
+        TODO
+        (p.x + p.y) %
+    }
+    pub fn get_link_from_point(&mut self, loc: Point) -> &mut Link{
+        // See if this point is on the sublattice of the stored verticies.
+        // Only storing one sublattice so other verticies are implied.
+        // Lets call the ones in our `vertices` vector "real" and the
+        // implied ones "fake".
+        let is_real = 
+    }
 }
 
 
@@ -66,7 +88,7 @@ pub fn build_blank_lat(size: Point) -> Lattice {
     // Only need half of N because we only need vertices from one sub
     // lattice to compleatly define all links.
     println!("Filling vertex array:");
-    for i in (0..half_n) {
+    for i in 0..half_n {
         println!("i {}", i);
         let cur_vertex: Vertex = Vertex{
             n: Link::Blank,
@@ -107,3 +129,4 @@ pub fn y_from_vertex_vec_position(position: u64, size: &Point) -> u64 {
     let y = position * 2 / size.x;
     y
 }
+
