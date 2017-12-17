@@ -1,6 +1,7 @@
 //use std::error::Error;
 extern crate z3stringnet;
 use z3stringnet::datamodel::*;
+use z3stringnet::datamodel::lattice::*;
 use z3stringnet::oio::*;
     
 

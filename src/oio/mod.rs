@@ -2,7 +2,7 @@ use std::io::prelude::*;
 use std::fs::File;
 use std::path::Path;
 use super::datamodel::Link;
-use super::datamodel::Lattice;
+use super::datamodel::lattice::Lattice;
 use std::error::Error;
 
 fn get_out_string_from_link(link: &Link) -> &str{
