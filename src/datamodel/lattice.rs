@@ -34,7 +34,9 @@ impl Lattice {
         } 
         else {
             // The edges are the tough part to handle
-            // TODO
+            // TODO: Or I think it is fine if this is never implemented and the
+            // case of implied sublattice points is handled else where like in the 
+            // string operator.
             panic!("Cant handle implied vertices yet. Not sure if we need to. This functionality may never exist.");
         }
     }

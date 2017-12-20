@@ -34,6 +34,32 @@ fn main() {
     
     write_lattice(String::from("lattice.txt"), &lat);
 
+    let mut bound_point: BoundPoint = BoundPoint {
+        size: Point{x: 4, y: 4},
+        location: Point{x: 1, y: 1},
+    };
+
+
+    println!("Checking out X");
+    for _i in 0..10 {
+        let update_point: Point = Point{x: 1, y: 0};
+        bound_point = bound_point + update_point;
+        println!("new bound point {:?}", bound_point);
+    }
+
+    let mut bound_point: BoundPoint = BoundPoint {
+        size: Point{x: 4, y: 4},
+        location: Point{x: 1, y: 1},
+    };
+
+
+    println!("Checking out y");
+    for _i in 0..10 {
+        let update_point: Point = Point{x: 0, y: 1};
+        bound_point = bound_point + update_point;
+        println!("new bound point {:?}", bound_point);
+    }
+
     // Playing with the update struct.
     //let mut update: Update = Update {
     //    lat_size: Point {

@@ -1,8 +1,8 @@
-
 use rand;
 use rand::Rng;
 pub mod lattice;
 use self::lattice::Lattice;
+use std::ops::Add;
 
 #[derive(Debug)]
 pub enum Link {
@@ -33,14 +33,25 @@ pub struct Point {
 
 #[derive(Debug)]
 pub struct BoundPoint {
-    size: Point; 
-    pub x: u64,
-    pub y: u64,
+    pub size: Point, 
+    pub location: Point,
 }
-impl BoundPoint{
+impl Add <Point> for BoundPoint{
     // overload + here to make it modulus `size`
+    type Output = BoundPoint;
+    fn add(self, input: Point) -> BoundPoint {
+        BoundPoint {
+            size: Point {
+                x: self.size.x,
+                y: self.size.y,
+            },
+            location: Point {
+                x: (self.location.x + input.x) % self.size.x,
+                y: (self.location.y + input.y) % self.size.y,
+            }
+        }
+    }
 }
-
 
 
 #[derive(Debug)]
@@ -73,7 +84,7 @@ pub struct Z3String {
     /// struct will be used to perform some operation on the lattice and then go out of scope so
     /// the mutable reference can be avaliabel again.
     pub start_loc: Point,
-    pub cur_loc: Point,
+    pub cur_loc: BoundPoint,
     pub path: Vec<Point>,
     lat: &mut Lattice, 
 }
@@ -86,14 +97,33 @@ impl Z3String {
         
         // If the lnik is a real one (point is of the stored sub lattice) then you just need
         // to call lat `get_link_from_point` and operate on that link
-        if *lat.point_real(cur_loc){
+        if *lat.point_real(cur_loc.location){
+            let mut increment: Option<Point> = None;
             match direction {
-                Direction::N => out_raise(cur_loc),
-                Direction::E => out_raise(cur_loc),
-                Direction::S => out_raise(cur_loc),
-                Direction::W => out_raise(cur_loc),
+                // Remember that this function only works for the defined (real) lattice
+                // points but this point is real so its fine.
+                let link = *lat.get_link_from_point(TODO)
+                Direction::N => {
+                    out_raise();
+                    increment = Some(Point {x: 0, y: 1});
+                },
+                Direction::E => {
+                    out_raise(cur_loc)
+                    increment = Some(Point {x: 1, y: 0});
+                },
+                Direction::S => {
+                    out_raise(cur_loc)
+                    increment = Some(Point {x: 0, y: -1});
+                },
+                Direction::W => {
+                    out_raise(cur_loc)
+                    increment = Some(Point {x: -1, y: 0});
+                },
             }
-            advance cur_loc
+            match increment {
+                Some(inc) => self.cur_loc = self.cur_loc + inc;
+                None => panic!("No step taken for some reason. No increment.");    
+            }
         }
         // If the link is not real then step in `direction`, which will guarentee you are now on
         // the reall sublattice, and look back accross the link from the new vertex. You have to
