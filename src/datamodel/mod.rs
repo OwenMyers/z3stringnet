@@ -89,7 +89,7 @@ pub struct Z3String {
     lat: &mut Lattice, 
 }
 impl Z3String {
-    pub fn raise_step(&self, direction: Direction) {
+    pub fn raise_step(&self, direction: &Direction) {
         /// This function takes a step along a path from the self.cur_loc position to a new
         /// position determined by the input from the user. It onle steps across one link and it
         /// CHANGES that link acording to the raising and lowing rules given the orientation of the
@@ -97,36 +97,21 @@ impl Z3String {
         
         // If the lnik is a real one (point is of the stored sub lattice) then you just need
         // to call lat `get_link_from_point` and operate on that link
-        if *lat.point_real(&cur_loc.location){
+        if *lat.point_real(&cur_loc.location, &direction){
             let mut increment: Option<Point> = None;
             
-            // Just to be safe lets make sure the links lives only for this block
-            {
-                // Remember that this function only works for the defined (real) lattice
-                // points but this point is real so its fine.
-                let mut link: &mut Link = *lat.get_link_from_point(&cur_loc.location, &direction);
-                match link {
-                    Link::In    => *link = Link::Blank,
-                    Link::Out   => *link = Link::In,
-                    Link::Blank => *link = Link::Out,
-                }
-            }
-
-            match direction {
-                Direction::N => {
-                    out_raise();
+            *lat.out_raise_link(&cur_loc.location, &direction);
+            match &direction {
+                &Direction::N => {
                     increment = Some(Point {x: 0, y: 1});
                 },
-                Direction::E => {
-                    out_raise(cur_loc)
+                &Direction::E => {
                     increment = Some(Point {x: 1, y: 0});
                 },
-                Direction::S => {
-                    out_raise(cur_loc)
+                &Direction::S => {
                     increment = Some(Point {x: 0, y: -1});
                 },
-                Direction::W => {
-                    out_raise(cur_loc)
+                &Direction::W => {
                     increment = Some(Point {x: -1, y: 0});
                 },
             }

@@ -40,6 +40,17 @@ impl Lattice {
             panic!("Cant handle implied vertices yet. Not sure if we need to. This functionality may never exist.");
         }
     }
+    pub fn out_raise_link(&mut self, loc: &Point, direction: &Direction) {
+        /// Raies a linke traveling outward from the specified vertex
+        /// This function, because of get_link_from_point will only() will only work
+        /// on real verticies. Thats the way we want it
+        let mut link: &mut Link = self.get_link_from_point(loc, direction);
+        match &link {
+            &Link::In    => *link = Link::Blank,
+            &Link::Out   => *link = Link::In,
+            &Link::Blank => *link = Link::Out,
+        }
+    }
 }
 
 
