@@ -89,6 +89,27 @@ pub struct Z3String {
     lat: &mut Lattice, 
 }
 impl Z3String {
+    fn increment_cur_loc(&self, &direction) {
+        let mut increment: Option<Point> = None;
+        match &direction {
+            &Direction::N => {
+                increment = Some(Point {x: 0, y: 1});
+            },
+            &Direction::E => {
+                increment = Some(Point {x: 1, y: 0});
+            },
+            &Direction::S => {
+                increment = Some(Point {x: 0, y: -1});
+            },
+            &Direction::W => {
+                increment = Some(Point {x: -1, y: 0});
+            },
+        }
+        match increment {
+            Some(inc) => self.cur_loc = self.cur_loc + inc;
+            None => panic!("No step taken for some reason. No increment.");    
+        }
+    }
     pub fn raise_step(&self, direction: &Direction) {
         /// This function takes a step along a path from the self.cur_loc position to a new
         /// position determined by the input from the user. It onle steps across one link and it
@@ -98,40 +119,18 @@ impl Z3String {
         // If the lnik is a real one (point is of the stored sub lattice) then you just need
         // to call lat `get_link_from_point` and operate on that link
         if *lat.point_real(&cur_loc.location, &direction){
-            let mut increment: Option<Point> = None;
-            
             *lat.out_raise_link(&cur_loc.location, &direction);
-            match &direction {
-                &Direction::N => {
-                    increment = Some(Point {x: 0, y: 1});
-                },
-                &Direction::E => {
-                    increment = Some(Point {x: 1, y: 0});
-                },
-                &Direction::S => {
-                    increment = Some(Point {x: 0, y: -1});
-                },
-                &Direction::W => {
-                    increment = Some(Point {x: -1, y: 0});
-                },
-            }
-            match increment {
-                Some(inc) => self.cur_loc = self.cur_loc + inc;
-                None => panic!("No step taken for some reason. No increment.");    
-            }
+            self.increment_cur_loc(&direction);
         }
         // If the link is not real then step in `direction`, which will guarentee you are now on
         // the reall sublattice, and look back accross the link from the new vertex. You have to
         // be careful operating on the link because it will be in the reverse direcction now that
         // you have already taken the step.
+        // "out lower" is would be the same as "in raise". Either works now that we have
+        // shifted position without changing anything.
         else {
-            advance cur_loc
-            match direction {
-                Direction::N => in_raise(cur_loc),
-                Direction::E => in_raise(cur_loc),
-                Direction::S => in_raise(cur_loc),
-                Direction::W => in_raise(cur_loc),
-            }
+            self.increment_cur_loc(&direction);
+            *lat.out_lower_link(&cur_loc.location, &direction);
         }
     }
 }
