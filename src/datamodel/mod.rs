@@ -27,8 +27,8 @@ pub struct Vertex {
 
 #[derive(Debug)]
 pub struct Point {
-    pub x: u64,
-    pub y: u64,
+    pub x: i64,
+    pub y: i64,
 }
 
 #[derive(Debug)]
@@ -79,47 +79,47 @@ impl Update {
     }
 }
 
-pub struct Z3String {
+pub struct Z3String<'a> {
     /// This borrows a mutable refference to a lattice so it is assumed that an instance of this
     /// struct will be used to perform some operation on the lattice and then go out of scope so
     /// the mutable reference can be avaliabel again.
     pub start_loc: Point,
     pub cur_loc: BoundPoint,
     pub path: Vec<Point>,
-    lat: &mut Lattice, 
+    lat: &'a mut Lattice, 
 }
-impl Z3String {
-    fn increment_cur_loc(&self, &direction) {
+impl<'a> Z3String<'a> {
+    fn increment_cur_loc(&self, direction: &Direction) {
         let mut increment: Option<Point> = None;
-        match &direction {
-            &Direction::N => {
+        match *direction {
+            Direction::N => {
                 increment = Some(Point {x: 0, y: 1});
             },
-            &Direction::E => {
+            Direction::E => {
                 increment = Some(Point {x: 1, y: 0});
             },
-            &Direction::S => {
+            Direction::S => {
                 increment = Some(Point {x: 0, y: -1});
             },
-            &Direction::W => {
+            Direction::W => {
                 increment = Some(Point {x: -1, y: 0});
             },
         }
         match increment {
-            Some(inc) => self.cur_loc = self.cur_loc + inc;
-            None => panic!("No step taken for some reason. No increment.");    
+            Some(inc) => self.cur_loc = self.cur_loc + inc,
+            None => panic!("No step taken for some reason. No increment."),    
         }
     }
     pub fn raise_step(&self, direction: &Direction) {
-        /// This function takes a step along a path from the self.cur_loc position to a new
-        /// position determined by the input from the user. It onle steps across one link and it
-        /// CHANGES that link acording to the raising and lowing rules given the orientation of the
-        /// link and the direction of the step.
+        // This function takes a step along a path from the self.cur_loc position to a new
+        // position determined by the input from the user. It onle steps across one link and it
+        // CHANGES that link acording to the raising and lowing rules given the orientation of the
+        // link and the direction of the step.
         
         // If the lnik is a real one (point is of the stored sub lattice) then you just need
         // to call lat `get_link_from_point` and operate on that link
-        if *lat.point_real(&cur_loc.location, &direction){
-            *lat.out_raise_link(&cur_loc.location, &direction);
+        if self.lat.point_real(&self.cur_loc.location){
+            self.lat.out_raise_link(&self.cur_loc.location, &direction);
             self.increment_cur_loc(&direction);
         }
         // If the link is not real then step in `direction`, which will guarentee you are now on
@@ -130,7 +130,7 @@ impl Z3String {
         // shifted position without changing anything.
         else {
             self.increment_cur_loc(&direction);
-            *lat.out_lower_link(&cur_loc.location, &direction);
+            self.lat.out_lower_link(&self.cur_loc.location, &direction);
         }
     }
 }

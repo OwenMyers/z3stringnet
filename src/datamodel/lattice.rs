@@ -41,9 +41,9 @@ impl Lattice {
         }
     }
     pub fn out_raise_link(&mut self, loc: &Point, direction: &Direction) {
-        /// Raies a link traveling outward from the specified vertex
-        /// This function, because of get_link_from_point(), will only will only work
-        /// on real verticies. Thats the way we want it
+        // Raies a link traveling outward from the specified vertex
+        // This function, because of get_link_from_point(), will only will only work
+        // on real verticies. Thats the way we want it
         let mut link: &mut Link = self.get_link_from_point(loc, direction);
         match &link {
             &Link::In    => *link = Link::Blank,
@@ -52,14 +52,15 @@ impl Lattice {
         }
     }
     pub fn out_lower_link(&mut self, loc: &Point, direction: &Direction) {
-        /// Lower a link traveling outward from the specified vertex. Also see raise 
-        /// description.
+        // Lower a link traveling outward from the specified vertex. Also see raise 
+        // description.
         let mut link: &mut Link = self.get_link_from_point(loc, direction);
         match &link {
             &Link::In    => *link = Link::Out,
             &Link::Out   => *link = Link::Blank,
             &Link::Blank => *link = Link::In,
         }
+    }
 }
 
 
