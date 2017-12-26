@@ -43,7 +43,7 @@ fn main() {
     println!("Checking out X");
     for _i in 0..10 {
         let update_point: Point = Point{x: 1, y: 0};
-        bound_point = bound_point + update_point;
+        bound_point = &bound_point + update_point;
         println!("new bound point {:?}", bound_point);
     }
 
@@ -56,7 +56,7 @@ fn main() {
     println!("Checking out y");
     for _i in 0..10 {
         let update_point: Point = Point{x: 0, y: 1};
-        bound_point = bound_point + update_point;
+        bound_point = &bound_point + update_point;
         println!("new bound point {:?}", bound_point);
     }
 

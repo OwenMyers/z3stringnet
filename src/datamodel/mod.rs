@@ -36,7 +36,7 @@ pub struct BoundPoint {
     pub size: Point, 
     pub location: Point,
 }
-impl Add <Point> for BoundPoint{
+impl<'a> Add <Point> for &'a BoundPoint{
     // overload + here to make it modulus `size`
     type Output = BoundPoint;
     fn add(self, input: Point) -> BoundPoint {
@@ -89,8 +89,8 @@ pub struct Z3String<'a> {
     lat: &'a mut Lattice, 
 }
 impl<'a> Z3String<'a> {
-    fn increment_cur_loc(&self, direction: &Direction) {
-        let mut increment: Option<Point> = None;
+    fn increment_cur_loc(&mut self, direction: &Direction) {
+        let increment: Option<Point>; 
         match *direction {
             Direction::N => {
                 increment = Some(Point {x: 0, y: 1});
@@ -106,11 +106,11 @@ impl<'a> Z3String<'a> {
             },
         }
         match increment {
-            Some(inc) => self.cur_loc = self.cur_loc + inc,
+            Some(inc) => self.cur_loc = &self.cur_loc + inc,
             None => panic!("No step taken for some reason. No increment."),    
         }
     }
-    pub fn raise_step(&self, direction: &Direction) {
+    pub fn raise_step(&mut self, direction: &Direction) {
         // This function takes a step along a path from the self.cur_loc position to a new
         // position determined by the input from the user. It onle steps across one link and it
         // CHANGES that link acording to the raising and lowing rules given the orientation of the

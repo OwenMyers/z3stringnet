@@ -44,21 +44,21 @@ impl Lattice {
         // Raies a link traveling outward from the specified vertex
         // This function, because of get_link_from_point(), will only will only work
         // on real verticies. Thats the way we want it
-        let mut link: &mut Link = self.get_link_from_point(loc, direction);
-        match &link {
-            &Link::In    => *link = Link::Blank,
-            &Link::Out   => *link = Link::In,
-            &Link::Blank => *link = Link::Out,
+        let link: &mut Link = self.get_link_from_point(loc, direction);
+        match *link {
+            Link::In    => *link = Link::Blank,
+            Link::Out   => *link = Link::In,
+            Link::Blank => *link = Link::Out,
         }
     }
     pub fn out_lower_link(&mut self, loc: &Point, direction: &Direction) {
         // Lower a link traveling outward from the specified vertex. Also see raise 
         // description.
-        let mut link: &mut Link = self.get_link_from_point(loc, direction);
-        match &link {
-            &Link::In    => *link = Link::Out,
-            &Link::Out   => *link = Link::Blank,
-            &Link::Blank => *link = Link::In,
+        let link: &mut Link = self.get_link_from_point(loc, direction);
+        match *link {
+            Link::In    => *link = Link::Out,
+            Link::Out   => *link = Link::Blank,
+            Link::Blank => *link = Link::In,
         }
     }
 }
@@ -97,7 +97,7 @@ pub fn build_blank_lat(size: Point) -> Lattice {
 }
 
 //TODO: check these
-pub fn x_from_vertex_vec_position(position: u64, size: &Point) -> u64 {
+pub fn x_from_vertex_vec_position(position: i64, size: &Point) -> i64 {
     
     let y = y_from_vertex_vec_position(position, &size);
     println!("y is: {}", y);
@@ -111,7 +111,7 @@ pub fn x_from_vertex_vec_position(position: u64, size: &Point) -> u64 {
     }
 }
 
-pub fn y_from_vertex_vec_position(position: u64, size: &Point) -> u64 {
+pub fn y_from_vertex_vec_position(position: i64, size: &Point) -> i64 {
     if position > (size.x*size.y)/2{
         panic!("The position specified is greater
                than the number of unique vetices in the Lattice");
