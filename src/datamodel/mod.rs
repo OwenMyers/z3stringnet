@@ -56,26 +56,43 @@ impl<'a> Add <Point> for &'a BoundPoint{
 
 #[derive(Debug)]
 pub struct Update {
-    pub lat_size: Point,
-    pub working_loc: Point,
+    pub working_loc: BoundPoint,
 }
 impl Update {
     pub fn get_rand_point(&mut self) {
-        self.working_loc = Point {
+        self.working_loc.location = Point {
             x: rand::thread_rng()
-                .gen_range(0, self.lat_size.x),
+                .gen_range(0, self.working_loc.size.x),
             y: rand::thread_rng()
-                .gen_range(0, self.lat_size.y)
+                .gen_range(0, self.working_loc.size.y)
                 
         };
     }
-    pub fn update(&mut self, lat: &mut Lattice) {
+    pub fn update(&self, lat: &mut Lattice) {
         // Get a random point.
         // Lets say the random point is the lower left
         // corner of the plaquette.
         // Clockwise walk.
         self.get_rand_point();
+        let z3string: Z3String = Z3String{
+            start_loc: self.working_loc.location,
+            cur_loc: self.working_loc,
+            lat: lat
+        };
         // TODO
+        let cur_direction = Direction::N;
+        z3string.raise_step(&cur_direction);
+
+        let cur_direction = Direction::E;
+        z3string.raise_step(&cur_direction);
+
+        let cur_direction = Direction::S;
+        z3string.raise_step(&cur_direction);
+
+        let cur_direction = Direction::W;
+        z3string.raise_step(&cur_direction);
+        
+        assert!(z3string.cur_loc == z3string.start_loc);
     }
 }
 
@@ -85,8 +102,8 @@ pub struct Z3String<'a> {
     /// the mutable reference can be avaliabel again.
     pub start_loc: Point,
     pub cur_loc: BoundPoint,
-    pub path: Vec<Point>,
     lat: &'a mut Lattice, 
+    //pub path: Vec<Point>,
 }
 impl<'a> Z3String<'a> {
     fn increment_cur_loc(&mut self, direction: &Direction) {
