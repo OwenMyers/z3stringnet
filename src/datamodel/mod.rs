@@ -52,6 +52,15 @@ impl<'a> Add <Point> for &'a BoundPoint{
         }
     }
 }
+impl PartialEq <Point> for BoundPoint{
+    fn eq(&self, rhs: &Point) -> bool {
+        (self.location.x == rhs.x) && (self.location.y == rhs.y)
+    }
+}
+// Confused: I thought I had to have this so #derive does not have to be used. If #derive is
+// used, all fields must be equal, not just a subset
+//impl Eq <Point> for BoundPoint {}
+// PartialEq seams to compile just fine the way it is.
 
 
 #[derive(Debug)]
@@ -68,13 +77,13 @@ impl Update {
                 
         };
     }
-    pub fn update(&self, lat: &mut Lattice) {
+    pub fn update(&mut self, lat: &mut Lattice) {
         // Get a random point.
         // Lets say the random point is the lower left
         // corner of the plaquette.
         // Clockwise walk.
         self.get_rand_point();
-        let z3string: Z3String = Z3String{
+        let mut z3string: Z3String = Z3String{
             start_loc: self.working_loc.location,
             cur_loc: self.working_loc,
             lat: lat
