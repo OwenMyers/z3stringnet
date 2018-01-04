@@ -14,6 +14,7 @@ impl Lattice {
     // Lets call the ones in our `vertices` vector "real" and the
     // implied ones "fake".
     pub fn point_real(&self, p: &Point) -> bool {
+        assert!((p.x >= 0) && (p.y >= 0), "Function point_real requires positive x and y");
         ((p.x + p.y) % 2) == 0
     }
     pub fn get_link_from_point(&mut self, loc: &Point, direction: &Direction) -> &mut Link{
@@ -24,6 +25,7 @@ impl Lattice {
         let is_real = self.point_real(&loc);
         // The potential location of vertex in the vector
         let vloc = loc.x + loc.y;
+        println!("vector location: {}",vloc);
         if is_real {
             match *direction {
                 Direction::N => return &mut (&mut self.vertices[vloc as usize]).n,
@@ -41,6 +43,8 @@ impl Lattice {
         }
     }
     pub fn out_raise_link(&mut self, loc: &Point, direction: &Direction) {
+        println!("in lat out raise, loc: {:?}",loc);
+        println!("in lat out raise, dir: {:?}",direction);
         // Raies a link traveling outward from the specified vertex
         // This function, because of get_link_from_point(), will only will only work
         // on real verticies. Thats the way we want it

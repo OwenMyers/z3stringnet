@@ -31,31 +31,31 @@ fn main() {
         }
     };
     
-    //updater.update(&mut lat);
+    updater.update(&mut lat);
 
     write_lattice(String::from("lattice.txt"), &lat);
 
     // Need the mutable reference to go out of scope.
-    {
-        let gotten_link: &mut Link = lat.get_link_from_point(&p, &d);
-        println!("gotten_link {:?}", gotten_link);
-        *gotten_link = Link::Out;
-    }
+    //{
+    //    let gotten_link: &mut Link = lat.get_link_from_point(&p, &d);
+    //    println!("gotten_link {:?}", gotten_link);
+    //    *gotten_link = Link::Out;
+    //}
 
     
     //write_lattice(String::from("lattice.txt"), &lat);
 
-    let mut bound_point: BoundPoint = BoundPoint {
-        size: Point{x: 4, y: 4},
-        location: Point{x: 1, y: 1},
-    };
+    //let mut bound_point: BoundPoint = BoundPoint {
+    //    size: Point{x: 4, y: 4},
+    //    location: Point{x: 1, y: 1},
+    //};
 
-    println!("Checking out X");
-    for _i in 0..10 {
-        let update_point: Point = Point{x: -1, y: 0};
-        bound_point = &bound_point + update_point;
-        println!("new bound point {:?}", bound_point);
-    }
+    //println!("Checking out X");
+    //for _i in 0..10 {
+    //    let update_point: Point = Point{x: -1, y: 0};
+    //    bound_point = &bound_point + update_point;
+    //    println!("new bound point {:?}", bound_point);
+    //}
 
     //let mut bound_point: BoundPoint = BoundPoint {
     //    size: Point{x: 4, y: 4},
