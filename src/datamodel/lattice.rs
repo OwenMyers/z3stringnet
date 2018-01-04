@@ -79,7 +79,6 @@ pub fn build_blank_lat(size: Point) -> Lattice {
     // lattice to compleatly define all links.
     println!("Filling vertex array:");
     for i in 0..half_n {
-        println!("i {}", i);
         let cur_vertex: Vertex = Vertex{
             n: Link::Blank,
             e: Link::Blank,
@@ -98,10 +97,11 @@ pub fn build_blank_lat(size: Point) -> Lattice {
 
 //TODO: check these
 pub fn x_from_vertex_vec_position(position: i64, size: &Point) -> i64 {
+    assert!(position >= 0, "No negative numbers may be passed into x_from_vertex_vec_position");
     
     let y = y_from_vertex_vec_position(position, &size);
-    println!("y is: {}", y);
-    println!("size.x is: {}", size.x);
+    //println!("y is: {}", y);
+    //println!("size.x is: {}", size.x);
 
     if y % 2 == 0 {
         return (position * 2) % size.x;
@@ -112,6 +112,8 @@ pub fn x_from_vertex_vec_position(position: i64, size: &Point) -> i64 {
 }
 
 pub fn y_from_vertex_vec_position(position: i64, size: &Point) -> i64 {
+    assert!(position >= 0, "No negative numbers may be passed into x_from_vertex_vec_position");
+
     if position > (size.x*size.y)/2{
         panic!("The position specified is greater
                than the number of unique vetices in the Lattice");
