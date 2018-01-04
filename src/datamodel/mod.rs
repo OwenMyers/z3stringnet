@@ -25,13 +25,13 @@ pub struct Vertex {
     pub xy: Point,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Point {
     pub x: i64,
     pub y: i64,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct BoundPoint {
     pub size: Point, 
     pub location: Point,
@@ -40,14 +40,19 @@ impl<'a> Add <Point> for &'a BoundPoint{
     // overload + here to make it modulus `size`
     type Output = BoundPoint;
     fn add(self, input: Point) -> BoundPoint {
+        let new_x = self.location.x + input.x;
+        let new_y = self.location.y + input.y;
         BoundPoint {
             size: Point {
                 x: self.size.x,
                 y: self.size.y,
             },
+            // Be carful here: % is nod modulus but the remainder -> can be negative.
+            // This looks strange becase the extra stuff will insure that we get 
+            // the modulus.
             location: Point {
-                x: (self.location.x + input.x) % self.size.x,
-                y: (self.location.y + input.y) % self.size.y,
+                x: ((new_x % self.size.x) + self.size.x) % self.size.x,
+                y: ((new_y % self.size.y) + self.size.y) % self.size.y,
             }
         }
     }
@@ -88,6 +93,9 @@ impl Update {
             cur_loc: self.working_loc,
             lat: lat
         };
+        println!("z3string.cur_loc: {:?}",z3string.cur_loc);
+        println!("z3string.start_loc: {:?}",z3string.start_loc);
+
         // TODO
         let cur_direction = Direction::N;
         z3string.raise_step(&cur_direction);
@@ -101,6 +109,9 @@ impl Update {
         let cur_direction = Direction::W;
         z3string.raise_step(&cur_direction);
         
+        println!("z3string.cur_loc: {:?}",z3string.cur_loc);
+        println!("z3string.start_loc: {:?}",z3string.start_loc);
+
         assert!(z3string.cur_loc == z3string.start_loc);
     }
 }
