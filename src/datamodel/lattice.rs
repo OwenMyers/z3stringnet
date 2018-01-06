@@ -1,5 +1,13 @@
 use super::*;
 
+//     |   |   |   |
+//     +---6---+---7---
+//     |   |   |   |
+//     4---+---5---+---
+//     |   |   |   |
+//     +---2---+---3---
+//     |   |   |   |
+//     0---+---1---+---
 pub struct Lattice {
     // All links can be defined by the vertices of one sublattice.
     // This means the len of vertices will always be N/2, where N is the
@@ -23,8 +31,8 @@ impl Lattice {
         // Lets call the ones in our `vertices` vector "real" and the
         // implied ones "fake".
         let is_real = self.point_real(&loc);
-        // The potential location of vertex in the vector
-        let vloc = loc.x + loc.y;
+        // The location of vertex in the vector. This works becuase integers division rounds down.
+        let vloc = loc.y * (self.size.x/2) + loc.x/2;
         println!("vector location: {}",vloc);
         if is_real {
             match *direction {
@@ -88,6 +96,46 @@ pub fn build_blank_lat(size: Point) -> Lattice {
             e: Link::Blank,
             s: Link::Blank,
             w: Link::Blank,
+            xy: Point{
+                x: x_from_vertex_vec_position(i, &lat.size),
+                y: y_from_vertex_vec_position(i, &lat.size),
+            }
+        };
+        lat.vertices.push(cur_vertex);
+    }
+
+    lat
+}
+
+
+//     |   |   |   |
+//     +->-6->-+->-7->-
+//     |   |   |   |
+//     4->-+->-5->-+->-
+//     |   |   |   |
+//     +->-2->-+->-3->-
+//     |   |   |   |
+//     0->-+->-1->-+->-
+pub fn build_z3_striped_lat(size: Point) -> Lattice {
+    println!("Building stagard lattice of size x {}, y {}",
+             size.x, size.y);
+
+    let mut lat: Lattice = Lattice {
+        vertices: Vec::new(),
+        size,
+    };
+
+    let half_n = (lat.size.x * lat.size.y)/2;
+
+    // Only need half of N because we only need vertices from one sub
+    // lattice to compleatly define all links.
+    println!("Filling vertex array:");
+    for i in 0..half_n {
+        let cur_vertex: Vertex = Vertex{
+            n: Link::Blank,
+            e: Link::Out,
+            s: Link::Blank,
+            w: Link::In,
             xy: Point{
                 x: x_from_vertex_vec_position(i, &lat.size),
                 y: y_from_vertex_vec_position(i, &lat.size),

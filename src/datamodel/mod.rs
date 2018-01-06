@@ -99,17 +99,16 @@ impl Update {
         let cur_direction = Direction::N;
         z3string.raise_step(&cur_direction);
 
-        //HERE
-        //let cur_direction = Direction::E;
-        //z3string.raise_step(&cur_direction);
+        let cur_direction = Direction::E;
+        z3string.raise_step(&cur_direction);
 
-        //let cur_direction = Direction::S;
-        //z3string.raise_step(&cur_direction);
+        let cur_direction = Direction::S;
+        z3string.raise_step(&cur_direction);
 
-        //let cur_direction = Direction::W;
-        //z3string.raise_step(&cur_direction);
+        let cur_direction = Direction::W;
+        z3string.raise_step(&cur_direction);
         
-        //assert!(z3string.cur_loc == z3string.start_loc);
+        assert!(z3string.cur_loc == z3string.start_loc);
     }
 }
 
