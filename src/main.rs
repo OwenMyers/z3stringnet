@@ -24,10 +24,10 @@ fn main() {
         }
     };
     
-    write_lattice(String::from("lattice_before.txt"), &lat);
+    write_lattice(String::from("lattice_before.csv"), &lat);
 
     updater.update(&mut lat);
 
-    write_lattice(String::from("lattice_after.txt"), &lat);
+    write_lattice(String::from("lattice_after.csv"), &lat);
 
 } 
