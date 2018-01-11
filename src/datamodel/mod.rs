@@ -18,6 +18,16 @@ pub enum Direction {
     S,
     W,
 }
+impl Direction {
+    pub fn flip(&self) -> Direction {
+        match *self{
+            Direction::N => { Direction::S }
+            Direction::E => { Direction::W }
+            Direction::S => { Direction::N }
+            Direction::W => { Direction::E }
+        }
+    }
+}
 
 pub struct Vertex {
     pub n: Link,
@@ -76,6 +86,7 @@ pub struct Update {
 }
 impl Update {
     pub fn get_rand_point(&mut self) {
+
         self.working_loc.location = Point {
             x: rand::thread_rng()
                 .gen_range(0, self.working_loc.size.x),
@@ -83,6 +94,8 @@ impl Update {
                 .gen_range(0, self.working_loc.size.y)
                 
         };
+        // for testing
+        //self.working_loc.location = Point { x: 0, y: 0 }
     }
     pub fn update(&mut self, lat: &mut Lattice) {
         // Get a random point.
@@ -166,8 +179,11 @@ impl<'a> Z3String<'a> {
         // shifted position without changing anything.
         else {
             println!("not real point");
+            println!("orig dir {:?}", direction);
             self.increment_cur_loc(&direction);
-            self.lat.out_lower_link(&self.cur_loc.location, &direction);
+            let fliped_dir = direction.flip();
+            println!("new dir {:?}", fliped_dir);
+            self.lat.out_lower_link(&self.cur_loc.location, &fliped_dir);
         }
         println!("cur location after {:?}",self.cur_loc.location);
     }

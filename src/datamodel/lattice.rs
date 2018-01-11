@@ -66,6 +66,8 @@ impl Lattice {
     pub fn out_lower_link(&mut self, loc: &Point, direction: &Direction) {
         // Lower a link traveling outward from the specified vertex. Also see raise 
         // description.
+        println!("in out_lower_link. ---> location is: {:?}", loc);
+        println!("in out_lower_link. ---> directio is: {:?}", direction);
         let link: &mut Link = self.get_link_from_point(loc, direction);
         match *link {
             Link::In    => *link = Link::Out,

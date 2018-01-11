@@ -23,11 +23,10 @@ fn main() {
             location: Point{x: 0, y: 0},
         }
     };
-    
-    write_lattice(String::from("lattice_before.csv"), &lat);
 
-    updater.update(&mut lat);
-
-    write_lattice(String::from("lattice_after.csv"), &lat);
+    for i in 0..10 {
+        write_lattice(String::from(format!("lattice_{}.csv", i)), &lat);
+        updater.update(&mut lat);
+    }   
 
 } 
