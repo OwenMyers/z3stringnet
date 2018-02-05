@@ -27,6 +27,16 @@ impl Direction {
             Direction::W => { Direction::E }
         }
     }
+    pub fn get_random_direction() -> Direction {
+        let direction_int = rand::thread_rng().gen_range(0, 4);
+        assert!((direction_int < 4) && (direction_int >= 0));
+        match direction_int {
+            0 => { Direction::N }
+            1 => { Direction::E }
+            2 => { Direction::S }
+            3 => { Direction::W }
+        }
+    }
 }
 
 pub struct Vertex {
@@ -103,7 +113,7 @@ impl Update {
         // corner of the plaquette.
         // Clockwise walk.
         self.get_rand_point();
-        let mut z3string: Z3String = Z3String{
+        let mut z3string = Z3String{
             start_loc: self.working_loc.location,
             cur_loc: self.working_loc,
             lat: lat
@@ -122,6 +132,25 @@ impl Update {
         z3string.raise_step(&cur_direction);
         
         assert!(z3string.cur_loc == z3string.start_loc);
+    }
+    pub fn random_walk_update(&mut self, lat: &mut Lattice) {
+        self.get_rand_point();
+        let mut z3string = Z3String{
+            start_loc: self.working_loc.location,
+            cur_loc: self.working_loc,
+            lat: lat
+        };
+        
+        // Take first step before loop so cur_loc and start_loc
+        // are different.  
+        let cur_direction = Direction::get_random_direction();
+        z3string.rais_step(&cur_direction);
+
+        while () {
+        TODO HERE
+        }
+        
+        
     }
 }
 
