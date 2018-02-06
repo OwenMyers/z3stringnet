@@ -35,6 +35,7 @@ impl Direction {
             1 => { Direction::E }
             2 => { Direction::S }
             3 => { Direction::W }
+            _ => panic!("Not a valid random integer for random direction.")
         }
     }
 }
@@ -144,13 +145,13 @@ impl Update {
         // Take first step before loop so cur_loc and start_loc
         // are different.  
         let cur_direction = Direction::get_random_direction();
-        z3string.rais_step(&cur_direction);
+        z3string.raise_step(&cur_direction);
 
-        while () {
-        TODO HERE
+        while (z3string.cur_loc != z3string.start_loc) {
+            let cur_direction = Direction::get_random_direction();
+            z3string.raise_step(&cur_direction);
         }
-        
-        
+        assert!(z3string.cur_loc == z3string.start_loc);
     }
 }
 

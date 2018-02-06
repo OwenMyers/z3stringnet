@@ -24,9 +24,8 @@ fn main() {
         }
     };
 
-    for i in 0..10 {
+    for i in 0..2 {
         write_lattice(String::from(format!("lattice_{}.csv", i)), &lat);
-        updater.update(&mut lat);
+        updater.random_walk_update(&mut lat);
     }   
-
 } 
