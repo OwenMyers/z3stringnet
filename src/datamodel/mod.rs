@@ -40,6 +40,92 @@ impl Direction {
     }
 }
 
+pub stuct VertexLinkCount {
+    pub n: u64,
+    pub e: u64,
+    pub s: u64,
+    pub w: u64,
+    pub xy: Point,
+}
+
+pub struct DensityEstimator{
+    cur_link_in_count: Vec<VertexLinkCount>,
+    cur_link_out_count: Vec<VertexLinkCount>,
+}
+impl DensityEstimator{
+    // We are just going to count "in" and "out" for each link of
+    // the real vertices.
+
+    pub fn count_in_out(&mut self, lat: &Lattice){
+        // for each direction add to the cur_in_count, cur_out_count
+        // vectors if you find those directions.
+        // loop over real vertices
+        for (i, cur_vertex) in lat.vertices.enumerate(){
+            match cur_vertex.n {
+                In  => cur_link_in_count[i].n += 1,
+                Out => cur_link_out_count[i].n += 1,
+                Blank => _,
+            }
+            match cur_vertex.e {
+                In  => cur_link_in_count[i].e += 1,
+                Out => cur_link_out_count[i].e += 1,
+                Blank => _,
+            }
+            match cur_vertex.s {
+                In  => cur_link_in_count[i].s += 1,
+                Out => cur_link_out_count[i].s += 1,
+                Blank => _,
+            }
+            match cur_vertex.w {
+                In  => cur_link_in_count[i].w += 1,
+                Out => cur_link_out_count[i].w += 1,
+                Blank => _,
+            }
+        }
+    }
+TODO HERE want new function as constructor
+}
+
+pub struct Vertex {
+    pub n: Link,
+    pub e: Link,
+    pub s: Link,
+    pub w: Link,
+    pub xy: Point,
+}
+
+#[derive(Debug, Copy, Clone)]
+pub struct Point {
+    pub x: i64,
+    pub y: i64,
+}
+
+#[derive(Debug, Copy, Clone)]
+pub struct BoundPoint {
+    pub size: Point, 
+    pub location: Point,
+}
+impl<'a> Add <Point> for &'a BoundPoint{
+    // overload + here to make it modulus `size`
+    type Output = BoundPoint;
+    fn add(self, input: Point) -> BoundPoint {
+        let new_x = self.location.x + input.x;
+        let new_y = self.location.y + input.y;
+        BoundPoint {
+            size: Point {
+                x: self.size.x,
+                y: self.size.y,
+            },
+            // Be carful here: % is nod modulus but the remainder -> can be negative.
+            // This looks strange becase the extra stuff will insure that we get 
+        }
+         
+        // for each direction add to the cur_in_count, cur_out_count
+        // vectors if you find those directions.
+        
+    }
+}
+
 pub struct Vertex {
     pub n: Link,
     pub e: Link,
