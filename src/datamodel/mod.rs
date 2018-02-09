@@ -83,6 +83,24 @@ impl DensityEstimator{
             }
         }
     }
+    // static "constructor" method.
+    pub fn new(size: Point) -> DensityEstimator{
+        println!("Initilizing DensityEstimator"); 
+        
+        let mut density_estimator = DensityEstimator{
+            cur_link_in_count: Vec::new(),
+            cur_link_out_count: Vec::new(),
+        }
+        let half_n = (size.x * size.y)/2; 
+        for i in 0..half_n {
+            let cur_vertex_link_count = VertexLinkCount{
+                n: 0,
+                e: 0,
+                s: 0,
+                w: 0,  
+            }
+        }
+    }
 TODO HERE want new function as constructor
 }
 
