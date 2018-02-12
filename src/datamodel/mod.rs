@@ -2,6 +2,8 @@ use rand;
 use rand::Rng;
 pub mod lattice;
 use self::lattice::Lattice;
+use self::lattice::x_from_vertex_vec_position;
+use self::lattice::y_from_vertex_vec_position;
 use std::ops::Add;
 
 #[derive(Debug)]
@@ -40,15 +42,31 @@ impl Direction {
     }
 }
 
-pub stuct VertexLinkCount {
+#[derive(Debug)]
+pub struct VertexLinkCount {
     pub n: u64,
     pub e: u64,
     pub s: u64,
     pub w: u64,
     pub xy: Point,
 }
+impl VertexLinkCount {
+    // pass in the "vec_position" which is the position of the "real"
+    // vertex in the 1D vector storing all of the real vertices.
+    pub fn new(vec_position: i64, size: &Point) -> VertexLinkCount {
+        VertexLinkCount {
+            n: 0, e: 0, s: 0, w: 0,
+            xy: Point{
+                        x: x_from_vertex_vec_position(vec_position, size),
+                        y: y_from_vertex_vec_position(vec_position, size)
+                     }
+ 
+        }
+    }
+}
 
-pub struct DensityEstimator{
+#[derive(Debug)]
+pub struct DensityEstimator {
     cur_link_in_count: Vec<VertexLinkCount>,
     cur_link_out_count: Vec<VertexLinkCount>,
 }
@@ -60,87 +78,48 @@ impl DensityEstimator{
         // for each direction add to the cur_in_count, cur_out_count
         // vectors if you find those directions.
         // loop over real vertices
-        for (i, cur_vertex) in lat.vertices.enumerate(){
+        for (i, cur_vertex) in lat.vertices.iter().enumerate(){
             match cur_vertex.n {
-                In  => cur_link_in_count[i].n += 1,
-                Out => cur_link_out_count[i].n += 1,
-                Blank => _,
+                Link::In  => self.cur_link_in_count[i].n += 1,
+                Link::Out => self.cur_link_out_count[i].n += 1,
+                Link::Blank => (),
             }
             match cur_vertex.e {
-                In  => cur_link_in_count[i].e += 1,
-                Out => cur_link_out_count[i].e += 1,
-                Blank => _,
+                Link::In  => self.cur_link_in_count[i].e += 1,
+                Link::Out => self.cur_link_out_count[i].e += 1,
+                Link::Blank => (),
             }
             match cur_vertex.s {
-                In  => cur_link_in_count[i].s += 1,
-                Out => cur_link_out_count[i].s += 1,
-                Blank => _,
+                Link::In  => self.cur_link_in_count[i].s += 1,
+                Link::Out => self.cur_link_out_count[i].s += 1,
+                Link::Blank => (),
             }
             match cur_vertex.w {
-                In  => cur_link_in_count[i].w += 1,
-                Out => cur_link_out_count[i].w += 1,
-                Blank => _,
+                Link::In  => self.cur_link_in_count[i].w += 1,
+                Link::Out => self.cur_link_out_count[i].w += 1,
+                Link::Blank => (),
             }
         }
     }
     // static "constructor" method.
-    pub fn new(size: Point) -> DensityEstimator{
+    pub fn new(size: &Point) -> DensityEstimator{
         println!("Initilizing DensityEstimator"); 
         
         let mut density_estimator = DensityEstimator{
             cur_link_in_count: Vec::new(),
             cur_link_out_count: Vec::new(),
-        }
+        };
+
         let half_n = (size.x * size.y)/2; 
         for i in 0..half_n {
-            let cur_vertex_link_count = VertexLinkCount{
-                n: 0,
-                e: 0,
-                s: 0,
-                w: 0,  
-            }
+            let cur_vertex_link_count = VertexLinkCount::new(i, size);
+            density_estimator.cur_link_in_count.push(cur_vertex_link_count);
+            // cur_vertex_link_count was consumed so make another for out count
+            let cur_vertex_link_count = VertexLinkCount::new(i, size);
+            density_estimator.cur_link_out_count.push(cur_vertex_link_count);
         }
-    }
-TODO HERE want new function as constructor
-}
 
-pub struct Vertex {
-    pub n: Link,
-    pub e: Link,
-    pub s: Link,
-    pub w: Link,
-    pub xy: Point,
-}
-
-#[derive(Debug, Copy, Clone)]
-pub struct Point {
-    pub x: i64,
-    pub y: i64,
-}
-
-#[derive(Debug, Copy, Clone)]
-pub struct BoundPoint {
-    pub size: Point, 
-    pub location: Point,
-}
-impl<'a> Add <Point> for &'a BoundPoint{
-    // overload + here to make it modulus `size`
-    type Output = BoundPoint;
-    fn add(self, input: Point) -> BoundPoint {
-        let new_x = self.location.x + input.x;
-        let new_y = self.location.y + input.y;
-        BoundPoint {
-            size: Point {
-                x: self.size.x,
-                y: self.size.y,
-            },
-            // Be carful here: % is nod modulus but the remainder -> can be negative.
-            // This looks strange becase the extra stuff will insure that we get 
-        }
-         
-        // for each direction add to the cur_in_count, cur_out_count
-        // vectors if you find those directions.
-        
+        return density_estimator
     }
 }
 
@@ -251,7 +230,7 @@ impl Update {
         let cur_direction = Direction::get_random_direction();
         z3string.raise_step(&cur_direction);
 
-        while (z3string.cur_loc != z3string.start_loc) {
+        while z3string.cur_loc != z3string.start_loc {
             let cur_direction = Direction::get_random_direction();
             z3string.raise_step(&cur_direction);
         }

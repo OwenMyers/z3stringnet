@@ -17,15 +17,21 @@ fn main() {
     //lat = build_blank_lat(size);
     lat = build_z3_striped_lat(size);
 
-    let mut updater: Update = Update{
+    // Initilize the object to update the lattice
+    let mut updater = Update{
         working_loc: BoundPoint{
             size: lat.size,
             location: Point{x: 0, y: 0},
         }
     };
 
-    for i in 0..2 {
-        write_lattice(String::from(format!("lattice_{}.csv", i)), &lat);
-        updater.random_walk_update(&mut lat);
-    }   
+    // Initilize the object to measure the string density,
+    let density_estimator: DensityEstimator = DensityEstimator::new(&lat.size);
+    println!("Density estimator {:?}", density_estimator)
+
+    // Make some updates and print the results.
+    //for i in 0..2 {
+    //    write_lattice(String::from(format!("lattice_{}.csv", i)), &lat);
+    //    updater.random_walk_update(&mut lat);
+    //}   
 } 
