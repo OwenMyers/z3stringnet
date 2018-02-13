@@ -26,8 +26,9 @@ fn main() {
     };
 
     // Initilize the object to measure the string density,
-    let density_estimator: DensityEstimator = DensityEstimator::new(&lat.size);
-    println!("Density estimator {:?}", density_estimator)
+    let mut density_estimator: DensityEstimator = DensityEstimator::new(&lat.size);
+    density_estimator.count_in_out(&lat);
+    density_estimator.write_total_count(String::from(format!("density_estimator.csv")))
 
     // Make some updates and print the results.
     //for i in 0..2 {
