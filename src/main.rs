@@ -7,6 +7,9 @@ use z3stringnet::oio::*;
 
 fn main() {
 
+    let equilibrate = true;
+    let write_configurations = false;
+
     let size: Point = Point {
         x: 4,
         y: 4,
@@ -30,9 +33,21 @@ fn main() {
     density_estimator.count_in_out(&lat);
     density_estimator.write_total_count(String::from(format!("density_estimator_{}.csv", 0)))
 
-    // Make some updates and print the results.
-    //for i in 0..2 {
-    //    write_lattice(String::from(format!("lattice_{}.csv", i)), &lat);
-    //    updater.random_walk_update(&mut lat);
-    //}   
+    // Equilibrate
+    if equilibrate {
+        equilibration_time = lat.size.x * lat.size.y;
+        for i in equilibration_time {
+            updater.random_walk_update(&mut lat);
+        }
+    }
+
+    // Actual run
+    for i in 0..2 {
+        density_estimator.count_in_out(&lat);
+        density_estimator.write_total_count(String::from(format!("density_estimator_{}.csv", 0)))
+        if write_configurations {
+            write_lattice(String::from(format!("lattice_{}.csv", i)), &lat);
+        }
+        updater.random_walk_update(&mut lat);
+    }   
 } 
