@@ -40,15 +40,18 @@ fn main() {
 
     // Initilize the object to measure the string density,
     let mut density_estimator: DensityEstimator = DensityEstimator::new(&lat.size);
-    density_estimator.count_in_out(&lat);
+    density_estimator.measure(&lat);
     density_estimator.write_total_count(String::from(format!("density_estimator_{}.csv", 0)))
 
     // Equilibrate
     if equilibrate {
-        equilibration_time = lat.size.x * lat.size.y;
+        println!("Equilibrating");
+        let equilibration_time = lat.size.x * lat.size.y;
+        println!("Number of updates in equilibration: {}", equilibration_time);
         for i in equilibration_time {
             updater.random_walk_update(&mut lat);
         }
+        println!("Done equilibrating");
     }
 
     // Actual run
@@ -60,8 +63,9 @@ fn main() {
                 }
                 updater.random_walk_update(&mut lat);
             }
-            density_estimator.count_in_out(&lat);
+            density_estimator.measure(&lat);
             density_estimator.write_total_count(String::from(format!("density_estimator_{}.csv", 0)))
         }
+        // devide counts by number_measure here to make a bin.
     }   
 } 

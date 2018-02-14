@@ -69,6 +69,10 @@ impl VertexLinkCount {
     }
 }
 
+/// Measures the string density
+/// 
+/// By counting the number of non blank links we can measure the string density.
+/// For prosterity we also count the number of `In` and `Out` links seperatly.
 #[derive(Debug)]
 pub struct DensityEstimator {
     cur_link_in_count: Vec<VertexLinkCount>,
@@ -79,7 +83,7 @@ impl DensityEstimator{
     // We are just going to count "in" and "out" for each link of
     // the real vertices.
 
-    pub fn count_in_out(&mut self, lat: &Lattice){
+    pub fn measure(&mut self, lat: &Lattice){
         // for each direction add to the cur_in_count, cur_out_count
         // vectors if you find those directions.
         // loop over real vertices
