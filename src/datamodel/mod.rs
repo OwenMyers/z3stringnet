@@ -98,39 +98,39 @@ impl DensityEstimator{
             match cur_vertex.e {
                 Link::In  => {
                     self.cur_link_in_count[i].e += 1;
-                    self.cur_total_count[i].n += 1;
+                    self.cur_total_count[i].e += 1;
                 },
                 Link::Out => {
                     self.cur_link_out_count[i].e += 1;
-                    self.cur_total_count[i].n += 1;
+                    self.cur_total_count[i].e += 1;
                 },
                 Link::Blank => (),
             }
             match cur_vertex.s {
                 Link::In  => {
                     self.cur_link_in_count[i].s += 1;
-                    self.cur_total_count[i].n += 1;
+                    self.cur_total_count[i].s += 1;
                 },
                 Link::Out => {
                     self.cur_link_out_count[i].s += 1;
-                    self.cur_total_count[i].n += 1;
+                    self.cur_total_count[i].s += 1;
                 },
                 Link::Blank => (),
             }
             match cur_vertex.w {
                 Link::In  => {
                     self.cur_link_in_count[i].w += 1;
-                    self.cur_total_count[i].n += 1;
+                    self.cur_total_count[i].w += 1;
                 },
                 Link::Out => {
                     self.cur_link_out_count[i].w += 1;
-                    self.cur_total_count[i].n += 1;
+                    self.cur_total_count[i].w += 1;
                 },
                 Link::Blank => (),
             }
         }
     }
-    // static "constructor" method.
+    /// static "constructor" method.
     pub fn new(size: &Point) -> DensityEstimator{
         println!("Initilizing DensityEstimator"); 
         
@@ -147,6 +147,8 @@ impl DensityEstimator{
             // cur_vertex_link_count was consumed so make another for out count
             let cur_vertex_link_count = VertexLinkCount::new(i, size);
             density_estimator.cur_link_out_count.push(cur_vertex_link_count);
+            let cur_vertex_link_count = VertexLinkCount::new(i, size);
+            density_estimator.cur_total_count.push(cur_vertex_link_count);
         }
 
         println!("Done initilizing density estimator.");
@@ -191,6 +193,17 @@ impl DensityEstimator{
     }
 }
 
+/// A `Lattice` is built exclusivly with these objects each containing `Links` that
+/// touch the vertex.
+/// 
+/// ```
+///   |
+/// --+--
+///   |
+/// ```
+/// `|` and `--` denote the horizontal and vertical links respectivly.
+/// 
+/// `Vertex.xy` is a `Point` specifying the position of the vertex.
 pub struct Vertex {
     pub n: Link,
     pub e: Link,
