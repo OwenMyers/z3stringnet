@@ -1,7 +1,8 @@
 //use std::error::Error;
 extern crate z3stringnet;
-use z3stringnet::datamodel::*;
-use z3stringnet::datamodel::lattice::*;
+use z3stringnet::datamodel::Point;
+use z3stringnet::datamodel::lattice::Lattice;
+use z3stringnet::lattice_updates::Update;
 use z3stringnet::oio::*;
     
 
@@ -41,14 +42,18 @@ fn main() {
     // Initilize the object to measure the string density,
     let mut density_estimator: DensityEstimator = DensityEstimator::new(&lat.size);
     density_estimator.measure(&lat);
-    density_estimator.write_total_count(String::from(format!("density_estimator_{}.csv", 0)))
+    density_estimator.write_total_count(
+        String::from(format!("density_estimator_{}.csv", 0))
+    );
 
     // Equilibrate
     if equilibrate {
         println!("Equilibrating");
-        let equilibration_time = lat.size.x * lat.size.y;
+        //let equilibration_time = lat.size.x * lat.size.y;
+        let equilibration_time = 1;
+
         println!("Number of updates in equilibration: {}", equilibration_time);
-        for i in equilibration_time {
+        for i in 0..equilibration_time {
             updater.random_walk_update(&mut lat);
         }
         println!("Done equilibrating");
@@ -64,7 +69,9 @@ fn main() {
                 updater.random_walk_update(&mut lat);
             }
             density_estimator.measure(&lat);
-            density_estimator.write_total_count(String::from(format!("density_estimator_{}.csv", 0)))
+            density_estimator.write_total_count(
+                String::from(format!("density_estimator_{}.csv", 0))
+            );
         }
         // devide counts by number_measure here to make a bin.
     }   

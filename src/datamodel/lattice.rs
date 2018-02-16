@@ -1,19 +1,28 @@
-use super::*;
+use super::Direction;
+use super::Link;
+use super::Point;
+use super::Vertex;
 
-//     |   |   |   |
-//     +---6---+---7---
-//     |   |   |   |
-//     4---+---5---+---
-//     |   |   |   |
-//     +---2---+---3---
-//     |   |   |   |
-//     0---+---1---+---
+/// Stores the representation of the sytem
+/// 
+/// 
+/// All links can be defined by the vertices of one sublattice.
+/// This means the len of vertices will always be N/2, where N is the
+/// total number of vertices.
+/// TODO: Do a check or asertation to ensure the length of vertices
+/// is correct given Point. 
+/// 
+/// ```
+///     |   |   |   |
+///     +---6---+---7---
+///     |   |   |   |
+///     4---+---5---+---
+///     |   |   |   |
+///     +---2---+---3---
+///     |   |   |   |
+///     0---+---1---+---
+/// ```
 pub struct Lattice {
-    // All links can be defined by the vertices of one sublattice.
-    // This means the len of vertices will always be N/2, where N is the
-    // total number of vertices.
-    // TODO: Do a check or asertation to ensure the length of vertices
-    // is correct given Point. 
     pub vertices: Vec<Vertex>,
     pub size: Point,
 }
@@ -33,7 +42,7 @@ impl Lattice {
         let is_real = self.point_real(&loc);
         // The location of vertex in the vector. This works becuase integers division rounds down.
         let vloc = loc.y * (self.size.x/2) + loc.x/2;
-        println!("vector location: {}",vloc);
+        //println!("vector location: {}",vloc);
         if is_real {
             match *direction {
                 Direction::N => return &mut (&mut self.vertices[vloc as usize]).n,
@@ -51,8 +60,8 @@ impl Lattice {
         }
     }
     pub fn out_raise_link(&mut self, loc: &Point, direction: &Direction) {
-        println!("in lat out raise, loc: {:?}",loc);
-        println!("in lat out raise, dir: {:?}",direction);
+        //println!("in lat out raise, loc: {:?}",loc);
+        //println!("in lat out raise, dir: {:?}",direction);
         // Raies a link traveling outward from the specified vertex
         // This function, because of get_link_from_point(), will only will only work
         // on real verticies. Thats the way we want it
@@ -66,8 +75,8 @@ impl Lattice {
     pub fn out_lower_link(&mut self, loc: &Point, direction: &Direction) {
         // Lower a link traveling outward from the specified vertex. Also see raise 
         // description.
-        println!("in out_lower_link. ---> location is: {:?}", loc);
-        println!("in out_lower_link. ---> directio is: {:?}", direction);
+        //println!("in out_lower_link. ---> location is: {:?}", loc);
+        //println!("in out_lower_link. ---> directio is: {:?}", direction);
         let link: &mut Link = self.get_link_from_point(loc, direction);
         match *link {
             Link::In    => *link = Link::Out,
