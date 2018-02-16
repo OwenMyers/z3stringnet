@@ -1,3 +1,13 @@
+use super::Measureable;
+use super::super::datamodel::VertexLinkCount;
+use super::super::datamodel::Link;
+use super::super::datamodel::Point;
+use super::super::datamodel::lattice::Lattice;
+use std::io::prelude::*;
+use std::fs::File;
+use std::path::Path;
+use std::error::Error;
+
 /// Measures the string density
 /// 
 /// By counting the number of non blank links we can measure the string density.
@@ -9,60 +19,7 @@ pub struct DensityEstimator {
     cur_total_count: Vec<VertexLinkCount>,
 }
 impl DensityEstimator{
-    // We are just going to count "in" and "out" for each link of
-    // the real vertices.
 
-    pub fn measure(&mut self, lat: &Lattice){
-        // for each direction add to the cur_in_count, cur_out_count
-        // vectors if you find those directions.
-        // loop over real vertices
-        for (i, cur_vertex) in lat.vertices.iter().enumerate(){
-            match cur_vertex.n {
-                Link::In  => {
-                    self.cur_link_in_count[i].n += 1;
-                    self.cur_total_count[i].n += 1;
-                },
-                Link::Out => {
-                    self.cur_link_out_count[i].n += 1;
-                    self.cur_total_count[i].n += 1;
-                },
-                Link::Blank => (),
-            }
-            match cur_vertex.e {
-                Link::In  => {
-                    self.cur_link_in_count[i].e += 1;
-                    self.cur_total_count[i].e += 1;
-                },
-                Link::Out => {
-                    self.cur_link_out_count[i].e += 1;
-                    self.cur_total_count[i].e += 1;
-                },
-                Link::Blank => (),
-            }
-            match cur_vertex.s {
-                Link::In  => {
-                    self.cur_link_in_count[i].s += 1;
-                    self.cur_total_count[i].s += 1;
-                },
-                Link::Out => {
-                    self.cur_link_out_count[i].s += 1;
-                    self.cur_total_count[i].s += 1;
-                },
-                Link::Blank => (),
-            }
-            match cur_vertex.w {
-                Link::In  => {
-                    self.cur_link_in_count[i].w += 1;
-                    self.cur_total_count[i].w += 1;
-                },
-                Link::Out => {
-                    self.cur_link_out_count[i].w += 1;
-                    self.cur_total_count[i].w += 1;
-                },
-                Link::Blank => (),
-            }
-        }
-    }
     /// static "constructor" method.
     pub fn new(size: &Point) -> DensityEstimator{
         println!("Initilizing DensityEstimator"); 
@@ -122,6 +79,62 @@ impl DensityEstimator{
                             display,
                             err.description()),
             Ok(_) => println!("file out worked"),
+        }
+    }
+}
+
+impl Measureable for DensityEstimator {
+    // We are just going to count "in" and "out" for each link of
+    // the real vertices.
+    fn measure(&mut self, lat: &Lattice){
+        // for each direction add to the cur_in_count, cur_out_count
+        // vectors if you find those directions.
+        // loop over real vertices
+        for (i, cur_vertex) in lat.vertices.iter().enumerate(){
+            match cur_vertex.n {
+                Link::In  => {
+                    self.cur_link_in_count[i].n += 1;
+                    self.cur_total_count[i].n += 1;
+                },
+                Link::Out => {
+                    self.cur_link_out_count[i].n += 1;
+                    self.cur_total_count[i].n += 1;
+                },
+                Link::Blank => (),
+            }
+            match cur_vertex.e {
+                Link::In  => {
+                    self.cur_link_in_count[i].e += 1;
+                    self.cur_total_count[i].e += 1;
+                },
+                Link::Out => {
+                    self.cur_link_out_count[i].e += 1;
+                    self.cur_total_count[i].e += 1;
+                },
+                Link::Blank => (),
+            }
+            match cur_vertex.s {
+                Link::In  => {
+                    self.cur_link_in_count[i].s += 1;
+                    self.cur_total_count[i].s += 1;
+                },
+                Link::Out => {
+                    self.cur_link_out_count[i].s += 1;
+                    self.cur_total_count[i].s += 1;
+                },
+                Link::Blank => (),
+            }
+            match cur_vertex.w {
+                Link::In  => {
+                    self.cur_link_in_count[i].w += 1;
+                    self.cur_total_count[i].w += 1;
+                },
+                Link::Out => {
+                    self.cur_link_out_count[i].w += 1;
+                    self.cur_total_count[i].w += 1;
+                },
+                Link::Blank => (),
+            }
         }
     }
 }

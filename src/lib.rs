@@ -1,6 +1,7 @@
 extern crate rand;
 pub mod datamodel;
 pub mod lattice_updates;
+pub mod estimators;
 pub mod oio;
 
 #[cfg(test)]
