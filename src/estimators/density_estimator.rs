@@ -84,6 +84,9 @@ impl DensityEstimator{
 }
 
 impl Measureable for DensityEstimator {
+    fn divide_by(&mut self) {
+        TODO 
+    }
     // We are just going to count "in" and "out" for each link of
     // the real vertices.
     fn measure(&mut self, lat: &Lattice){

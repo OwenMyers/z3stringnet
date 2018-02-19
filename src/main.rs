@@ -12,12 +12,12 @@ use z3stringnet::oio::*;
 
 fn main() {
 
-    let equilibrate = true;
-    let write_configurations = false;
+    let equilibrate = false;
+    let write_configurations = true;
 
     let size: Point = Point {
-        x: 4,
-        y: 4,
+        x: 8,
+        y: 8,
     };
 
     let mut lat: Lattice;
@@ -30,7 +30,7 @@ fn main() {
     // number_measure: How many measurements to average over per bin
     let number_measure: u64 = 1;
     // number_update: How many updated before a measurement
-    let number_update: u64 = 1;
+    let number_update: u64 = 30;
     // for local updates it should be
     //let number_update: u64 = 2 * lat.size.x * lat.size.y;
 
@@ -64,13 +64,18 @@ fn main() {
     }
 
     // Actual run
+    let mut total_update_count: u64 = 0;
     for i in 0..number_bins {
         for j in 0..number_measure {
             for k in 0..number_update {
                 if write_configurations {
-                    write_lattice(String::from(format!("lattice_{}.csv", i)), &lat);
+                    write_lattice(
+                        String::from(format!("lattice_{}.csv", total_update_count)), 
+                        &lat
+                    );
                 }
                 updater.random_walk_update(&mut lat);
+                total_update_count += 1;
             }
             density_estimator.measure(&lat);
             density_estimator.write_total_count(

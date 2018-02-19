@@ -108,8 +108,8 @@ impl<'a> Z3String<'a> {
         }
     }
     pub fn raise_step(&mut self, direction: &Direction) {
-        println!("cur location before {:?}",self.cur_loc.location);
-        println!("cur direction before {:?}",direction);
+        //println!("cur location before {:?}",self.cur_loc.location);
+        //println!("cur direction before {:?}",direction);
         // This function takes a step along a path from the self.cur_loc position to a new
         // position determined by the input from the user. It onle steps across one link and it
         // CHANGES that link acording to the raising and lowing rules given the orientation of the
@@ -118,7 +118,7 @@ impl<'a> Z3String<'a> {
         // If the lnik is a real one (point is of the stored sub lattice) then you just need
         // to call lat `get_link_from_point` and operate on that link
         if self.lat.point_real(&self.cur_loc.location){
-            println!("real point");
+            //println!("real point");
             self.lat.out_raise_link(&self.cur_loc.location, &direction);
             self.increment_cur_loc(&direction);
         }
@@ -129,13 +129,13 @@ impl<'a> Z3String<'a> {
         // "out lower" is would be the same as "in raise". Either works now that we have
         // shifted position without changing anything.
         else {
-            println!("not real point");
-            println!("orig dir {:?}", direction);
+            //println!("not real point");
+            //println!("orig dir {:?}", direction);
             self.increment_cur_loc(&direction);
             let fliped_dir = direction.flip();
-            println!("new dir {:?}", fliped_dir);
+            //println!("new dir {:?}", fliped_dir);
             self.lat.out_lower_link(&self.cur_loc.location, &fliped_dir);
         }
-        println!("cur location after {:?}",self.cur_loc.location);
+        //println!("cur location after {:?}",self.cur_loc.location);
     }
 }
