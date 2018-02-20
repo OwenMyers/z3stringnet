@@ -29,14 +29,14 @@ impl DensityEstimator{
         println!("Opening density estimator file;");
         let path = Path::new("density_estimator.csv");
         let display = path.display();
-        let mut file = match File::create(&path){
+        let file = match File::create(&path){
             Err(err) => panic!("could not create {}: {}",
                             display,
                             err.description()),
             Ok(good_file) => good_file,
         };
 
-        let mut result_file_buffer = BufWriter::new(file);
+        let result_file_buffer = BufWriter::new(file);
 
         let mut density_estimator = DensityEstimator{
             cur_link_in_count: Vec::new(),
@@ -100,7 +100,29 @@ impl DensityEstimator{
 
 impl Measureable for DensityEstimator {
     fn finalize_bin_and_write(&mut self, denominator: u64) {
-        
+        // Devide all of the counts by `denominator`, which is the 
+        // number of measurments per bin, and write the result.
+        let float_denominator = denominator as f64;
+        let mut out_string = String::new();
+        out_string.push_str("x,y,N,E,S,W");
+        for vertex in self.cur_total_count.iter(){
+            out_string.push_str(
+                    &format!("{},{},{},{},{},{}\n",
+                            vertex.xy.x,
+                            vertex.xy.y,
+                            (vertex.n as f64) / float_denominator,
+                            (vertex.e as f64) / float_denominator,
+                            (vertex.s as f64) / float_denominator,
+                            (vertex.w as f64) / float_denominator,
+                            )
+                    );
+        }
+        out_string.push_str("\n");
+        match self.result_file_buffer.write(out_string.as_bytes()){
+            Err(err) => panic!("Can not write to density estimator buffer: {}",
+                err.description()),
+            Ok(_) => println!("Wrote measurment to density estimator buffer.") ,
+        }
     }
     // We are just going to count "in" and "out" for each link of
     // the real vertices.
