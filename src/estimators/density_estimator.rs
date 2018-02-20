@@ -7,6 +7,7 @@ use std::io::prelude::*;
 use std::fs::File;
 use std::path::Path;
 use std::error::Error;
+use std::io::BufWriter;
 
 /// Measures the string density
 /// 
@@ -17,6 +18,7 @@ pub struct DensityEstimator {
     cur_link_in_count: Vec<VertexLinkCount>,
     cur_link_out_count: Vec<VertexLinkCount>,
     cur_total_count: Vec<VertexLinkCount>,
+    result_file_buffer: BufWriter<File>,
 }
 impl DensityEstimator{
 
@@ -24,10 +26,23 @@ impl DensityEstimator{
     pub fn new(size: &Point) -> DensityEstimator{
         println!("Initilizing DensityEstimator"); 
         
+        println!("Opening density estimator file;");
+        let path = Path::new("density_estimator.csv");
+        let display = path.display();
+        let mut file = match File::create(&path){
+            Err(err) => panic!("could not create {}: {}",
+                            display,
+                            err.description()),
+            Ok(good_file) => good_file,
+        };
+
+        let mut result_file_buffer = BufWriter::new(file);
+
         let mut density_estimator = DensityEstimator{
             cur_link_in_count: Vec::new(),
             cur_link_out_count: Vec::new(),
             cur_total_count: Vec::new(),
+            result_file_buffer: result_file_buffer,
         };
 
         let half_n = (size.x * size.y)/2; 
@@ -84,8 +99,8 @@ impl DensityEstimator{
 }
 
 impl Measureable for DensityEstimator {
-    fn divide_by(&mut self) {
-        TODO 
+    fn finalize_bin_and_write(&mut self, denominator: u64) {
+        
     }
     // We are just going to count "in" and "out" for each link of
     // the real vertices.

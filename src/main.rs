@@ -47,7 +47,7 @@ fn main() {
     let mut density_estimator: DensityEstimator = DensityEstimator::new(&lat.size);
     density_estimator.measure(&lat);
     density_estimator.write_total_count(
-        String::from(format!("density_estimator_{}.csv", 0))
+        String::from(format!("density_estimator_total_count_{}.csv", 0))
     );
 
     // Equilibrate
@@ -79,7 +79,7 @@ fn main() {
             }
             density_estimator.measure(&lat);
             density_estimator.write_total_count(
-                String::from(format!("density_estimator_{}.csv", 0))
+                String::from(format!("density_estimator_toatl_count_{}.csv", 0))
             );
         }
         // devide counts by number_measure here to make a bin.
