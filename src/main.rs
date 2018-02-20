@@ -13,7 +13,7 @@ use z3stringnet::oio::*;
 fn main() {
 
     let equilibrate = false;
-    let write_configurations = true;
+    let write_configurations = false;
 
     let size: Point = Point {
         x: 8,
@@ -26,11 +26,11 @@ fn main() {
     lat = build_z3_striped_lat(size);
 
     // number_bins: The number of lines in the data file
-    let number_bins: u64 = 1;
+    let number_bins: u64 = 2;
     // number_measure: How many measurements to average over per bin
-    let number_measure: u64 = 1;
+    let number_measure: u64 = 3;
     // number_update: How many updated before a measurement
-    let number_update: u64 = 30;
+    let number_update: u64 = 2;
     // for local updates it should be
     //let number_update: u64 = 2 * lat.size.x * lat.size.y;
 
@@ -45,10 +45,6 @@ fn main() {
 
     // Initilize the object to measure the string density,
     let mut density_estimator: DensityEstimator = DensityEstimator::new(&lat.size);
-    density_estimator.measure(&lat);
-    density_estimator.write_total_count(
-        String::from(format!("density_estimator_total_count_{}.csv", 0))
-    );
 
     // Equilibrate
     if equilibrate {
@@ -78,10 +74,9 @@ fn main() {
                 total_update_count += 1;
             }
             density_estimator.measure(&lat);
-            density_estimator.write_total_count(
                 String::from(format!("density_estimator_toatl_count_{}.csv", 0))
             );
         }
-        // devide counts by number_measure here to make a bin.
+        density_estimator.finalize_bin_and_write(number_measure);
     }   
 } 
