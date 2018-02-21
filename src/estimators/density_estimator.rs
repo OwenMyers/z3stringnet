@@ -47,16 +47,26 @@ impl DensityEstimator{
             vector_size: 0,
         };
 
-        density_estimator.vector_size = (size.x * size.y)/2; 
+        density_estimator.vector_size = ((size.x * size.y)/2) as u64; 
         for i in 0..density_estimator.vector_size {
-            let cur_vertex_link_count = VertexLinkCount::new(i, size);
+            let cur_vertex_link_count = VertexLinkCount::new(i as i64, size);
             density_estimator.cur_link_in_count.push(cur_vertex_link_count);
             // cur_vertex_link_count was consumed so make another for out count
-            let cur_vertex_link_count = VertexLinkCount::new(i, size);
+            let cur_vertex_link_count = VertexLinkCount::new(i as i64, size);
             density_estimator.cur_link_out_count.push(cur_vertex_link_count);
-            let cur_vertex_link_count = VertexLinkCount::new(i, size);
+            let cur_vertex_link_count = VertexLinkCount::new(i as i64, size);
             density_estimator.cur_total_count.push(cur_vertex_link_count);
         }
+
+        // Write the file header
+        let mut out_string = String::new();
+        out_string.push_str("x,y,N,E,S,W\n");
+        match density_estimator.result_file_buffer.write(out_string.as_bytes()){
+            Err(_) => panic!("Can not write to density estimators header"),
+            Ok(_) => println!("Wrote measurment to density estimator buffer.") ,
+        }
+
+
 
         println!("Done initilizing density estimator.");
         return density_estimator
@@ -103,11 +113,11 @@ impl DensityEstimator{
 impl Measureable for DensityEstimator {
     fn clear(&mut self) {
         for i in 0..self.vector_size {
-            self.cur_link_in_count[i].clear();
-            self.cur_link_out_count[i].clear();
-            self.cur_total_count[i].clear();
+            let cur_index = i as usize;
+            self.cur_link_in_count[cur_index].clear();
+            self.cur_link_out_count[cur_index].clear();
+            self.cur_total_count[cur_index].clear();
         }
-       
     }
 
     fn finalize_bin_and_write(&mut self, denominator: u64) {
@@ -115,7 +125,6 @@ impl Measureable for DensityEstimator {
         // number of measurments per bin, and write the result.
         let float_denominator = denominator as f64;
         let mut out_string = String::new();
-        out_string.push_str("x,y,N,E,S,W");
         for vertex in self.cur_total_count.iter(){
             out_string.push_str(
                     &format!("{},{},{},{},{},{}\n",
