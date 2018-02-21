@@ -62,6 +62,13 @@ impl VertexLinkCount {
  
         }
     }
+    
+    pub fn clear(&mut self) {
+        self.n = 0;
+        self.e = 0;
+        self.s = 0;
+        self.w = 0;
+    }
 }
 /// A `Lattice` is built exclusivly with these objects each containing `Links` that
 /// touch the vertex.

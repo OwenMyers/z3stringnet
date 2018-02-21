@@ -16,8 +16,8 @@ fn main() {
     let write_configurations = false;
 
     let size: Point = Point {
-        x: 8,
-        y: 8,
+        x: 4,
+        y: 4,
     };
 
     let mut lat: Lattice;
@@ -26,11 +26,11 @@ fn main() {
     lat = build_z3_striped_lat(size);
 
     // number_bins: The number of lines in the data file
-    let number_bins: u64 = 2;
+    let number_bins: u64 = 10;
     // number_measure: How many measurements to average over per bin
-    let number_measure: u64 = 3;
+    let number_measure: u64 = 100;
     // number_update: How many updated before a measurement
-    let number_update: u64 = 2;
+    let number_update: u64 = 5;
     // for local updates it should be
     //let number_update: u64 = 2 * lat.size.x * lat.size.y;
 
@@ -74,9 +74,8 @@ fn main() {
                 total_update_count += 1;
             }
             density_estimator.measure(&lat);
-                String::from(format!("density_estimator_toatl_count_{}.csv", 0))
-            );
         }
         density_estimator.finalize_bin_and_write(number_measure);
+        density_estimator.clear();
     }   
 } 

@@ -19,6 +19,7 @@ pub struct DensityEstimator {
     cur_link_out_count: Vec<VertexLinkCount>,
     cur_total_count: Vec<VertexLinkCount>,
     result_file_buffer: BufWriter<File>,
+    vector_size: u64,
 }
 impl DensityEstimator{
 
@@ -43,10 +44,11 @@ impl DensityEstimator{
             cur_link_out_count: Vec::new(),
             cur_total_count: Vec::new(),
             result_file_buffer: result_file_buffer,
+            vector_size: 0,
         };
 
-        let half_n = (size.x * size.y)/2; 
-        for i in 0..half_n {
+        density_estimator.vector_size = (size.x * size.y)/2; 
+        for i in 0..density_estimator.vector_size {
             let cur_vertex_link_count = VertexLinkCount::new(i, size);
             density_estimator.cur_link_in_count.push(cur_vertex_link_count);
             // cur_vertex_link_count was consumed so make another for out count
@@ -99,6 +101,15 @@ impl DensityEstimator{
 }
 
 impl Measureable for DensityEstimator {
+    fn clear(&mut self) {
+        for i in 0..self.vector_size {
+            self.cur_link_in_count[i].clear();
+            self.cur_link_out_count[i].clear();
+            self.cur_total_count[i].clear();
+        }
+       
+    }
+
     fn finalize_bin_and_write(&mut self, denominator: u64) {
         // Devide all of the counts by `denominator`, which is the 
         // number of measurments per bin, and write the result.
@@ -124,6 +135,7 @@ impl Measureable for DensityEstimator {
             Ok(_) => println!("Wrote measurment to density estimator buffer.") ,
         }
     }
+
     // We are just going to count "in" and "out" for each link of
     // the real vertices.
     fn measure(&mut self, lat: &Lattice){

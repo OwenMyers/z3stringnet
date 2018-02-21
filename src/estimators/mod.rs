@@ -6,4 +6,7 @@ pub trait Measureable {
     /// Devide the counts by the number of measurements
     /// per bin and write the file.
     fn finalize_bin_and_write(&mut self, denominator: u64);
+    /// Clear out counts before taking a series of measurements to 
+    /// be bined.
+    fn clear(&mut self);
 }
