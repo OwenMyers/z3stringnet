@@ -21,7 +21,7 @@ pub struct DensityEstimator {
     result_file_buffer: BufWriter<File>,
     vector_size: u64,
 }
-impl DensityEstimator{
+impl DensityEstimator {
 
     /// static "constructor" method.
     pub fn new(size: &Point) -> DensityEstimator{
