@@ -59,10 +59,11 @@ impl DensityEstimator {
             density_estimator.cur_total_count.push(cur_vertex_link_count);
         }
 
-        write_standard_header(&density_estimator.result_file_buffer);
+        write_standard_header(&mut density_estimator.result_file_buffer);
 
         println!("Done initilizing density estimator.");
-        return density_estimator
+
+        density_estimator
     }
     pub fn write_total_count(&self, f_str: String) {
         println!("Writing density estimator total count");
@@ -119,8 +120,7 @@ impl Measurable for DensityEstimator {
         let float_denominator = denominator as f64;
         let mut out_string = String::new();
         for vertex in self.cur_total_count.iter(){
-            let formatted_line = 
-                    Measurable::line_out_string_from_vertex_link_count(vertex, float_denominator);
+            let formatted_line: String = Self::line_out_string_from_vertex_link_count(vertex, &float_denominator);
             out_string.push_str(&formatted_line);
         }
 

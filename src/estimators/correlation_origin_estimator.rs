@@ -76,17 +76,30 @@ impl CorrelationOriginEstimator {
             vector_size: 0,
         };
         correlation_origin_estimator.vector_size = ((size.x * size.y)/2) as u64; 
+        for i in 0..correlation_origin_estimator.vector_size {
+            let cur_vertex_link_count = VertexLinkCount::new(i as i64, size);
+            correlation_origin_estimator.cur_binary_horizontal_out_correlation.push(cur_vertex_link_count);
+            // cur_vertex_link_count was consumed so make another for out count
+            let cur_vertex_link_count = VertexLinkCount::new(i as i64, size);
+            correlation_origin_estimator.cur_binary_horizontal_in_correlation.push(cur_vertex_link_count);
+            let cur_vertex_link_count = VertexLinkCount::new(i as i64, size);
+            correlation_origin_estimator.cur_binary_vertical_in_correlation.push(cur_vertex_link_count);
+            let cur_vertex_link_count = VertexLinkCount::new(i as i64, size);
+            correlation_origin_estimator.cur_binary_vertical_out_correlation.push(cur_vertex_link_count);
+        }
 
         write_standard_header(
-            &correlation_origin_estimator.result_file_buffer_horizontal_in);
+            &mut correlation_origin_estimator.result_file_buffer_horizontal_in);
         write_standard_header(
-            &correlation_origin_estimator.result_file_buffer_horizontal_out);
+            &mut correlation_origin_estimator.result_file_buffer_horizontal_out);
         write_standard_header(
-            &correlation_origin_estimator.result_file_buffer_vertical_out);
+            &mut correlation_origin_estimator.result_file_buffer_vertical_out);
         write_standard_header(
-            &correlation_origin_estimator.result_file_buffer_vertical_out);
+            &mut correlation_origin_estimator.result_file_buffer_vertical_out);
 
-        println!("Done initilizing origin correlation estimator.")
+        println!("Done initilizing origin correlation estimator.");
+
+        correlation_origin_estimator
 
     }
 }
@@ -119,19 +132,19 @@ impl Measurable for CorrelationOriginEstimator {
         for i in 0..self.vector_size {
             let cur_index = i as usize;
 
-            let ho_formatted_line = Measurable::line_out_string_from_vertex_link_count(
+            let ho_formatted_line = Self::line_out_string_from_vertex_link_count(
                 &self.cur_binary_horizontal_out_correlation[cur_index], 
                 &float_denominator
             );
-            let hi_formatted_line = Measurable::line_out_string_from_vertex_link_count(
+            let hi_formatted_line = Self::line_out_string_from_vertex_link_count(
                 &self.cur_binary_horizontal_in_correlation[cur_index], 
                 &float_denominator
             );
-            let vo_formatted_line = Measurable::line_out_string_from_vertex_link_count(
+            let vo_formatted_line = Self::line_out_string_from_vertex_link_count(
                 &self.cur_binary_vertical_out_correlation[cur_index], 
                 &float_denominator
             );
-            let vi_formatted_line = Measurable::line_out_string_from_vertex_link_count(
+            let vi_formatted_line = Self::line_out_string_from_vertex_link_count(
                 &self.cur_binary_vertical_in_correlation[cur_index], 
                 &float_denominator
             );
@@ -172,21 +185,23 @@ impl Measurable for CorrelationOriginEstimator {
 
     fn measure(&mut self, lat: &Lattice) {
         // First check each of the origin links.
-        let origin_vertex: Vertex = lat.vertices[0];
-        let origin_horizontal_link: Link = origin_vertex.e;
-        let origin_vertical_link: Link = origin_vertex.n;
+        let origin_vertex: &Vertex = &lat.vertices[0];
+        let origin_horizontal_link: &Link = &origin_vertex.e;
+        let origin_vertical_link: &Link = &origin_vertex.n;
 
         let mut measure_horizontal = true;
         let mut measure_vertical = true;
-        match origin_horizontal_link {
+        match *origin_horizontal_link {
             Link::Blank => {
                 measure_horizontal = false;
-            }
+            },
+            _ => () 
         };
-        match origin_vertical_link {
+        match *origin_vertical_link {
             Link::Blank => {
                 measure_vertical = false;
-            }
+            },
+            _ => ()
         };
         
         // We can avoid looping over vertices if both the horizontal and 
@@ -197,7 +212,7 @@ impl Measurable for CorrelationOriginEstimator {
 
         for (i, cur_vertex) in lat.vertices.iter().enumerate(){
             if measure_horizontal {
-                match origin_horizontal_link {
+                match *origin_horizontal_link {
                     Link::In => {
                         match cur_vertex.e {
                             Link::In => {
@@ -231,7 +246,7 @@ impl Measurable for CorrelationOriginEstimator {
             }
 
             if measure_vertical {
-                match origin_vertical_link {
+                match *origin_vertical_link {
                     Link::In => {
                         match cur_vertex.n {
                             Link::In => {
@@ -256,7 +271,8 @@ impl Measurable for CorrelationOriginEstimator {
                         match cur_vertex.s {
                             Link::In => {
                                 self.cur_binary_vertical_out_correlation[i].s += 1;
-                            }
+                            },
+                            _ => (),
                         }
                     },
                     Link::Blank => ()

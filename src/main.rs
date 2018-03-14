@@ -7,7 +7,7 @@ use z3stringnet::datamodel::lattice::build_z3_striped_lat;
 use z3stringnet::lattice_updates::Update;
 use z3stringnet::estimators::density_estimator::DensityEstimator;
 use z3stringnet::estimators::correlation_origin_estimator::CorrelationOriginEstimator;
-use z3stringnet::estimators::Measureable;
+use z3stringnet::estimators::Measurable;
 use z3stringnet::oio::*;
     
 

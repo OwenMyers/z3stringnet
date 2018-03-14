@@ -9,7 +9,7 @@ use std::io::prelude::*;
     
 /// Write what should be the header for all 
 /// estimator files.
-pub fn write_standard_header(writer: &BufWriter<File>) {
+pub fn write_standard_header(writer: &mut BufWriter<File>) {
     let mut out_string = String::new();
     out_string.push_str("x,y,N,E,S,W\n");
     match writer.write(out_string.as_bytes()){
@@ -41,7 +41,7 @@ pub trait Measurable {
                 (vertex.w as f64) / denominator,
                 );
     
-        return formatted_line;
+        formatted_line
     }
 
 }
