@@ -1,4 +1,5 @@
-use super::Measureable;
+use super::Measurable;
+use super::write_standard_header;
 use super::super::datamodel::VertexLinkCount;
 use super::super::datamodel::Link;
 use super::super::datamodel::Point;
@@ -58,15 +59,7 @@ impl DensityEstimator {
             density_estimator.cur_total_count.push(cur_vertex_link_count);
         }
 
-        // Write the file header
-        let mut out_string = String::new();
-        out_string.push_str("x,y,N,E,S,W\n");
-        match density_estimator.result_file_buffer.write(out_string.as_bytes()){
-            Err(_) => panic!("Can not write to density estimators header"),
-            Ok(_) => println!("Wrote measurment to density estimator buffer.") ,
-        }
-
-
+        write_standard_header(&density_estimator.result_file_buffer);
 
         println!("Done initilizing density estimator.");
         return density_estimator
@@ -110,7 +103,7 @@ impl DensityEstimator {
     }
 }
 
-impl Measureable for DensityEstimator {
+impl Measurable for DensityEstimator {
     fn clear(&mut self) {
         for i in 0..self.vector_size {
             let cur_index = i as usize;
@@ -126,17 +119,11 @@ impl Measureable for DensityEstimator {
         let float_denominator = denominator as f64;
         let mut out_string = String::new();
         for vertex in self.cur_total_count.iter(){
-            out_string.push_str(
-                    &format!("{},{},{},{},{},{}\n",
-                            vertex.xy.x,
-                            vertex.xy.y,
-                            (vertex.n as f64) / float_denominator,
-                            (vertex.e as f64) / float_denominator,
-                            (vertex.s as f64) / float_denominator,
-                            (vertex.w as f64) / float_denominator,
-                            )
-                    );
+            let formatted_line = 
+                    Measurable::line_out_string_from_vertex_link_count(vertex, float_denominator);
+            out_string.push_str(&formatted_line);
         }
+
         out_string.push_str("\n");
         match self.result_file_buffer.write(out_string.as_bytes()){
             Err(err) => panic!("Can not write to density estimator buffer: {}",

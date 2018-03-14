@@ -1,24 +1,12 @@
 pub mod density_estimator;
+pub mod correlation_origin_estimator;
 use super::datamodel::lattice::Lattice;
 use std::io::BufWriter;
 use std::fs::File;
 use super::datamodel::VertexLinkCount;
+use std::io::prelude::*;
 
-pub fn line_out_string_from_vertex_link_count(vertex: &VertexLinkCount,
-                                              denominator: f64) -> String {
     
-    let formatted_line = format!("{},{},{},{},{},{}\n",
-            vertex.xy.x,
-            vertex.xy.y,
-            (vertex.n as f64) / denominator,
-            (vertex.e as f64) / denominator,
-            (vertex.s as f64) / denominator,
-            (vertex.w as f64) / denominator,
-            );
-
-    return formatted_line;
-}
-
 /// Write what should be the header for all 
 /// estimator files.
 pub fn write_standard_header(writer: &BufWriter<File>) {
@@ -30,7 +18,9 @@ pub fn write_standard_header(writer: &BufWriter<File>) {
     }
 }
 
-pub trait Measureable {
+
+
+pub trait Measurable {
     fn measure(&mut self, lat: &Lattice);
     /// Devide the counts by the number of measurements
     /// per bin and write the file.
@@ -38,4 +28,20 @@ pub trait Measureable {
     /// Clear out counts before taking a series of measurements to 
     /// be bined.
     fn clear(&mut self);
+
+    fn line_out_string_from_vertex_link_count(vertex: &VertexLinkCount,
+                                                  denominator: &f64) -> String {
+                                                  
+        let formatted_line = format!("{},{},{},{},{},{}\n",
+                vertex.xy.x,
+                vertex.xy.y,
+                (vertex.n as f64) / denominator,
+                (vertex.e as f64) / denominator,
+                (vertex.s as f64) / denominator,
+                (vertex.w as f64) / denominator,
+                );
+    
+        return formatted_line;
+    }
+
 }

@@ -6,6 +6,7 @@ use z3stringnet::datamodel::lattice::Lattice;
 use z3stringnet::datamodel::lattice::build_z3_striped_lat;
 use z3stringnet::lattice_updates::Update;
 use z3stringnet::estimators::density_estimator::DensityEstimator;
+use z3stringnet::estimators::correlation_origin_estimator::CorrelationOriginEstimator;
 use z3stringnet::estimators::Measureable;
 use z3stringnet::oio::*;
     
@@ -44,7 +45,8 @@ fn main() {
     };
 
     // Initilize the object to measure the string density,
-    let mut density_estimator: DensityEstimator = DensityEstimator::new(&lat.size);
+    let mut density_estimator = DensityEstimator::new(&lat.size);
+    let mut correlation_origin_estimator = CorrelationOriginEstimator::new(&lat.size);
 
     // Equilibrate
     if equilibrate {
@@ -74,8 +76,11 @@ fn main() {
                 total_update_count += 1;
             }
             density_estimator.measure(&lat);
+            correlation_origin_estimator.measure(&lat);
         }
         density_estimator.finalize_bin_and_write(number_measure);
+        correlation_origin_estimator.finalize_bin_and_write(number_measure);
         density_estimator.clear();
+        correlation_origin_estimator.clear();
     }   
 } 
