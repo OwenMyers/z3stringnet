@@ -164,22 +164,26 @@ impl Measurable for CorrelationOriginEstimator {
         match self.result_file_buffer_horizontal_out
                 .write(ho_out_string.as_bytes()){
             Err(err) => panic!("Can't write to origin estimator buff: {}", err.description()),
-            Ok(_) => println!("Wrote measurment to origin estimator buffer.") ,
+            //Ok(_) => println!("Wrote measurment to origin estimator buffer.") ,
+            Ok(_) => (),
         }
         match self.result_file_buffer_horizontal_in
                 .write(hi_out_string.as_bytes()){
             Err(err) => panic!("Can't write to origin estimator buff: {}", err.description()),
-            Ok(_) => println!("Wrote measurment to origin estimator buffer.") ,
+            //Ok(_) => println!("Wrote measurment to origin estimator buffer.") ,
+            Ok(_) => (),
         }
         match self.result_file_buffer_vertical_out
                 .write(vo_out_string.as_bytes()){
             Err(err) => panic!("Can't write to origin estimator buff: {}", err.description()),
-            Ok(_) => println!("Wrote measurment to origin estimator buffer.") ,
+            //Ok(_) => println!("Wrote measurment to origin estimator buffer.") ,
+            Ok(_) => (),
         }
         match self.result_file_buffer_vertical_in
                 .write(vi_out_string.as_bytes()){
             Err(err) => panic!("Can't write to origin estimator buff: {}", err.description()),
-            Ok(_) => println!("Wrote measurment to origin estimator buffer.") ,
+            //Ok(_) => println!("Wrote measurment to origin estimator buffer.") ,
+            Ok(_) => (),
         }
     }
 

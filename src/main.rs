@@ -27,7 +27,7 @@ fn main() {
     lat = build_z3_striped_lat(size);
 
     // number_bins: The number of lines in the data file
-    let number_bins: u64 = 10;
+    let number_bins: u64 = 1000;
     // number_measure: How many measurements to average over per bin
     let number_measure: u64 = 100;
     // number_update: How many updated before a measurement
@@ -64,6 +64,7 @@ fn main() {
     // Actual run
     let mut total_update_count: u64 = 0;
     for i in 0..number_bins {
+        println!("Working on bin {}", i);
         for j in 0..number_measure {
             for k in 0..number_update {
                 if write_configurations {

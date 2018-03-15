@@ -128,7 +128,8 @@ impl Measurable for DensityEstimator {
         match self.result_file_buffer.write(out_string.as_bytes()){
             Err(err) => panic!("Can not write to density estimator buffer: {}",
                 err.description()),
-            Ok(_) => println!("Wrote measurment to density estimator buffer.") ,
+            //Ok(_) => println!("Wrote measurment to density estimator buffer.") ,
+            Ok(_) => (),
         }
     }
 
