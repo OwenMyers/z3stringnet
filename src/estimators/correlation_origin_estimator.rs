@@ -93,7 +93,7 @@ impl CorrelationOriginEstimator {
         write_standard_header(
             &mut correlation_origin_estimator.result_file_buffer_horizontal_out);
         write_standard_header(
-            &mut correlation_origin_estimator.result_file_buffer_vertical_out);
+            &mut correlation_origin_estimator.result_file_buffer_vertical_in);
         write_standard_header(
             &mut correlation_origin_estimator.result_file_buffer_vertical_out);
 
