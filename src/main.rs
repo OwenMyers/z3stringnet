@@ -41,7 +41,8 @@ fn main() {
         working_loc: BoundPoint{
             size: lat.size,
             location: Point{x: 0, y: 0},
-        }
+        },
+        link_number_tuning = 1.0,
     };
 
     // Initilize the object to measure the string density,

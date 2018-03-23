@@ -15,6 +15,7 @@ use rand::Rng;
 #[derive(Debug)]
 pub struct Update {
     pub working_loc: BoundPoint,
+    pub link_number_tuning: f64,
 }
 impl Update {
     pub fn get_rand_point(&mut self) {
