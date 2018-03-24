@@ -5,7 +5,7 @@ use self::lattice::x_from_vertex_vec_position;
 use self::lattice::y_from_vertex_vec_position;
 use std::ops::Add;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum Link {
     In,
     Out,

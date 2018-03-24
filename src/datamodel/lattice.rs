@@ -59,7 +59,7 @@ impl Lattice {
             panic!("Cant handle implied vertices yet. Not sure if we need to. This functionality may never exist.");
         }
     }
-    pub fn out_raise_link(&mut self, loc: &Point, direction: &Direction) {
+    pub fn out_raise_link(&mut self, loc: &Point, direction: &Direction) -> Link {
         //println!("in lat out raise, loc: {:?}",loc);
         //println!("in lat out raise, dir: {:?}",direction);
         // Raies a link traveling outward from the specified vertex
@@ -67,21 +67,27 @@ impl Lattice {
         // on real verticies. Thats the way we want it
         let link: &mut Link = self.get_link_from_point(loc, direction);
         match *link {
-            Link::In    => *link = Link::Blank,
-            Link::Out   => *link = Link::In,
-            Link::Blank => *link = Link::Out,
+            Link::In    => {*link = Link::Blank;
+                            Link::Blank},
+            Link::Out   => {*link = Link::In;
+                            Link::In},
+            Link::Blank => {*link = Link::Out;
+                            Link::Out},
         }
     }
-    pub fn out_lower_link(&mut self, loc: &Point, direction: &Direction) {
+    pub fn out_lower_link(&mut self, loc: &Point, direction: &Direction) -> Link{
         // Lower a link traveling outward from the specified vertex. Also see raise 
         // description.
         //println!("in out_lower_link. ---> location is: {:?}", loc);
         //println!("in out_lower_link. ---> directio is: {:?}", direction);
         let link: &mut Link = self.get_link_from_point(loc, direction);
         match *link {
-            Link::In    => *link = Link::Out,
-            Link::Out   => *link = Link::Blank,
-            Link::Blank => *link = Link::In,
+            Link::In    => {*link = Link::Out;
+                            Link::Out},
+            Link::Out   => {*link = Link::Blank;
+                            Link::Blank},
+            Link::Blank => {*link = Link::In;
+                            Link::In},
         }
     }
 }

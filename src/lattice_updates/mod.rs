@@ -18,6 +18,17 @@ pub struct Update {
     pub link_number_tuning: f64,
 }
 impl Update {
+    /// Detgermine by how much the number of non blank links has changed
+    /// after a raise step.
+    /// Possibilities 
+    ///     1) if a raise operation just switches the orientation it returns 0.
+    ///     2) if it brings an ocupied link to a blink link -> -1
+    ///     3) Blank to ocupied -> +1
+    ///
+    fn find_increase_or_decrease(before_after_links: (Link, Link)) -> i8 {
+        let (before_link, after_link) = before_after_links;
+        match before_link
+    }
     pub fn get_rand_point(&mut self) {
 
         self.working_loc.location = Point {
@@ -43,16 +54,18 @@ impl Update {
         };
     
         let cur_direction = Direction::N;
-        z3string.raise_step(&cur_direction);
+        let before_after_links: (Link, Link) = z3string.raise_step(&cur_direction);
+        let number_increase_or_decrease = 
+            find_increase_or_decrease(before_after_links)
 
         let cur_direction = Direction::E;
-        z3string.raise_step(&cur_direction);
+        let raised_link: Link = z3string.raise_step(&cur_direction);
 
         let cur_direction = Direction::S;
-        z3string.raise_step(&cur_direction);
+        let raised_link: Link = z3string.raise_step(&cur_direction);
 
         let cur_direction = Direction::W;
-        z3string.raise_step(&cur_direction);
+        let raised_link: Link = z3string.raise_step(&cur_direction);
         
         assert!(z3string.cur_loc == z3string.start_loc);
     }
@@ -108,7 +121,7 @@ impl<'a> Z3String<'a> {
             None => panic!("No step taken for some reason. No increment."),    
         }
     }
-    pub fn raise_step(&mut self, direction: &Direction) {
+    pub fn raise_step(&mut self, direction: &Direction) -> (Link, Link) {
         //println!("cur location before {:?}",self.cur_loc.location);
         //println!("cur direction before {:?}",direction);
         // This function takes a step along a path from the self.cur_loc position to a new
@@ -116,11 +129,15 @@ impl<'a> Z3String<'a> {
         // CHANGES that link acording to the raising and lowing rules given the orientation of the
         // link and the direction of the step.
         
+        let pre_raise_link: Link = self.lat.get_link_from_point(&self.cur_loc.location, &direction)
+                                        .clone();
+        
         // If the lnik is a real one (point is of the stored sub lattice) then you just need
         // to call lat `get_link_from_point` and operate on that link
         if self.lat.point_real(&self.cur_loc.location){
             //println!("real point");
-            self.lat.out_raise_link(&self.cur_loc.location, &direction);
+            let post_raise_link: Link = 
+                self.lat.out_raise_link(&self.cur_loc.location, &direction);
             self.increment_cur_loc(&direction);
         }
         // If the link is not real then step in `direction`, which will guarentee you are now on
@@ -135,8 +152,10 @@ impl<'a> Z3String<'a> {
             self.increment_cur_loc(&direction);
             let fliped_dir = direction.flip();
             //println!("new dir {:?}", fliped_dir);
-            self.lat.out_lower_link(&self.cur_loc.location, &fliped_dir);
+            let post_raise_link: Link =
+                self.lat.out_lower_link(&self.cur_loc.location, &fliped_dir);
         }
         //println!("cur location after {:?}",self.cur_loc.location);
+        (pre_raise_link, post_raise_link)
     }
 }
