@@ -11,6 +11,15 @@ pub enum Link {
     Out,
     Blank,
 }
+impl Link {
+    pub fn flip(&self) -> Link {
+        match *self{
+            Link::In => {Link::Out}
+            Link::Out => {Link::In}
+            Link::Blank => {Link::Blank}
+        }
+    }
+}
 
 #[derive(Debug)]
 pub enum Direction {

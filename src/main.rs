@@ -34,17 +34,17 @@ fn main() {
     // for local updates it should be
     //let number_update: u64 = 2 * lat.size.x * lat.size.y;
 
-
-    // Initilize the object to update the lattice
+    // Initialize the object to update the lattice
     let mut updater = Update{
         working_loc: BoundPoint{
             size: lat.size,
             location: Point{x: 0, y: 0},
         },
-        link_number_tuning = 1.0,
+        link_number_tuning: 1.0,
+        link_number_change: 0,
     };
 
-    // Initilize the object to measure the string density,
+    // Initialize the object to measure the string density,
     let mut density_estimator = DensityEstimator::new(&lat.size);
     let mut correlation_origin_estimator = CorrelationOriginEstimator::new(&lat.size);
 
@@ -64,13 +64,14 @@ fn main() {
     // Actual run
     let mut total_update_count: u64 = 0;
     for i in 0..number_bins {
-        println!("Working on bin {}", i);
+        //println!("Working on bin {}", i);
         for j in 0..number_measure {
+            //println!("j {}", j);
             for k in 0..number_update {
+                //println!("k {}", k);
                 if write_configurations {
                     write_lattice(
-                        String::from(format!("lattice_{}.csv", total_update_count)), 
-                        &lat
+                        String::from(format!("lattice_{}.csv", total_update_count)), &lat
                     );
                 }
                 updater.random_walk_update(&mut lat);
