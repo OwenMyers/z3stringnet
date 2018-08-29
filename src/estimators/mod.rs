@@ -14,7 +14,7 @@ pub fn write_standard_header(writer: &mut BufWriter<File>) {
     out_string.push_str("x,y,N,E,S,W\n");
     match writer.write(out_string.as_bytes()){
         Err(_) => panic!("Can not write estimator's header"),
-        Ok(_) => println!("Wrote header to estimator buffer.") ,
+        Ok(_) => println!("Wrote header to estimator buffer."),
     }
 }
 

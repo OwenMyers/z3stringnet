@@ -25,9 +25,10 @@ use super::Vertex;
 pub struct Lattice {
     pub vertices: Vec<Vertex>,
     pub size: Point,
+    pub number_filled_links: u64,
 }
 impl Lattice {
-    // Only storing one sublattice so other verticies are implied.
+    // Only storing one sublattice so other vertices are implied.
     // Lets call the ones in our `vertices` vector "real" and the
     // implied ones "fake".
     pub fn point_real(&self, p: &Point) -> bool {
@@ -35,8 +36,8 @@ impl Lattice {
         ((p.x + p.y) % 2) == 0
     }
     pub fn get_link_from_point(&mut self, loc: &Point, direction: &Direction) -> &mut Link{
-        // See if this point is on the sublattice of the stored verticies.
-        // Only storing one sublattice so other verticies are implied.
+        // See if this point is on the sublattice of the stored vertices.
+        // Only storing one sublattice so other vertices are implied.
         // Lets call the ones in our `vertices` vector "real" and the
         // implied ones "fake".
         let is_real = self.point_real(&loc);
@@ -92,6 +93,33 @@ impl Lattice {
                             Link::In},
         }
     }
+
+    pub fn count_non_blank_links(&mut self) -> u64{
+        let mut count: u64;
+        for (_, cur_vertex) in self.vertices.iter().enumerate(){
+            match cur_vertex.n {
+                Link::In  => {count += 1},
+                Link::Out => {count += 1},
+                Link::Blank => (),
+            }
+            match cur_vertex.e {
+                Link::In  => {count += 1},
+                Link::Out => {count += 1},
+                Link::Blank => (),
+            }
+            match cur_vertex.s {
+                Link::In  => {count += 1},
+                Link::Out => {count += 1},
+                Link::Blank => (),
+            }
+            match cur_vertex.w {
+                Link::In  => {count += 1},
+                Link::Out => {count += 1},
+                Link::Blank => (),
+            }
+        }
+        count
+    }
 }
 
 
@@ -102,6 +130,7 @@ pub fn build_blank_lat(size: Point) -> Lattice {
     let mut lat: Lattice = Lattice {
         vertices: Vec::new(),
         size,
+        number_filled_links: 0
     };
 
     let half_n = (lat.size.x * lat.size.y)/2;
@@ -142,6 +171,7 @@ pub fn build_z3_striped_lat(size: Point) -> Lattice {
     let mut lat: Lattice = Lattice {
         vertices: Vec::new(),
         size,
+        number_filled_links: size.y/(2 as u64) * size.x
     };
 
     let half_n = (lat.size.x * lat.size.y)/2;

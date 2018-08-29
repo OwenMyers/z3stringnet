@@ -47,6 +47,7 @@ fn main() {
     // Initialize the object to measure the string density,
     let mut density_estimator = DensityEstimator::new(&lat.size);
     let mut correlation_origin_estimator = CorrelationOriginEstimator::new(&lat.size);
+    let mut total_link_count_estimator = TotalLinkCountEstimator::new
 
     // Equilibrate
     if equilibrate {

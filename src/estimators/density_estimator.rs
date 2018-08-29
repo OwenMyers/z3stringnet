@@ -13,7 +13,7 @@ use std::io::BufWriter;
 /// Measures the string density
 /// 
 /// By counting the number of non blank links we can measure the string density.
-/// For prosterity we also count the number of `In` and `Out` links seperatly.
+/// For posterity we also count the number of `In` and `Out` links seperatly.
 #[derive(Debug)]
 pub struct DensityEstimator {
     cur_link_in_count: Vec<VertexLinkCount>,
@@ -26,7 +26,7 @@ impl DensityEstimator {
 
     /// static "constructor" method.
     pub fn new(size: &Point) -> DensityEstimator{
-        println!("Initilizing DensityEstimator"); 
+        println!("Initializing DensityEstimator");
         
         println!("Opening density estimator file;");
         let path = Path::new("density_estimator.csv");
@@ -44,7 +44,7 @@ impl DensityEstimator {
             cur_link_in_count: Vec::new(),
             cur_link_out_count: Vec::new(),
             cur_total_count: Vec::new(),
-            result_file_buffer: result_file_buffer,
+            result_file_buffer,
             vector_size: 0,
         };
 
@@ -115,8 +115,8 @@ impl Measurable for DensityEstimator {
     }
 
     fn finalize_bin_and_write(&mut self, denominator: u64) {
-        // Devide all of the counts by `denominator`, which is the 
-        // number of measurments per bin, and write the result.
+        // Divide all of the counts by `denominator`, which is the
+        // number of measurements per bin, and write the result.
         let float_denominator = denominator as f64;
         let mut out_string = String::new();
         for vertex in self.cur_total_count.iter(){
@@ -128,7 +128,7 @@ impl Measurable for DensityEstimator {
         match self.result_file_buffer.write(out_string.as_bytes()){
             Err(err) => panic!("Can not write to density estimator buffer: {}",
                 err.description()),
-            //Ok(_) => println!("Wrote measurment to density estimator buffer.") ,
+            //Ok(_) => println!("Wrote measurement to density estimator buffer.") ,
             Ok(_) => (),
         }
     }

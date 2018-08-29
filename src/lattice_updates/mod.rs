@@ -13,6 +13,11 @@ use rand::Rng;
 ///   walking clockwise with the raising operator. 
 /// * The `random_walk_update` will perform a random walk to produce an
 ///   extensive change to the configuration it operates on.
+///
+/// Currently the random walk update will modify an attribute in lattice.
+/// This is hidden when using the update method so I'm pointing it out here.
+/// `number_filled_links` will be modified by adding (subtracting) the
+/// `link_number_change` determined by the update function.
 #[derive(Debug)]
 pub struct Update {
     pub working_loc: BoundPoint,
