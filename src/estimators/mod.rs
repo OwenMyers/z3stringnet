@@ -1,5 +1,6 @@
 pub mod density_estimator;
 pub mod correlation_origin_estimator;
+pub mod total_link_count_estimator;
 use super::datamodel::lattice::Lattice;
 use std::io::BufWriter;
 use std::fs::File;
@@ -22,7 +23,7 @@ pub fn write_standard_header(writer: &mut BufWriter<File>) {
 
 pub trait Measurable {
     fn measure(&mut self, lat: &Lattice);
-    /// Devide the counts by the number of measurements
+    /// Divide the counts by the number of measurements
     /// per bin and write the file.
     fn finalize_bin_and_write(&mut self, denominator: u64);
     /// Clear out counts before taking a series of measurements to 

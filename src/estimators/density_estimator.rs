@@ -61,7 +61,7 @@ impl DensityEstimator {
 
         write_standard_header(&mut density_estimator.result_file_buffer);
 
-        println!("Done initilizing density estimator.");
+        println!("Done initializing density estimator.");
 
         density_estimator
     }

@@ -1,7 +1,11 @@
-use super::Measurable;
+use std::fs::File;
 use std::path::Path;
 use std::error::Error;
 use std::io::BufWriter;
+use std::io::prelude::*;
+use super::Measurable;
+use super::super::datamodel::Link;
+use super::super::datamodel::lattice::Lattice;
 
 #[derive(Debug)]
 pub struct TotalLinkCountEstimator {
@@ -15,7 +19,7 @@ impl TotalLinkCountEstimator {
         println!("Initializing TotalLinkCountEstimator");
 
         println!("Opening density estimator file");
-        let path = Path::new("total_link_count_estimator.csv")
+        let path = Path::new("total_link_count_estimator.csv");
         let display = path.display();
         let file = match File::create(&path) {
             Err(err) => panic!("could not create {}: {}",
@@ -30,12 +34,17 @@ impl TotalLinkCountEstimator {
             count: 0,
             result_file_buffer,
         };
+
         let mut header_string = String::new();
-        header_string.push_str("Average (per bin) Total Counts\n")
-        match result_file_buffer.write(header_string.as_bytes()){
+        header_string.push_str("Average Total Link Counts\n");
+        match total_link_count_estimator.result_file_buffer.write(header_string.as_bytes()){
             Err(err) => panic!("Can now write total link count header."),
             Ok(_) => println!("Wrote total link count header."),
-        }
+        };
+
+        println!("Done initializing total link count estimator.");
+
+        total_link_count_estimator
     }
 }
 
@@ -45,9 +54,9 @@ impl Measurable for TotalLinkCountEstimator {
     }
 
     fn finalize_bin_and_write(&mut self, denominator: u64) {
-        let avg_count: f64 = (count as f64) / (denominator as f64);
+        let avg_count: f64 = (self.count as f64) / (denominator as f64);
         let mut out_string: String = String::new();
-        out_string.push_str(format!("{}\n", avg_count))
+        out_string.push_str(&format!("{}\n", &avg_count));
 
         match self.result_file_buffer.write(out_string.as_bytes()){
             Err(err) => panic!("Can not write to total link count estimator buffer {}",

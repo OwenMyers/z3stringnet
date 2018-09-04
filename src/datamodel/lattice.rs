@@ -95,7 +95,7 @@ impl Lattice {
     }
 
     pub fn count_non_blank_links(&mut self) -> u64{
-        let mut count: u64;
+        let mut count: u64 = 0;
         for (_, cur_vertex) in self.vertices.iter().enumerate(){
             match cur_vertex.n {
                 Link::In  => {count += 1},
@@ -171,7 +171,7 @@ pub fn build_z3_striped_lat(size: Point) -> Lattice {
     let mut lat: Lattice = Lattice {
         vertices: Vec::new(),
         size,
-        number_filled_links: size.y/(2 as u64) * size.x
+        number_filled_links: (size.y / 2 * size.x) as u64
     };
 
     let half_n = (lat.size.x * lat.size.y)/2;
