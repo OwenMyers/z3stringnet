@@ -6,6 +6,15 @@ use super::datamodel::Link;
 use rand;
 use rand::Rng;
 
+pub enum UpdateType {
+    Local,
+    Walk,
+}
+pub enum AcceptReject {
+    Accept,
+    Reject,
+}
+
 /// This will ergodicly update the Z3 string net model.
 /// 
 /// A couple of choices are available.
@@ -81,10 +90,8 @@ impl Update {
     pub fn get_rand_point(&mut self) {
 
         self.working_loc.location = Point {
-            x: rand::thread_rng()
-                .gen_range(0, self.working_loc.size.x),
-            y: rand::thread_rng()
-                .gen_range(0, self.working_loc.size.y)
+            x: rand::thread_rng().gen_range(0, self.working_loc.size.x),
+            y: rand::thread_rng().gen_range(0, self.working_loc.size.y)
                 
         };
         // for testing
@@ -128,6 +135,7 @@ impl Update {
     }
 
     pub fn random_walk_update(&mut self, lat: &mut Lattice) {
+
         self.get_rand_point();
         let mut z3string = Z3String{
             start_loc: self.working_loc.location,
@@ -153,12 +161,47 @@ impl Update {
         assert_eq!(z3string.cur_loc, z3string.start_loc);
         self.link_number_change = total_link_number_change;
     }
+
+    /// Accept or reject an update based on the number of links and the size of the lattice.
+    pub fn accept_or_reject_update(lattice_size: Point, number_filled_links: u64) -> AcceptReject{
+        assert!(lattice_size.x >= 0);
+        assert!(lattice_size.y >= 0);
+
+        let total_possible: u64 = lattice_size.x * lattice_size.y * 2 as u64;
+        let ratio: f64 = (number_filled_links as f64) / total_possible;
+        rand_number =
+    }
+
+    /// Organizes the calling of the update functions while taking care of high level
+    /// accept reject decisions.
+    pub fn main_update(&mut self, lat: &mut Lattice, update_type: UpdateType) {
+
+        // Save the original configuration of the lattice because moves might end up being
+        // rejected.
+        let mut original_lat: &mut Lattice = &mut lat.clone();
+
+        match update_type {
+            Local => {self.update(lat)},
+            Walk => {self.random_walk_update(lat)}
+        };
+
+        // How many links on the new configuration.
+        let new_number_links: u64 = lat.number_filled_links;
+        // How many links on the old configuration.
+        //let old_number_links: u64 = original_lat.number_filled_links;
+
+        // Determine accept or reject. This function will return AcceptReject enum
+        match self.accept_or_reject_update(lat.size, new_number_links) {
+            Reject => {lat = original_lat},
+            Accept => {},
+        };
+    }
 }
 
 pub struct Z3String<'a> {
     /// This borrows a mutable reference to a lattice so it is assumed that an instance of this
     /// struct will be used to perform some operation on the lattice and then go out of scope so
-    /// the mutable reference can be avaliabel again.
+    /// the mutable reference can be available again.
     pub start_loc: Point,
     pub cur_loc: BoundPoint,
     lat: &'a mut Lattice, 

@@ -5,6 +5,7 @@ use z3stringnet::datamodel::BoundPoint;
 use z3stringnet::datamodel::lattice::Lattice;
 use z3stringnet::datamodel::lattice::build_z3_striped_lat;
 use z3stringnet::lattice_updates::Update;
+use z3stringnet::lattice_updates::UpdateType;
 use z3stringnet::estimators::density_estimator::DensityEstimator;
 use z3stringnet::estimators::correlation_origin_estimator::CorrelationOriginEstimator;
 use z3stringnet::estimators::total_link_count_estimator::TotalLinkCountEstimator;
@@ -15,6 +16,7 @@ fn main() {
 
     let equilibrate = false;
     let write_configurations = false;
+    let update_type: UpdateType = UpdateType::Walk;
 
     let size: Point = Point {
         x: 4,
@@ -76,7 +78,7 @@ fn main() {
                         String::from(format!("lattice_{}.csv", total_update_count)), &lat
                     );
                 }
-                updater.random_walk_update(&mut lat);
+                updater.main_update(&mut lat, update_type);
                 total_update_count += 1;
             }
             density_estimator.measure(&lat);
