@@ -22,6 +22,7 @@ use super::Vertex;
 ///     |   |   |   |
 ///     0---+---1---+---
 /// ```
+#[derive(Clone)]
 pub struct Lattice {
     pub vertices: Vec<Vertex>,
     pub size: Point,
