@@ -3,8 +3,8 @@ use super::datamodel::Point;
 use super::datamodel::Direction;
 use super::datamodel::lattice::Lattice;
 use super::datamodel::Link;
-use rand;
-use rand::Rng;
+extern crate rand;
+use rand::prelude::*;
 
 pub enum UpdateType {
     Local,
@@ -90,8 +90,8 @@ impl Update {
     pub fn get_rand_point(&mut self) {
 
         self.working_loc.location = Point {
-            x: rand::thread_rng().gen_range(0, self.working_loc.size.x),
-            y: rand::thread_rng().gen_range(0, self.working_loc.size.y)
+            x: thread_rng().gen_range(0, self.working_loc.size.x),
+            y: thread_rng().gen_range(0, self.working_loc.size.y)
                 
         };
         // for testing
@@ -106,7 +106,7 @@ impl Update {
         let mut z3string = Z3String{
             start_loc: self.working_loc.location,
             cur_loc: self.working_loc,
-            lat: lat
+            lat,
         };
         let mut totatal_link_number_change: i64 = 0;
 
@@ -140,7 +140,7 @@ impl Update {
         let mut z3string = Z3String{
             start_loc: self.working_loc.location,
             cur_loc: self.working_loc,
-            lat: lat
+            lat
         };
         let mut total_link_number_change: i64 = 0;
         // Take first step before loop so cur_loc and start_loc
@@ -163,26 +163,34 @@ impl Update {
     }
 
     /// Accept or reject an update based on the number of links and the size of the lattice.
-    pub fn accept_or_reject_update(lattice_size: Point, number_filled_links: u64) -> AcceptReject{
+    pub fn accept_or_reject_update(&mut self, lattice_size: Point, number_filled_links: u64) -> AcceptReject{
         assert!(lattice_size.x >= 0);
         assert!(lattice_size.y >= 0);
 
-        let total_possible: u64 = lattice_size.x * lattice_size.y * 2 as u64;
-        let ratio: f64 = (number_filled_links as f64) / total_possible;
-        rand_number =
+        let total_possible: u64 = (lattice_size.x * lattice_size.y * 2) as u64;
+        let ratio: f64 = (number_filled_links as f64) / total_possible as f64;
+        let mut check_against = (ratio + self.link_number_tuning)/2.0;
+        check_against = check_against.abs();
+        let mut rng = thread_rng();
+        let rand_number: f64 = rng.gen();
+
+        if rand_number < check_against{
+            return AcceptReject::Accept
+        }
+        return  AcceptReject::Reject
     }
 
     /// Organizes the calling of the update functions while taking care of high level
     /// accept reject decisions.
-    pub fn main_update(&mut self, lat: &mut Lattice, update_type: UpdateType) {
+    pub fn main_update(&mut self, lat: &mut Lattice, update_type: &UpdateType) {
 
         // Save the original configuration of the lattice because moves might end up being
         // rejected.
-        let mut original_lat: &mut Lattice = &mut lat.clone();
+        let original_lat: Lattice = lat.clone();
 
         match update_type {
-            Local => {self.update(lat)},
-            Walk => {self.random_walk_update(lat)}
+            UpdateType::Local => {self.update(lat)},
+            UpdateType::Walk => {self.random_walk_update(lat)}
         };
 
         // How many links on the new configuration.
@@ -192,8 +200,8 @@ impl Update {
 
         // Determine accept or reject. This function will return AcceptReject enum
         match self.accept_or_reject_update(lat.size, new_number_links) {
-            Reject => {lat = original_lat},
-            Accept => {},
+            AcceptReject::Reject => {*lat = original_lat},
+            AcceptReject::Accept => {},
         };
     }
 }

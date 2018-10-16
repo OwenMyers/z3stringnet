@@ -16,7 +16,7 @@ fn main() {
 
     let equilibrate = false;
     let write_configurations = false;
-    let update_type: UpdateType = UpdateType::Walk;
+    let update_type: &UpdateType = &UpdateType::Walk;
 
     let size: Point = Point {
         x: 4,
@@ -59,7 +59,7 @@ fn main() {
         let equilibration_time = 1;
 
         println!("Number of updates in equilibration: {}", equilibration_time);
-        for i in 0..equilibration_time {
+        for _ in 0..equilibration_time {
             updater.random_walk_update(&mut lat);
         }
         println!("Done equilibrating");
@@ -67,18 +67,18 @@ fn main() {
 
     // Actual run
     let mut total_update_count: u64 = 0;
-    for i in 0..number_bins {
-        //println!("Working on bin {}", i);
-        for j in 0..number_measure {
-            //println!("j {}", j);
-            for k in 0..number_update {
-                //println!("k {}", k);
+    for _i in 0..number_bins {
+        //println!("Working on bin {}", _i);
+        for _j in 0..number_measure {
+            //println!("j {}", _j);
+            for _k in 0..number_update {
+                //println!("k {}", _k);
                 if write_configurations {
                     write_lattice(
                         String::from(format!("lattice_{}.csv", total_update_count)), &lat
                     );
                 }
-                updater.main_update(&mut lat, update_type);
+                updater.main_update(&mut lat, &update_type);
                 total_update_count += 1;
             }
             density_estimator.measure(&lat);

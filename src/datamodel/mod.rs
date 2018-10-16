@@ -4,6 +4,8 @@ pub mod lattice;
 use self::lattice::x_from_vertex_vec_position;
 use self::lattice::y_from_vertex_vec_position;
 use std::ops::Add;
+use std::slice::Iter;
+
 
 #[derive(Debug, Clone, Copy)]
 pub enum Link {
@@ -48,6 +50,12 @@ impl Direction {
             _ => panic!("Not a valid random integer for random direction.")
         }
     }
+    pub fn iterator() -> Iter<'static, Direction> {
+        static DIRECTIONS: [Direction;  4] = [
+            Direction::N, Direction::S, Direction::E, Direction::W
+        ];
+        DIRECTIONS.into_iter()
+    }
 }
 
 #[derive(Debug)]
@@ -79,6 +87,7 @@ impl VertexLinkCount {
         self.w = 0;
     }
 }
+
 /// A `Lattice` is built exclusivly with these objects each containing `Links` that
 /// touch the vertex.
 /// 
@@ -121,8 +130,8 @@ impl<'a> Add <Point> for &'a BoundPoint{
                 x: self.size.x,
                 y: self.size.y,
             },
-            // Be carful here: % is nod modulus but the remainder -> can be negative.
-            // This looks strange becase the extra stuff will insure that we get 
+            // Be careful here: % is nod modulus but the remainder -> can be negative.
+            // This looks strange because the extra stuff will insure that we get
             // the modulus.
             location: Point {
                 x: ((new_x % self.size.x) + self.size.x) % self.size.x,
