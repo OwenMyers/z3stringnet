@@ -168,12 +168,14 @@ impl Update {
         assert!(lattice_size.y >= 0);
 
         let total_possible: u64 = (lattice_size.x * lattice_size.y * 2) as u64;
-        let ratio: f64 = (number_filled_links as f64) / total_possible as f64;
-        let mut check_against = (ratio + self.link_number_tuning)/2.0;
-        check_against = check_against.abs();
+        // normalization factor for the weights.
+        let mut normalization_factor = 0;
+        for i in 0..total_possible {
+            normalization_factor += f64::pow(self.link_number_tuning, i as f64);
+        }
+        let mut check_against = f64::pow(self.link_number_tuning, number_filled_links as f64);
         let mut rng = thread_rng();
-        let rand_number: f64 = rng.gen();
-
+        let rand_number: f64 = rng.gen(0.0, normalization_factor);
         if rand_number < check_against{
             return AcceptReject::Accept
         }
