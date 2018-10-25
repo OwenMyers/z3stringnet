@@ -169,13 +169,13 @@ impl Update {
 
         let total_possible: u64 = (lattice_size.x * lattice_size.y * 2) as u64;
         // normalization factor for the weights.
-        let mut normalization_factor = 0;
+        let mut normalization_factor: f64 = 0.0;
         for i in 0..total_possible {
-            normalization_factor += f64::pow(self.link_number_tuning, i as f64);
+            normalization_factor += f64::powf(self.link_number_tuning, i as f64);
         }
-        let mut check_against = f64::pow(self.link_number_tuning, number_filled_links as f64);
+        let check_against = f64::powf(self.link_number_tuning, number_filled_links as f64);
         let mut rng = thread_rng();
-        let rand_number: f64 = rng.gen(0.0, normalization_factor);
+        let rand_number: f64 = rng.gen_range(0.0, normalization_factor);
         if rand_number < check_against{
             return AcceptReject::Accept
         }
