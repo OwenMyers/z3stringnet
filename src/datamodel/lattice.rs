@@ -26,7 +26,7 @@ use super::Vertex;
 pub struct Lattice {
     pub vertices: Vec<Vertex>,
     pub size: Point,
-    pub number_filled_links: u64,
+    pub number_filled_links: i64,
 }
 impl Lattice {
     // Only storing one sublattice so other vertices are implied.
@@ -172,7 +172,7 @@ pub fn build_z3_striped_lat(size: Point) -> Lattice {
     let mut lat: Lattice = Lattice {
         vertices: Vec::new(),
         size,
-        number_filled_links: (size.y / 2 * size.x) as u64
+        number_filled_links: (size.y / 2 * size.x) as i64
     };
 
     let half_n = (lat.size.x * lat.size.y)/2;

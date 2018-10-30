@@ -4,6 +4,7 @@ use z3stringnet::datamodel::Point;
 use z3stringnet::datamodel::BoundPoint;
 use z3stringnet::datamodel::lattice::Lattice;
 use z3stringnet::datamodel::lattice::build_z3_striped_lat;
+use z3stringnet::datamodel::lattice::build_blank_lat;
 use z3stringnet::lattice_updates::Update;
 use z3stringnet::lattice_updates::UpdateType;
 use z3stringnet::estimators::density_estimator::DensityEstimator;
@@ -12,9 +13,10 @@ use z3stringnet::estimators::total_link_count_estimator::TotalLinkCountEstimator
 use z3stringnet::estimators::Measurable;
 use z3stringnet::oio::*;
 
+
 fn main() {
 
-    let equilibrate = false;
+    let equilibrate = true;
     let write_configurations = false;
     let update_type: &UpdateType = &UpdateType::Walk;
 
@@ -25,14 +27,14 @@ fn main() {
 
     let mut lat: Lattice;
     // lat now owns size -> That is good and intentional
-    //lat = build_blank_lat(size);
-    lat = build_z3_striped_lat(size);
+    lat = build_blank_lat(size);
+    //lat = build_z3_striped_lat(size);
 
-    // number_bins: The number of lines in the data file
-    let number_bins: u64 = 10000;
-    // number_measure: How many measurements to average over per bin
-    let number_measure: u64 = 200;
-    // number_update: How many updated before a measurement
+    // number_bins: The number of lines in the data file (10000)
+    let number_bins: u64 = 20000;
+    // number_measure: How many measurements to average over per bin (500)
+    let number_measure: u64 = 500;
+    // number_update: How many updated before a measurement (5)
     let number_update: u64 = 5;
     // for local updates it should be
     //let number_update: u64 = 2 * lat.size.x * lat.size.y;
@@ -43,7 +45,7 @@ fn main() {
             size: lat.size,
             location: Point{x: 0, y: 0},
         },
-        link_number_tuning: 0.05,
+        link_number_tuning: 0.9,
         link_number_change: 0,
     };
 
@@ -55,12 +57,12 @@ fn main() {
     // Equilibrate
     if equilibrate {
         println!("Equilibrating");
-        //let equilibration_time = lat.size.x * lat.size.y;
-        let equilibration_time = 1;
+        let equilibration_time = lat.size.x * lat.size.y;
+        //let equilibration_time = 1;
 
         println!("Number of updates in equilibration: {}", equilibration_time);
         for _ in 0..equilibration_time {
-            updater.random_walk_update(&mut lat);
+            updater.main_update(&mut lat, &update_type);
         }
         println!("Done equilibrating");
     }

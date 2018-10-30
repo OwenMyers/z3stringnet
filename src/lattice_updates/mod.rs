@@ -10,6 +10,7 @@ pub enum UpdateType {
     Local,
     Walk,
 }
+#[derive(Debug)]
 pub enum AcceptReject {
     Accept,
     Reject,
@@ -137,35 +138,44 @@ impl Update {
     pub fn random_walk_update(&mut self, lat: &mut Lattice) {
 
         self.get_rand_point();
-        let mut z3string = Z3String{
-            start_loc: self.working_loc.location,
-            cur_loc: self.working_loc,
-            lat
-        };
-        let mut total_link_number_change: i64 = 0;
-        // Take first step before loop so cur_loc and start_loc
-        // are different.  
-        let cur_direction = Direction::get_random_direction();
-        let before_after_links: (Link, Link) = z3string.raise_step(&cur_direction);
-        let number_increase_or_decrease = Update::find_increase_or_decrease(before_after_links);
-        total_link_number_change += number_increase_or_decrease as i64;
-
-        while z3string.cur_loc != z3string.start_loc {
-            //println!("In while loop: cur_loc {:?}, start_loc {:?}", z3string.cur_loc, z3string.start_loc);
+        // This strange scoping makes sure we can add to the number filled links at the bottom.
+        // Have to un-borrow the lat ref which is borrowed by the Z3String.
+        {
+            let mut z3string = Z3String {
+                start_loc: self.working_loc.location,
+                cur_loc: self.working_loc,
+                lat
+            };
+            let mut total_link_number_change: i64 = 0;
+            // Take first step before loop so cur_loc and start_loc
+            // are different.
             let cur_direction = Direction::get_random_direction();
-            //println!("  direction {:?}", cur_direction);
             let before_after_links: (Link, Link) = z3string.raise_step(&cur_direction);
             let number_increase_or_decrease = Update::find_increase_or_decrease(before_after_links);
             total_link_number_change += number_increase_or_decrease as i64;
-        }
-        assert_eq!(z3string.cur_loc, z3string.start_loc);
-        self.link_number_change = total_link_number_change;
+
+            while z3string.cur_loc != z3string.start_loc {
+                //println!("In while loop: cur_loc {:?}, start_loc {:?}", z3string.cur_loc, z3string.start_loc);
+                let cur_direction = Direction::get_random_direction();
+                //println!("  direction {:?}", cur_direction);
+                let before_after_links: (Link, Link) = z3string.raise_step(&cur_direction);
+                let number_increase_or_decrease = Update::find_increase_or_decrease(before_after_links);
+                total_link_number_change += number_increase_or_decrease as i64;
+            }
+            assert_eq!(z3string.cur_loc, z3string.start_loc);
+            //println!("total_link_number_change {:?}", total_link_number_change);
+            self.link_number_change = total_link_number_change;
+        };
+
+        lat.number_filled_links += self.link_number_change;
+        assert!(lat.number_filled_links >= 0);
     }
 
     /// Accept or reject an update based on the number of links and the size of the lattice.
-    pub fn accept_or_reject_update(&mut self, lattice_size: Point, number_filled_links: u64) -> AcceptReject{
+    pub fn accept_or_reject_update(&mut self, lattice_size: Point, number_filled_links: i64) -> AcceptReject{
         assert!(lattice_size.x >= 0);
         assert!(lattice_size.y >= 0);
+        assert!(number_filled_links >= 0);
 
         let total_possible: u64 = (lattice_size.x * lattice_size.y * 2) as u64;
         // normalization factor for the weights.
@@ -176,6 +186,14 @@ impl Update {
         let check_against = f64::powf(self.link_number_tuning, number_filled_links as f64);
         let mut rng = thread_rng();
         let rand_number: f64 = rng.gen_range(0.0, normalization_factor);
+
+        //println!("number_filled_links {:?}", number_filled_links);
+        //println!("normalization_factor {:?}", normalization_factor);
+        //println!("rng {:?}", rng);
+        //println!("rand_number {:?}", rand_number);
+        //println!("check_against {:?}", check_against);
+        //println!("self.link_number_tuning {:?}", self.link_number_tuning);
+        //println!("AcceptReject {:?}", AcceptReject::Reject);
         if rand_number < check_against{
             return AcceptReject::Accept
         }
@@ -191,12 +209,12 @@ impl Update {
         let original_lat: Lattice = lat.clone();
 
         match update_type {
-            UpdateType::Local => {self.update(lat)},
-            UpdateType::Walk => {self.random_walk_update(lat)}
+            UpdateType::Local => self.update(lat),
+            UpdateType::Walk => self.random_walk_update(lat)
         };
 
         // How many links on the new configuration.
-        let new_number_links: u64 = lat.number_filled_links;
+        let new_number_links: i64 = lat.number_filled_links;
         // How many links on the old configuration.
         //let old_number_links: u64 = original_lat.number_filled_links;
 
