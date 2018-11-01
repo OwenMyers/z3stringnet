@@ -38,7 +38,7 @@ impl TotalLinkCountEstimator {
         let mut header_string = String::new();
         header_string.push_str("Average Total Link Counts\n");
         match total_link_count_estimator.result_file_buffer.write(header_string.as_bytes()){
-            Err(_err) => panic!("Can now write total link count header."),
+            Err(_err) => panic!("Can not write total link count header."),
             Ok(_) => println!("Wrote total link count header."),
         };
 

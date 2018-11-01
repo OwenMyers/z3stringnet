@@ -29,8 +29,8 @@ fn simple_file_make_helper_function(direction_string: &str,
 }
 
 /// Measures the string correlation function from the horizontal 
-/// and vertical links at the origin seperatly, 
-/// in the out and in direcction (from origin vertex) seperatly
+/// and vertical links at the origin separately,
+/// in the out and in direction (from origin vertex) separately
 /// as well
 /// 
 /// This is really 4 correlation functions set up as one.  
@@ -53,7 +53,7 @@ pub struct CorrelationOriginEstimator {
 impl CorrelationOriginEstimator {
 
     pub fn new(size: &Point) -> CorrelationOriginEstimator {
-        println!("Initilizing HorizontalCorrelationOriginEstimator");
+        println!("Initializing HorizontalCorrelationOriginEstimator");
         let result_file_buffer_horizontal_out = 
             simple_file_make_helper_function("out", "horizontal");
         let result_file_buffer_horizontal_in = 
