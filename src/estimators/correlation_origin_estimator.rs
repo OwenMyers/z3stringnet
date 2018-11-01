@@ -69,10 +69,10 @@ impl CorrelationOriginEstimator {
             cur_binary_horizontal_in_correlation: Vec::new(),
             cur_binary_vertical_out_correlation: Vec::new(),
             cur_binary_vertical_in_correlation: Vec::new(),
-            result_file_buffer_horizontal_out: result_file_buffer_horizontal_out,
-            result_file_buffer_horizontal_in: result_file_buffer_horizontal_in,
-            result_file_buffer_vertical_out: result_file_buffer_vertical_out,
-            result_file_buffer_vertical_in: result_file_buffer_vertical_in,
+            result_file_buffer_horizontal_out,
+            result_file_buffer_horizontal_in,
+            result_file_buffer_vertical_out,
+            result_file_buffer_vertical_in,
             vector_size: 0,
         };
         correlation_origin_estimator.vector_size = ((size.x * size.y)/2) as u64; 
