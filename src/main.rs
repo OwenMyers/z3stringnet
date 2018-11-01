@@ -45,7 +45,7 @@ fn main() {
             size: lat.size,
             location: Point{x: 0, y: 0},
         },
-        link_number_tuning: 0.9,
+        link_number_tuning: 0.2,
         link_number_change: 0,
     };
 

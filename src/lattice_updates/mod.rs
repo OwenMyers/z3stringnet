@@ -172,26 +172,29 @@ impl Update {
     }
 
     /// Accept or reject an update based on the number of links and the size of the lattice.
-    pub fn accept_or_reject_update(&mut self, lattice_size: Point, number_filled_links: i64) -> AcceptReject{
+    pub fn accept_or_reject_update(
+        &mut self,
+        lattice_size: Point,
+        number_filled_links: i64,
+        old_number_filled_links: i64
+    ) -> AcceptReject{
+
         assert!(lattice_size.x >= 0);
         assert!(lattice_size.y >= 0);
         assert!(number_filled_links >= 0);
 
         let total_possible: u64 = (lattice_size.x * lattice_size.y * 2) as u64;
-        // normalization factor for the weights.
-        let mut normalization_factor: f64 = 0.0;
-        for i in 0..total_possible {
-            normalization_factor += f64::powf(self.link_number_tuning, i as f64);
-        }
-        let check_against = f64::powf(self.link_number_tuning, number_filled_links as f64);
+        let new_weight = f64::powf(self.link_number_tuning, number_filled_links as f64);
+        let old_weight = f64::powf(self.link_number_tuning, old_number_filled_links as f64);
+        let check_against: f64 = new_weight / old_weight;
         let mut rng = thread_rng();
-        let rand_number: f64 = rng.gen_range(0.0, normalization_factor);
+        let rand_number: f64 = rng.gen_range(0.0, 1.0);
 
         //println!("number_filled_links {:?}", number_filled_links);
         //println!("normalization_factor {:?}", normalization_factor);
         //println!("rng {:?}", rng);
         //println!("rand_number {:?}", rand_number);
-        //println!("check_against {:?}", check_against);
+        //println!("new_weight {:?}", new_weight);
         //println!("self.link_number_tuning {:?}", self.link_number_tuning);
         //println!("AcceptReject {:?}", AcceptReject::Reject);
         if rand_number < check_against{
@@ -215,11 +218,16 @@ impl Update {
 
         // How many links on the new configuration.
         let new_number_links: i64 = lat.number_filled_links;
+        let old_number_links: i64 = original_lat.number_filled_links;
         // How many links on the old configuration.
         //let old_number_links: u64 = original_lat.number_filled_links;
 
         // Determine accept or reject. This function will return AcceptReject enum
-        match self.accept_or_reject_update(lat.size, new_number_links) {
+        match self.accept_or_reject_update(
+            lat.size,
+            new_number_links,
+            old_number_links
+        ) {
             AcceptReject::Reject => {*lat = original_lat},
             AcceptReject::Accept => {},
         };
