@@ -3,6 +3,10 @@ use std::path::Path;
 use std::error::Error;
 use std::io::BufWriter;
 use super::Measurable;
+use super::super::datamodel::Link;
+use super::super::datamodel::Point;
+use super::super::datamodel::lattice::Lattice;
+use super::super::datamodel::Direction;
 
 #[derive(Debug)]
 pub struct WindingNumberCountEstimator {
@@ -35,18 +39,18 @@ impl WindingNumberCountEstimator {
 
         let mut header_string = String::new();
         header_string.push_str("Horizontal,Vertical\n");
-        match total_link_count_estimator.result_file_buffer.write(header_string.as_bytes()){
+        match winding_number_count_estimator.result_file_buffer.write(header_string.as_bytes()){
             Err(_err) => panic!("Can not write winding number count header."),
             Ok(_) => println!("Wrote total link count header."),
         };
 
         println!("Done initializing winding number count estimator.");
 
-        total_link_count_estimator
+        winding_number_count_estimator
     }
 
-    fn simple_add_sub_from_link_direction(&mut i64: num_in, &Link: link_in) {
-        match *link_in {
+    fn simple_add_sub_from_link_direction(num_in: &mut i64, link_in: &Link) {
+        match link_in {
             Link::In => *num_in -= 1,
             Link::Out => *num_in += 1,
             Link::Blank => 0,
@@ -55,39 +59,54 @@ impl WindingNumberCountEstimator {
 }
 
 impl Measurable for WindingNumberCountEstimator {
-    fn measure(&mut self, lat: &Lattice) {
+    fn measure(&mut self, lat: &mut Lattice) {
         // First count winding number in vertical direction along column at origin.
         // Also count winding number in vertical direction along column at origin + 1.
         // We can assert that this needs to be the same winding number as that found from the
         // origin column as a safety check.
 
         // Direction of horizontal links to get
-        horz_grab_direction = Direction::E;
-        horz_winding_count: i64 = 0;
-        horz_winding_count_check: i64 = 0;
+        let vert_grab_direction = Direction::E;
+        let vert_winding_count: i64 = 0;
+        let vert_winding_count_check: i64 = 0;
         for i in 0..lat.size.y {
-            cur_point: Point = Point {x: 0, y: i};
-            cur_point_check: Point = Point {x: 1, y: i};
+            let cur_point: Point = Point {x: 0, y: i};
+            let cur_point_check: Point = Point {x: 1, y: i};
 
-            cur_link = lat.get_link_from_point(cur_point, horz_grab_direction);
-            simple_add_sub_from_link_direction(horz_winding_count, cur_link);
-            cur_link_check = lat.get_link_from_point(cur_point_check, horz_grab_direction);
-            simple_add_sub_from_link_direction(horz_winding_count_check_, cur_link_check);
+            let cur_link = lat.get_link_from_point(&cur_point, &vert_grab_direction);
+            self.simple_add_sub_from_link_direction(vert_winding_count, cur_link);
+            let cur_link_check = lat.get_link_from_point(&cur_point_check, &vert_grab_direction);
+            self.simple_add_sub_from_link_direction(vert_winding_count_check, cur_link_check);
 
         }
-        assert_eq!(horz_winding_count, horz_winding_count_check)
-
+        assert_eq!(vert_winding_count, vert_winding_count_check);
 
         // Do the same for the horizontal direction
+        let horz_grab_direction = Direction::N;
+        let horz_winding_count: i64 = 0;
+        let horz_winding_count_check: i64 = 0;
+        for i in 0..lat.size.y {
+            let cur_point: Point = Point {x: i, y: 0};
+            let cur_point_check: Point = Point {x: i, y: 1};
 
+            let cur_link = lat.get_link_from_point(&cur_point, &horz_grab_direction);
+            self.simple_add_sub_from_link_direction(horz_winding_count, cur_link);
+            let cur_link_check = lat.get_link_from_point(&cur_point_check, &horz_grab_direction);
+            self.simple_add_sub_from_link_direction(horz_winding_count_check, cur_link_check);
 
+        }
+        assert_eq!(horz_winding_count, horz_winding_count_check);
+
+        self.count_vertical = vert_winding_count;
+        self.count_horizontal = horz_winding_count;
     }
+
     fn finalize_bin_and_write(&mut self, denominator: u64) {
         let avg_count_vertical: f64 = (self.count_vertical as f64) / (denominator as f64);
         let avg_count_horizontal: f64 = (self.count_horizontal as f64) / (denominator as f64);
 
         let mut out_string: String = String::new();
-        out_string.push_str(&format!("{},{}\n",&avg_count_horizontal,&avg_count_vertical))
+        out_string.push_str(&format!("{},{}\n",&avg_count_horizontal,&avg_count_vertical));
 
         match self.result_file_buffer.write(out_string.as_bytes()) {
             Err(err) => panic!("Can not write to winding count estimator file {}",

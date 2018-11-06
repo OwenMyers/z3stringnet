@@ -10,6 +10,7 @@ use z3stringnet::lattice_updates::UpdateType;
 use z3stringnet::estimators::density_estimator::DensityEstimator;
 use z3stringnet::estimators::correlation_origin_estimator::CorrelationOriginEstimator;
 use z3stringnet::estimators::total_link_count_estimator::TotalLinkCountEstimator;
+use z3stringnet::estimators::winding_number_estimator::WindingNumberCountEstimator;
 use z3stringnet::estimators::Measurable;
 use z3stringnet::oio::*;
 
@@ -45,7 +46,7 @@ fn main() {
             size: lat.size,
             location: Point{x: 0, y: 0},
         },
-        link_number_tuning: 0.2,
+        link_number_tuning: 1.0,
         link_number_change: 0,
     };
 
@@ -53,6 +54,7 @@ fn main() {
     let mut density_estimator = DensityEstimator::new(&lat.size);
     let mut correlation_origin_estimator = CorrelationOriginEstimator::new(&lat.size);
     let mut total_link_count_estimator = TotalLinkCountEstimator::new();
+    let mut winding_count_estimator = WindingNumberCountEstimator::new();
 
     // Equilibrate
     if equilibrate {
@@ -86,12 +88,15 @@ fn main() {
             density_estimator.measure(&lat);
             correlation_origin_estimator.measure(&lat);
             total_link_count_estimator.measure(&lat);
+            winding_count_estimator.measure(&lat);
         }
         density_estimator.finalize_bin_and_write(number_measure);
         correlation_origin_estimator.finalize_bin_and_write(number_measure);
         total_link_count_estimator.finalize_bin_and_write(number_measure);
+        winding_count_estimator.finalize_bin_and_write(number_measure);
         density_estimator.clear();
         correlation_origin_estimator.clear();
         total_link_count_estimator.clear();
+        winding_count_estimator.clear();
     }   
 } 
