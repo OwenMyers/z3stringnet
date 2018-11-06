@@ -63,6 +63,33 @@ impl Lattice {
                 direction is {:?}", loc.x, loc.y, *direction));
         }
     }
+    pub fn safe_get_link_from_point(&self, loc: &Point, direction: &Direction) -> &Link{
+        // See if this point is on the sublattice of the stored vertices.
+        // Only storing one sublattice so other vertices are implied.
+        // Lets call the ones in our `vertices` vector "real" and the
+        // implied ones "fake".
+        let is_real = self.point_real(&loc);
+        // The location of vertex in the vector. This works becuase integers division rounds down.
+        let vloc = loc.y * (self.size.x/2) + loc.x/2;
+        //println!("vector location: {}",vloc);
+        if is_real {
+            match *direction {
+                Direction::N => return &(&self.vertices[vloc as usize]).n,
+                Direction::E => return &(&self.vertices[vloc as usize]).e,
+                Direction::S => return &(&self.vertices[vloc as usize]).s,
+                Direction::W => return &(&self.vertices[vloc as usize]).w,
+            }
+        } 
+        else {
+            // The edges are the tough part to handle
+            // TODO: Or I think it is fine if this is never implemented and the
+            // case of implied sublattice points is handled else where like in the 
+            // string operator.
+            panic!(format!("Cant handle implied vertices yet. Not sure if we need to. \
+                This functionality may never exist. The location is x: {} y: {} and the \
+                direction is {:?}", loc.x, loc.y, *direction));
+        }
+    }
     pub fn out_raise_link(&mut self, loc: &Point, direction: &Direction) -> Link {
         //println!("in lat out raise, loc: {:?}",loc);
         //println!("in lat out raise, dir: {:?}",direction);
