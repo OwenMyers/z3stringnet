@@ -88,15 +88,16 @@ fn main() {
             density_estimator.measure(&lat);
             correlation_origin_estimator.measure(&lat);
             total_link_count_estimator.measure(&lat);
-            winding_count_estimator.measure(&lat);
         }
         density_estimator.finalize_bin_and_write(number_measure);
         correlation_origin_estimator.finalize_bin_and_write(number_measure);
         total_link_count_estimator.finalize_bin_and_write(number_measure);
-        winding_count_estimator.finalize_bin_and_write(number_measure);
         density_estimator.clear();
         correlation_origin_estimator.clear();
         total_link_count_estimator.clear();
-        winding_count_estimator.clear();
-    }   
-} 
+
+        winding_count_estimator.measure(&lat);
+        winding_count_estimator.finalize_bin_and_write(1);
+    }
+    winding_count_estimator.clear();
+}
