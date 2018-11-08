@@ -88,7 +88,7 @@ impl VertexLinkCount {
     }
 }
 
-/// A `Lattice` is built exclusivly with these objects each containing `Links` that
+/// A `Lattice` is built exclusively with these objects each containing `Links` that
 /// touch the vertex.
 /// 
 /// ```
@@ -96,7 +96,7 @@ impl VertexLinkCount {
 /// --+--
 ///   |
 /// ```
-/// `|` and `--` denote the horizontal and vertical links respectivly.
+/// `|` and `--` denote the horizontal and vertical links respectively.
 /// 
 /// `Vertex.xy` is a `Point` specifying the position of the vertex.
 #[derive(Clone)]

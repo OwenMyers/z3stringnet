@@ -183,7 +183,6 @@ impl Update {
         assert!(lattice_size.y >= 0);
         assert!(number_filled_links >= 0);
 
-        let total_possible: u64 = (lattice_size.x * lattice_size.y * 2) as u64;
         let new_weight = f64::powf(self.link_number_tuning, number_filled_links as f64);
         let old_weight = f64::powf(self.link_number_tuning, old_number_filled_links as f64);
         let check_against: f64 = new_weight / old_weight;

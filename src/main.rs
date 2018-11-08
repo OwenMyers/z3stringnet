@@ -10,6 +10,7 @@ use z3stringnet::lattice_updates::UpdateType;
 use z3stringnet::estimators::density_estimator::DensityEstimator;
 use z3stringnet::estimators::correlation_origin_estimator::CorrelationOriginEstimator;
 use z3stringnet::estimators::total_link_count_estimator::TotalLinkCountEstimator;
+use z3stringnet::estimators::winding_number_estimator::WindingNumberCountEstimator;
 use z3stringnet::estimators::Measurable;
 use z3stringnet::oio::*;
 
@@ -17,7 +18,7 @@ use z3stringnet::oio::*;
 fn main() {
 
     let equilibrate = true;
-    let write_configurations = false;
+    let write_configurations = true;
     let update_type: &UpdateType = &UpdateType::Walk;
 
     let size: Point = Point {
@@ -31,11 +32,11 @@ fn main() {
     //lat = build_z3_striped_lat(size);
 
     // number_bins: The number of lines in the data file (10000)
-    let number_bins: u64 = 20000;
+    let number_bins: u64 = 10;
     // number_measure: How many measurements to average over per bin (500)
-    let number_measure: u64 = 500;
+    let number_measure: u64 = 1;
     // number_update: How many updated before a measurement (5)
-    let number_update: u64 = 5;
+    let number_update: u64 = 1;
     // for local updates it should be
     //let number_update: u64 = 2 * lat.size.x * lat.size.y;
 
@@ -45,7 +46,7 @@ fn main() {
             size: lat.size,
             location: Point{x: 0, y: 0},
         },
-        link_number_tuning: 0.2,
+        link_number_tuning: 1.0,
         link_number_change: 0,
     };
 
@@ -53,6 +54,7 @@ fn main() {
     let mut density_estimator = DensityEstimator::new(&lat.size);
     let mut correlation_origin_estimator = CorrelationOriginEstimator::new(&lat.size);
     let mut total_link_count_estimator = TotalLinkCountEstimator::new();
+    let mut winding_count_estimator = WindingNumberCountEstimator::new();
 
     // Equilibrate
     if equilibrate {
@@ -93,5 +95,9 @@ fn main() {
         density_estimator.clear();
         correlation_origin_estimator.clear();
         total_link_count_estimator.clear();
-    }   
-} 
+
+        winding_count_estimator.measure(&lat);
+        winding_count_estimator.finalize_bin_and_write(1);
+    }
+    winding_count_estimator.clear();
+}
