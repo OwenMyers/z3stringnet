@@ -18,7 +18,7 @@ use z3stringnet::oio::*;
 fn main() {
 
     let equilibrate = true;
-    let write_configurations = false;
+    let write_configurations = true;
     let update_type: &UpdateType = &UpdateType::Walk;
 
     let size: Point = Point {
@@ -32,11 +32,11 @@ fn main() {
     //lat = build_z3_striped_lat(size);
 
     // number_bins: The number of lines in the data file (10000)
-    let number_bins: u64 = 20;
+    let number_bins: u64 = 10;
     // number_measure: How many measurements to average over per bin (500)
-    let number_measure: u64 = 50;
+    let number_measure: u64 = 1;
     // number_update: How many updated before a measurement (5)
-    let number_update: u64 = 5;
+    let number_update: u64 = 1;
     // for local updates it should be
     //let number_update: u64 = 2 * lat.size.x * lat.size.y;
 
