@@ -50,7 +50,7 @@ impl WindingNumberCountEstimator {
         winding_number_count_estimator
     }
 
-    fn simple_add_sub_from_link_direction(&self, num_in: &mut i64, link_in: &Link) {
+    pub fn simple_add_sub_from_link_direction(num_in: &mut i64, link_in: &Link) {
         match link_in {
             Link::In => *num_in -= 1,
             Link::Out => *num_in += 1,
@@ -141,8 +141,12 @@ impl Measurable for WindingNumberCountEstimator {
                 maybe_flipped_link_check = *cur_link_check;
             }
 
-            self.simple_add_sub_from_link_direction(&mut vert_winding_count, &maybe_flipped_link);
-            self.simple_add_sub_from_link_direction(&mut vert_winding_count_check, &maybe_flipped_link_check );
+            WindingNumberCountEstimator::simple_add_sub_from_link_direction(
+                &mut vert_winding_count, &maybe_flipped_link
+            );
+            WindingNumberCountEstimator::simple_add_sub_from_link_direction(
+                &mut vert_winding_count_check, &maybe_flipped_link_check
+            );
         }
         let mod_count = WindingNumberCountEstimator::modulo_winding_number(vert_winding_count) as i64;
         let mod_count_check= WindingNumberCountEstimator::modulo_winding_number(vert_winding_count_check) as i64;
