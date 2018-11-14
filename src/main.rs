@@ -11,6 +11,7 @@ use z3stringnet::estimators::density_estimator::DensityEstimator;
 use z3stringnet::estimators::correlation_origin_estimator::CorrelationOriginEstimator;
 use z3stringnet::estimators::total_link_count_estimator::TotalLinkCountEstimator;
 use z3stringnet::estimators::winding_number_estimator::WindingNumberCountEstimator;
+use z3stringnet::estimators::winding_variance_estimator::WindingNumberVarianceEstimator;
 use z3stringnet::estimators::Measurable;
 use z3stringnet::oio::*;
 
@@ -18,12 +19,12 @@ use z3stringnet::oio::*;
 fn main() {
 
     let equilibrate = true;
-    let write_configurations = true;
+    let write_configurations = false;
     let update_type: &UpdateType = &UpdateType::Walk;
 
     let size: Point = Point {
-        x: 4,
-        y: 4,
+        x: 6,
+        y: 6,
     };
 
     let mut lat: Lattice;
@@ -32,11 +33,11 @@ fn main() {
     //lat = build_z3_striped_lat(size);
 
     // number_bins: The number of lines in the data file (10000)
-    let number_bins: u64 = 10;
+    let number_bins: u64 = 10000;
     // number_measure: How many measurements to average over per bin (500)
-    let number_measure: u64 = 1;
+    let number_measure: u64 = 500;
     // number_update: How many updated before a measurement (5)
-    let number_update: u64 = 1;
+    let number_update: u64 = 5;
     // for local updates it should be
     //let number_update: u64 = 2 * lat.size.x * lat.size.y;
 
@@ -46,7 +47,7 @@ fn main() {
             size: lat.size,
             location: Point{x: 0, y: 0},
         },
-        link_number_tuning: 1.0,
+        link_number_tuning: 0.8,
         link_number_change: 0,
     };
 
@@ -55,6 +56,7 @@ fn main() {
     let mut correlation_origin_estimator = CorrelationOriginEstimator::new(&lat.size);
     let mut total_link_count_estimator = TotalLinkCountEstimator::new();
     let mut winding_count_estimator = WindingNumberCountEstimator::new();
+    let mut winding_variance_estimator = WindingNumberVarianceEstimator::new();
 
     // Equilibrate
     if equilibrate {
@@ -88,13 +90,18 @@ fn main() {
             density_estimator.measure(&lat);
             correlation_origin_estimator.measure(&lat);
             total_link_count_estimator.measure(&lat);
+            winding_variance_estimator.measure(&lat);
         }
+
         density_estimator.finalize_bin_and_write(number_measure);
         correlation_origin_estimator.finalize_bin_and_write(number_measure);
         total_link_count_estimator.finalize_bin_and_write(number_measure);
+        winding_variance_estimator.finalize_bin_and_write(number_measure);
+
         density_estimator.clear();
         correlation_origin_estimator.clear();
         total_link_count_estimator.clear();
+        winding_variance_estimator.clear();
 
         winding_count_estimator.measure(&lat);
         winding_count_estimator.finalize_bin_and_write(1);
