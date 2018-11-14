@@ -58,7 +58,7 @@ impl WindingNumberCountEstimator {
         }
     }
 
-    fn modulo_winding_number(x: i64) -> u64 {
+    pub fn modulo_winding_number(x: i64) -> u64 {
         //println!("x {}", x);
         let modulus_by = 3;
         let mut to_return: u64;
@@ -148,6 +148,7 @@ impl Measurable for WindingNumberCountEstimator {
                 &mut vert_winding_count_check, &maybe_flipped_link_check
             );
         }
+
         let mod_count = WindingNumberCountEstimator::modulo_winding_number(vert_winding_count) as i64;
         let mod_count_check= WindingNumberCountEstimator::modulo_winding_number(vert_winding_count_check) as i64;
 
@@ -193,8 +194,8 @@ impl Measurable for WindingNumberCountEstimator {
                 maybe_flipped_link_check = *cur_link_check;
             }
 
-            self.simple_add_sub_from_link_direction(&mut horz_winding_count, &maybe_flipped_link);
-            self.simple_add_sub_from_link_direction(&mut horz_winding_count_check, &maybe_flipped_link_check );
+            WindingNumberCountEstimator::simple_add_sub_from_link_direction(&mut horz_winding_count, &maybe_flipped_link);
+            WindingNumberCountEstimator::simple_add_sub_from_link_direction(&mut horz_winding_count_check, &maybe_flipped_link_check );
         }
         let mod_count= WindingNumberCountEstimator::modulo_winding_number(horz_winding_count) as i64;
         let mod_count_check= WindingNumberCountEstimator::modulo_winding_number(horz_winding_count_check) as i64;
