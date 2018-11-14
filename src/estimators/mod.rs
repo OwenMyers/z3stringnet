@@ -2,6 +2,7 @@ pub mod density_estimator;
 pub mod correlation_origin_estimator;
 pub mod total_link_count_estimator;
 pub mod winding_number_estimator;
+pub mod winding_variance_estimator;
 use super::datamodel::lattice::Lattice;
 use std::io::BufWriter;
 use std::fs::File;
