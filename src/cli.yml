@@ -1,0 +1,28 @@
+
+name: z3stringnet 
+version: "1.0"
+author: Owen M. <owendalemyers@gmail.com>
+about: Z3 string-net model on square lattice
+args:
+    - size:
+        short: s
+        long: size
+        value_name: SIZE
+        multiple: false
+        help: Pass in the lattice size. Assumes square lattice so only pass one number.
+        takes_value: true
+        required: true
+    - weights:
+        short: w
+        long: weights
+        value_name: WEIGHTS
+        multiple: false
+        help: This number to the power of the number of dimers in a given configuration will be 
+          the weights used in the Metropolis algorithm.
+        takes_value: true
+        required: true
+#    - verbose:
+#        short: v
+#        multiple: true
+#        help: Sets the level of verbosity
+

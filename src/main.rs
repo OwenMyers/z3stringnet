@@ -1,5 +1,8 @@
 //use std::error::Error;
+#[macro_use]
+extern crate clap;
 extern crate z3stringnet;
+use clap::App;
 use z3stringnet::datamodel::Point;
 use z3stringnet::datamodel::BoundPoint;
 use z3stringnet::datamodel::lattice::Lattice;
@@ -17,14 +20,25 @@ use z3stringnet::oio::*;
 
 
 fn main() {
+    // Parse arguments
+    let yaml = load_yaml!("cli.yml");
+    let matches = App::from_yaml(yaml).get_matches();
+    
+    let lattice_size_arg_str = matches.value_of("size").unwrap_or("4");
+    let lattice_size_arg: i64 = lattice_size_arg_str.parse().unwrap();
+    println!("Lattice size from argument: {}", lattice_size_arg);
+
+    let weights_arg_str = matches.value_of("weights").unwrap_or("1.0");
+    let weights_arg: f64 = weights_arg_str.parse().unwrap();
+    println!("Weight parameter from argument: {}", weights_arg);
 
     let equilibrate = true;
     let write_configurations = false;
     let update_type: &UpdateType = &UpdateType::Walk;
 
     let size: Point = Point {
-        x: 6,
-        y: 6,
+        x: lattice_size_arg,
+        y: lattice_size_arg,
     };
 
     let mut lat: Lattice;
@@ -47,7 +61,7 @@ fn main() {
             size: lat.size,
             location: Point{x: 0, y: 0},
         },
-        link_number_tuning: 0.8,
+        link_number_tuning: weights_arg,
         link_number_change: 0,
     };
 
