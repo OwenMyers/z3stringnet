@@ -47,7 +47,7 @@ fn main() {
     //lat = build_z3_striped_lat(size);
 
     // number_bins: The number of lines in the data file (10000)
-    let number_bins: u64 = 10000;
+    let number_bins: u64 = 200000;
     // number_measure: How many measurements to average over per bin (500)
     let number_measure: u64 = 500;
     // number_update: How many updated before a measurement (5)
