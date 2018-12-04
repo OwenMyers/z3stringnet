@@ -12,7 +12,7 @@ use super::Vertex;
 /// TODO: Do a check or asertation to ensure the length of vertices
 /// is correct given Point. 
 /// 
-/// ```
+/// ```ignore
 ///     |   |   |   |
 ///     +---6---+---7---
 ///     |   |   |   |
