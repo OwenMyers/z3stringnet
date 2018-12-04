@@ -1,6 +1,7 @@
 use rand;
 use rand::Rng;
 pub mod lattice;
+pub mod cluster;
 use self::lattice::x_from_vertex_vec_position;
 use self::lattice::y_from_vertex_vec_position;
 use std::ops::Add;
@@ -91,7 +92,7 @@ impl VertexLinkCount {
 /// A `Lattice` is built exclusively with these objects each containing `Links` that
 /// touch the vertex.
 /// 
-/// ```
+/// ```ignore
 ///   |
 /// --+--
 ///   |
