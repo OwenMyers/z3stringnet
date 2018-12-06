@@ -10,17 +10,6 @@ use std::collections::HashMap;
 mod tests {
     use super::*;
 
-    fn get_test_int() -> u8 {
-        let test_int: u8 = 8;
-        test_int
-    }
-
-    #[test]
-    fn test_outside_var() {
-        let test_int = get_test_int();
-        assert_eq!(8, test_int);
-    }
-
     #[test]
     fn test_increment_location() {
         let direction = Direction::E;
@@ -60,24 +49,28 @@ pub fn increment_location(location: BoundPoint, direction: &Direction) -> BoundP
     post_increment_bound_point
 }
 
-///// Return a vector of directions where each direction
-///// corresponds to the non empty links of a vertex.
-///// Return is done with option. Pattern match to get the actual vector
-///// and if no non-empty links are found then return None.
-//pub fn directions_of_filled_links(vertex: &Vertex) -> Option<Vec<Direction>> {
-//
-//    non_empty_links = Vec::new();
-//    for direction in Direction::iterator(){
-//        non_empty_links.push(direction)
-//    }
-//    if non_empty_links.len() > 0 {
-//        Some(non_empty_links)
-//    }
-//    else {
-//        None
-//    }
-//
-//}
+/// Return a vector of directions where each direction
+/// corresponds to the non empty links of a vertex.
+/// The order of this vector will be the same order that Direction::iterator()
+/// is done it which is:
+/// `Direction::N, Direction::E, Direction::S, Direction::W`
+/// Return is done with Option. Pattern match to get the actual vector
+/// and if no non-empty links are found then return None.
+pub fn directions_of_filled_links(vertex: &Vertex) -> Option<Vec<Direction>> {
+
+    let mut non_empty_links = Vec::new();
+    for direction in Direction::iterator(){
+        non_empty_links.push(direction.clone());
+        // TODO 
+    }
+    if non_empty_links.len() > 0 {
+        Some(non_empty_links)
+    }
+    else {
+        None
+    }
+
+}
 
 //pub fn watch_cluster(lat: &Lattice) {
 //    // loop over the points in the lattice
