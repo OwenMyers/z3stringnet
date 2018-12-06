@@ -24,7 +24,7 @@ impl Link {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum Direction {
     N,
     E,
@@ -53,7 +53,7 @@ impl Direction {
     }
     pub fn iterator() -> Iter<'static, Direction> {
         static DIRECTIONS: [Direction;  4] = [
-            Direction::N, Direction::S, Direction::E, Direction::W
+            Direction::N, Direction::E, Direction::S, Direction::W
         ];
         DIRECTIONS.into_iter()
     }
