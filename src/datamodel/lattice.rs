@@ -183,15 +183,17 @@ pub fn build_blank_lat(size: Point) -> Lattice {
     lat
 }
 
-
-//     |   |   |   |
-//     +->-6->-+->-7->-
-//     |   |   |   |
-//     4->-+->-5->-+->-
-//     |   |   |   |
-//     +->-2->-+->-3->-
-//     |   |   |   |
-//     0->-+->-1->-+->-
+/// Initilize a striped lattice
+/// ```ignore
+///     |   |   |   |
+///     +->-6->-+->-7->-
+///     |   |   |   |
+///     4->-+->-5->-+->-
+///     |   |   |   |
+///     +->-2->-+->-3->-
+///     |   |   |   |
+///     0->-+->-1->-+->-
+/// ```
 pub fn build_z3_striped_lat(size: Point) -> Lattice {
     println!("Building stagard lattice of size x {}, y {}",
              size.x, size.y);
