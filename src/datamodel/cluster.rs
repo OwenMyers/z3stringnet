@@ -1,4 +1,4 @@
-
+use super::Link;
 use super::Point;
 use super::BoundPoint;
 use super::lattice::Lattice;
@@ -21,6 +21,28 @@ mod tests {
         post_increment_bound_point = increment_location(bound_point, &direction);
         let should_be = Point{x: 2, y: 2};
         assert_eq!(post_increment_bound_point, should_be);
+    }
+    #[test]
+    fn test_add_direction_vector_if_filled_if_filled() {
+        let direction = Direction::N;
+        let link = Link::In;
+        let mut direction_vec = Vec::new();
+        add_direction_vector_if_filled(&mut direction_vec, &direction, &link);
+        assert_eq!(vec![Direction::N], direction_vec);
+    }
+    #[test]
+    fn test_add_direction_vector_if_filled_if_empty() {
+        let direction = Direction::N;
+        let link = Link::Blank;
+        let mut direction_vec = Vec::new();
+        add_direction_vector_if_filled(&mut direction_vec, &direction, &link);
+        assert_eq!(direction_vec.len(), 0);
+    }
+    #[test]
+    fn test_directions_of_filled_links() {
+    }
+    #[test]
+    fn test_directions_of_filled_links_when_empty() {
     }
 }
 
@@ -49,19 +71,28 @@ pub fn increment_location(location: BoundPoint, direction: &Direction) -> BoundP
     post_increment_bound_point
 }
 
+pub fn add_direction_vector_if_filled(
+    keep_vec: &mut Vec<Direction>, direction: &Direction, link: &Link
+) {
+    match *link {
+        Link::In => (*keep_vec).push(direction.clone()),
+        Link::Out => (*keep_vec).push(direction.clone()),
+        Link::Blank => ()
+    }
+}
+
 /// Return a vector of directions where each direction
 /// corresponds to the non empty links of a vertex.
-/// The order of this vector will be the same order that Direction::iterator()
-/// is done it which is:
-/// `Direction::N, Direction::E, Direction::S, Direction::W`
 /// Return is done with Option. Pattern match to get the actual vector
 /// and if no non-empty links are found then return None.
 pub fn directions_of_filled_links(vertex: &Vertex) -> Option<Vec<Direction>> {
 
     let mut non_empty_links = Vec::new();
     for direction in Direction::iterator(){
-        non_empty_links.push(direction.clone());
-        // TODO 
+        add_direction_vector_if_filled(&mut non_empty_links, &direction, &vertex.n);
+        add_direction_vector_if_filled(&mut non_empty_links, &direction, &vertex.e);
+        add_direction_vector_if_filled(&mut non_empty_links, &direction, &vertex.s);
+        add_direction_vector_if_filled(&mut non_empty_links, &direction, &vertex.w);
     }
     if non_empty_links.len() > 0 {
         Some(non_empty_links)
