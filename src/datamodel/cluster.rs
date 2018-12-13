@@ -40,9 +40,37 @@ mod tests {
     }
     #[test]
     fn test_directions_of_filled_links() {
+        let test_vertex = Vertex{
+            n: Link::In,
+            e: Link::Blank,
+            s: Link::Out,
+            w: Link::Blank,
+            xy: Point{x: 1, y: 1}
+        };
+        let dir_vec_option: Option<Vec<Direction>> = directions_of_filled_links(&test_vertex);
+        match dir_vec_option {
+            // See implementaiton of directions_of_filled_links() for order but it will be 
+            // N E S W, removing blanks
+            Some(dir_vec) => assert_eq!(vec![Direction::N, Direction::S], dir_vec),
+            None => panic!("In test_directions_of_filled_links we recived None.")
+        };
     }
     #[test]
     fn test_directions_of_filled_links_when_empty() {
+        let test_vertex = Vertex{
+            n: Link::Blank,
+            e: Link::Blank,
+            s: Link::Blank,
+            w: Link::Blank,
+            xy: Point{x: 1, y: 1}
+        };
+        let dir_vec_option: Option<Vec<Direction>> = directions_of_filled_links(&test_vertex);
+        let post_match = match dir_vec_option {
+            // See implementaiton of directions_of_filled_links() for order but it will be 
+            // N E S W, removing blanks
+            Some(dir_vec) => panic!("In test_directions_of_filled_links we recived Some."),
+            None => (),
+        };
     }
 }
 
@@ -88,20 +116,56 @@ pub fn add_direction_vector_if_filled(
 pub fn directions_of_filled_links(vertex: &Vertex) -> Option<Vec<Direction>> {
 
     let mut non_empty_links = Vec::new();
-    for direction in Direction::iterator(){
-        add_direction_vector_if_filled(&mut non_empty_links, &direction, &vertex.n);
-        add_direction_vector_if_filled(&mut non_empty_links, &direction, &vertex.e);
-        add_direction_vector_if_filled(&mut non_empty_links, &direction, &vertex.s);
-        add_direction_vector_if_filled(&mut non_empty_links, &direction, &vertex.w);
-    }
+    add_direction_vector_if_filled(&mut non_empty_links, &Direction::N, &vertex.n);
+    add_direction_vector_if_filled(&mut non_empty_links, &Direction::E, &vertex.e);
+    add_direction_vector_if_filled(&mut non_empty_links, &Direction::S, &vertex.s);
+    add_direction_vector_if_filled(&mut non_empty_links, &Direction::W, &vertex.w);
     if non_empty_links.len() > 0 {
         Some(non_empty_links)
     }
     else {
         None
     }
-
 }
+// recursive-ish search function:
+// need vars:
+//   stack
+//   initilize vector for direction path "walk list"
+//   current location
+// call directions_of_filled_links(cur_vertex)
+// if none: continue
+// else:
+//   add direction vec to stack
+//   stack full = true
+//   while stack full:
+//     pop off vec off stack
+//     if vec full
+//       pop direction off vec
+//       push modified vec to stack
+//       step direction
+//       push direction to walk list
+//       check if vertex belongs to other cluster
+//       if yes:
+//         if it belong to the current cluster:
+//            Thats good. Time to start backtracking
+//            pop direction from walk list and 
+//            -> reverse step direction (change current location)
+//         else if not the current cluster but part of a cluster
+//            panic because you did something wrong
+//       else:
+//         call direction_of_filled_links
+//         if not none: add to stack
+//         if none: panic
+//
+//        set stack full var
+
+// gotten_map = map verticies to "gotten"
+// Loop over all verticies in lattice
+//   Check if vertex is "gotten" with gotten map.
+//   If gotten:
+//     continue
+//   Else:
+//     recursive search function on vertex (pass in gotten map)
 
 //pub fn watch_cluster(lat: &Lattice) {
 //    // loop over the points in the lattice
