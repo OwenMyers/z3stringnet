@@ -136,12 +136,14 @@ pub fn directions_of_filled_links(vertex: &Vertex) -> Option<Vec<Direction>> {
 // if none: continue
 // else:
 //   add direction vec to stack
-//   stack full = true
-//   while stack full:
+//   while stack.len() > 0:
 //     pop off vec off stack
-//     if vec full
+//     if vec empty:
+//       pop direction from walk list
+//       -> reverse step direction (change current location)
+//     else:
 //       pop direction off vec
-//       push modified vec to stack
+//       push modified vec to stack even if empty
 //       step direction
 //       push direction to walk list
 //       check if vertex belongs to other cluster
@@ -153,11 +155,13 @@ pub fn directions_of_filled_links(vertex: &Vertex) -> Option<Vec<Direction>> {
 //         else if not the current cluster but part of a cluster
 //            panic because you did something wrong
 //       else:
+//         mark new vertex as this cluster
 //         call direction_of_filled_links
 //         if not none: add to stack
 //         if none: panic
 //
-//        set stack full var
+//      assert len stack == len walk list
+//      
 
 // gotten_map = map verticies to "gotten"
 // Loop over all verticies in lattice
