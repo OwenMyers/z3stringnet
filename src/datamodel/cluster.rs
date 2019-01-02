@@ -23,19 +23,31 @@ mod tests {
         assert_eq!(post_increment_bound_point, should_be);
     }
     #[test]
-    fn test_add_direction_vector_if_filled_if_filled() {
+    fn test_decrement_location() {
+        let direction = Direction::E;
+        let bound_point = BoundPoint{
+            size: Point{x:4, y: 4},
+            location: Point{x: 1, y: 2}
+        };
+        let post_decrement_bound_point: BoundPoint;
+        post_decrement_bound_point = decrement_location(bound_point, &direction);
+        let should_be = Point{x: 0, y: 2};
+        assert_eq!(post_decrement_bound_point, should_be);
+    }
+    #[test]
+    fn test_add_to_direction_vec_if_filled_if_filled() {
         let direction = Direction::N;
         let link = Link::In;
         let mut direction_vec = Vec::new();
-        add_direction_vector_if_filled(&mut direction_vec, &direction, &link);
+        add_to_direction_vec_if_filled(&mut direction_vec, &direction, &link);
         assert_eq!(vec![Direction::N], direction_vec);
     }
     #[test]
-    fn test_add_direction_vector_if_filled_if_empty() {
+    fn test_add_to_direction_vec_if_filled_if_empty() {
         let direction = Direction::N;
         let link = Link::Blank;
         let mut direction_vec = Vec::new();
-        add_direction_vector_if_filled(&mut direction_vec, &direction, &link);
+        add_to_direction_vec_if_filled(&mut direction_vec, &direction, &link);
         assert_eq!(direction_vec.len(), 0);
     }
     #[test]
@@ -99,7 +111,15 @@ pub fn increment_location(location: BoundPoint, direction: &Direction) -> BoundP
     post_increment_bound_point
 }
 
-pub fn add_direction_vector_if_filled(
+/// Reverse the input direction and increment the bound point in that
+/// reversed direction.
+pub fn decrement_location(location: BoundPoint, direction: &Direction) -> BoundPoint {
+    let flipped_direction = direction.flip();
+    let post_decrement_bound_point: BoundPoint = increment_location(location, &flipped_direction);
+    post_decrement_bound_point
+}
+
+pub fn add_to_direction_vec_if_filled(
     keep_vec: &mut Vec<Direction>, direction: &Direction, link: &Link
 ) {
     match *link {
@@ -116,10 +136,10 @@ pub fn add_direction_vector_if_filled(
 pub fn directions_of_filled_links(vertex: &Vertex) -> Option<Vec<Direction>> {
 
     let mut non_empty_links = Vec::new();
-    add_direction_vector_if_filled(&mut non_empty_links, &Direction::N, &vertex.n);
-    add_direction_vector_if_filled(&mut non_empty_links, &Direction::E, &vertex.e);
-    add_direction_vector_if_filled(&mut non_empty_links, &Direction::S, &vertex.s);
-    add_direction_vector_if_filled(&mut non_empty_links, &Direction::W, &vertex.w);
+    add_to_direction_vec_if_filled(&mut non_empty_links, &Direction::N, &vertex.n);
+    add_to_direction_vec_if_filled(&mut non_empty_links, &Direction::E, &vertex.e);
+    add_to_direction_vec_if_filled(&mut non_empty_links, &Direction::S, &vertex.s);
+    add_to_direction_vec_if_filled(&mut non_empty_links, &Direction::W, &vertex.w);
     if non_empty_links.len() > 0 {
         Some(non_empty_links)
     }
@@ -127,6 +147,7 @@ pub fn directions_of_filled_links(vertex: &Vertex) -> Option<Vec<Direction>> {
         None
     }
 }
+
 // recursive-ish search function:
 // need vars:
 //   stack
