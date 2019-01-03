@@ -149,40 +149,69 @@ pub fn directions_of_filled_links(vertex: &Vertex) -> Option<Vec<Direction>> {
 }
 
 // recursive-ish search function:
-// need vars:
-//   stack
-//   initilize vector for direction path "walk list"
-//   current location
-// call directions_of_filled_links(cur_vertex)
-// if none: continue
-// else:
-//   add direction vec to stack
-//   while stack.len() > 0:
-//     pop off vec off stack
-//     if vec empty:
-//       pop direction from walk list
-//       -> reverse step direction (change current location)
-//     else:
-//       pop direction off vec
-//       push modified vec to stack even if empty
-//       step direction
-//       push direction to walk list
-//       check if vertex belongs to other cluster
-//       if yes:
-//         if it belong to the current cluster:
-//            Thats good. Time to start backtracking
-//            pop direction from walk list and 
-//            -> reverse step direction (change current location)
-//         else if not the current cluster but part of a cluster
-//            panic because you did something wrong
-//       else:
-//         mark new vertex as this cluster
-//         call direction_of_filled_links
-//         if not none: add to stack
-//         if none: panic
-//
-//      assert len stack == len walk list
-//      
+pub fn recusiveish_cluster(vertex: &Vertex) -> Option<Vec<Point>> {
+    // general stack to keep track of directions not gone in
+    let mut stack: Vec<Vec<Direction>> = Vec::new();
+    // initilize vector for direction path "walk list"
+    let mut walk_list: Vec<Direction> = Vec::new();
+    let mut current_location: BoundPoint::new();
+    let mut clustered: Vec<Point> = Vec::new();
+    let vertex_available: Vec<Direction> = match directions_of_filled_links(vertex) {
+        Some(to_return_directions) => to_return_directions,
+        None => return None
+    };
+
+    // If we got some directions add direction vec to stack
+    stack.push(vertex_available); 
+    while stack.len() > 0 {
+        // pop off vec off stack
+        let filled_directions: Vec<Direction> = match stack.pop() {
+            Some(to_return_directions) => to_return_directions,
+            None => panic!("Stack should not be empty right after len > 0 check.")
+        };
+        // if vec empty:
+        if filled_directions.len() == 0 {
+            // pop direction from walk list
+            let reverse_step_dir: Direction = match walk_list.pop() {
+                Some(to_return_direction) => to_return_direction,
+                None => panic!("If the stack is not empty neither should the walk list be empty")
+            };
+            //  -> reverse step direction (change current location)
+            //  This function handles flipping the direction to reverse the step.
+            current_location = decrement_location(current_location, &reverse_step_dir);
+        }
+        else {
+            // pop direction off vec
+            let direction: Direction = match filled_directions.pop() {
+                Some(to_return_direction) => to_return_direction,
+                None => panic!("Filled directions should be full")
+            };
+            // push modified vec to stack even if empty
+            stack.push(filled_directions);
+            // step direction
+            current_location = increment_location(current_location, &direction);
+            // push direction to walk list
+            walk_list.push(direction);
+            // check if vertex belongs to other cluster
+             
+            // if yes:
+            //   if it belong to the current cluster:
+            //      Thats good. Time to start backtracking
+            //      pop direction from walk list and 
+            //      -> reverse step direction (change current location)
+            //   else if not the current cluster but part of a cluster
+            //      panic because you did something wrong
+            // else:
+            //   mark new vertex as this cluster
+            //   call direction_of_filled_links
+            //   if not none: add to stack
+            //   if none: panic
+            //
+        }
+        // assert len stack == len walk list
+    }
+    Some(clustered)
+}
 
 // gotten_map = map verticies to "gotten"
 // Loop over all verticies in lattice
