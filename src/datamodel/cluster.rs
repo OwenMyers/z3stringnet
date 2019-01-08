@@ -148,14 +148,22 @@ pub fn directions_of_filled_links(vertex: &Vertex) -> Option<Vec<Direction>> {
     }
 }
 
-// recursive-ish search function:
-pub fn recusiveish_cluster(vertex: &Vertex) -> Option<Vec<Point>> {
+/// I think the HashMap `clustered` will only ever contain points that are clustered. Mostly 
+/// we will just be checking to see if a key exists but I think it is nice to have the option
+/// of having a key that specifically denotes a point is not clustered. Until this
+/// algorithm is complete I won't really know. Just making that note in case there ends up 
+/// being a much better way to handle that in the future.
+pub fn recusiveish_cluster(vertex: &Vertex, lat_size: &Point) -> Option<HashMap<Point, bool>> {
     // general stack to keep track of directions not gone in
     let mut stack: Vec<Vec<Direction>> = Vec::new();
     // initilize vector for direction path "walk list"
     let mut walk_list: Vec<Direction> = Vec::new();
-    let mut current_location: BoundPoint::new();
-    let mut clustered: Vec<Point> = Vec::new();
+    let mut current_location: BoundPoint = BoundPoint {
+        size: lat_size.clone(),
+        location: vertex.xy.clone()
+    };
+    //let mut clustered: Vec<Point> = Vec::new();
+    let mut clustered: HashMap<Point, bool> = HashMap::new();
     let vertex_available: Vec<Direction> = match directions_of_filled_links(vertex) {
         Some(to_return_directions) => to_return_directions,
         None => return None
@@ -165,7 +173,7 @@ pub fn recusiveish_cluster(vertex: &Vertex) -> Option<Vec<Point>> {
     stack.push(vertex_available); 
     while stack.len() > 0 {
         // pop off vec off stack
-        let filled_directions: Vec<Direction> = match stack.pop() {
+        let mut filled_directions: Vec<Direction> = match stack.pop() {
             Some(to_return_directions) => to_return_directions,
             None => panic!("Stack should not be empty right after len > 0 check.")
         };
