@@ -109,7 +109,7 @@ pub struct Vertex {
     pub xy: Point,
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq)]
 pub struct Point {
     pub x: i64,
     pub y: i64,

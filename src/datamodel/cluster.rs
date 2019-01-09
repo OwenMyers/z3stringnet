@@ -153,7 +153,10 @@ pub fn directions_of_filled_links(vertex: &Vertex) -> Option<Vec<Direction>> {
 /// of having a key that specifically denotes a point is not clustered. Until this
 /// algorithm is complete I won't really know. Just making that note in case there ends up 
 /// being a much better way to handle that in the future.
-pub fn recusiveish_cluster(vertex: &Vertex, lat_size: &Point) -> Option<HashMap<Point, bool>> {
+pub fn recusiveish_cluster(vertex: &Vertex, 
+                           lat_size: &Point, 
+                           clustered: &mut HashMap<Point, u64>
+                           ) -> Option<HashMap<Point, bool>> {
     // general stack to keep track of directions not gone in
     let mut stack: Vec<Vec<Direction>> = Vec::new();
     // initilize vector for direction path "walk list"
@@ -162,8 +165,7 @@ pub fn recusiveish_cluster(vertex: &Vertex, lat_size: &Point) -> Option<HashMap<
         size: lat_size.clone(),
         location: vertex.xy.clone()
     };
-    //let mut clustered: Vec<Point> = Vec::new();
-    let mut clustered: HashMap<Point, bool> = HashMap::new();
+    //let mut clustered: HashMap<Point, bool> = HashMap::new();
     let vertex_available: Vec<Direction> = match directions_of_filled_links(vertex) {
         Some(to_return_directions) => to_return_directions,
         None => return None
