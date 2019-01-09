@@ -153,9 +153,18 @@ pub fn directions_of_filled_links(vertex: &Vertex) -> Option<Vec<Direction>> {
 /// of having a key that specifically denotes a point is not clustered. Until this
 /// algorithm is complete I won't really know. Just making that note in case there ends up 
 /// being a much better way to handle that in the future.
+///
+/// # Arguments:
+/// * `vertex` -
+/// * `lat_size` -
+/// * `clustered` -
+/// * `available_cluster_num` - Every time we successfully find a cluster we need to give it
+///   a unique name. That identifier will just be an incrementing integer. We need to keep track
+///   of the value for adding new clusters to the `HashMap` `clustered`.
 pub fn recusiveish_cluster(vertex: &Vertex, 
                            lat_size: &Point, 
-                           clustered: &mut HashMap<Point, u64>
+                           clustered: &mut HashMap<BoundPoint, u64>,
+                           available_cluster_num: u64
                            ) -> Option<HashMap<Point, bool>> {
     // general stack to keep track of directions not gone in
     let mut stack: Vec<Vec<Direction>> = Vec::new();
@@ -165,7 +174,7 @@ pub fn recusiveish_cluster(vertex: &Vertex,
         size: lat_size.clone(),
         location: vertex.xy.clone()
     };
-    //let mut clustered: HashMap<Point, bool> = HashMap::new();
+    //let mut clustered: HashMap<BoundPoint, u64> = HashMap::new();
     let vertex_available: Vec<Direction> = match directions_of_filled_links(vertex) {
         Some(to_return_directions) => to_return_directions,
         None => return None
@@ -203,14 +212,15 @@ pub fn recusiveish_cluster(vertex: &Vertex,
             // push direction to walk list
             walk_list.push(direction);
             // check if vertex belongs to other cluster
-             
             // if yes:
-            //   if it belong to the current cluster:
-            //      Thats good. Time to start backtracking
-            //      pop direction from walk list and 
-            //      -> reverse step direction (change current location)
-            //   else if not the current cluster but part of a cluster
-            //      panic because you did something wrong
+            if clustered.contains_key(current_location) {
+                // if it belong to the current cluster:
+                //    Thats good. Time to start backtracking
+                //    pop direction from walk list and 
+                //    -> reverse step direction (change current location)
+                // else if not the current cluster but part of a cluster
+                //    panic because you did something wrong
+            }
             // else:
             //   mark new vertex as this cluster
             //   call direction_of_filled_links

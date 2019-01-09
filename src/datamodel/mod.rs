@@ -115,7 +115,7 @@ pub struct Point {
     pub y: i64,
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq)]
 pub struct BoundPoint {
     pub size: Point, 
     pub location: Point,
