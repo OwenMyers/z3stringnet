@@ -161,6 +161,8 @@ pub fn directions_of_filled_links(vertex: &Vertex) -> Option<Vec<Direction>> {
 /// * `available_cluster_num` - Every time we successfully find a cluster we need to give it
 ///   a unique name. That identifier will just be an incrementing integer. We need to keep track
 ///   of the value for adding new clusters to the `HashMap` `clustered`.
+///   The "available" cluster number passed in is a cluster number that has "NOT BEEEN USED YET".
+///   It will become the cluster number of the cluster we are trying to cluster in this function.
 pub fn recusiveish_cluster(vertex: &Vertex, 
                            lat_size: &Point, 
                            clustered: &mut HashMap<BoundPoint, u64>,
@@ -213,20 +215,43 @@ pub fn recusiveish_cluster(vertex: &Vertex,
             walk_list.push(direction);
             // check if vertex belongs to other cluster
             // if yes:
-            if clustered.contains_key(current_location) {
+            if clustered.contains_key(&current_location) {
+                let cur_loc_cluster_num: u64 = match clustered.get(&current_location) {
+                    Some(to_return_cluster_num) => *to_return_cluster_num,
+                    None => panic!("There should be something because we just checked contains_key.")
+                };
                 // if it belong to the current cluster:
                 //    Thats good. Time to start backtracking
                 //    pop direction from walk list and 
                 //    -> reverse step direction (change current location)
+                if cur_loc_cluster_num == available_cluster_num {
+                    let last_direction: Direction = match walk_list.pop() {
+                        Some(to_return_direction) => to_return_direction,
+                        None => panic!("Walk list should not be empty at this point.")
+                    };
+                    current_location = decrement_location(current_location, &last_direction);
+                }
                 // else if not the current cluster but part of a cluster
                 //    panic because you did something wrong
+                else {
+                    panic!("Something has gone horribly wrong in the clustering algorithm. A link
+                           has been found that belongs to a different cluster. This should not
+                           be possible.");
+                }
             }
             // else:
             //   mark new vertex as this cluster
             //   call direction_of_filled_links
             //   if not none: add to stack
             //   if none: panic
-            //
+            else {
+                clustered.insert(current_location, available_cluster_num);
+                match directions_of_filled_links(TODO) {
+                    Some(to_return_directions) => stack.push(to_return_directions),
+                    None => panic!("If we moved in this direction we expect there to be at least
+                                   two filled links at this vertex.")
+                };
+            }
         }
         // assert len stack == len walk list
     }
