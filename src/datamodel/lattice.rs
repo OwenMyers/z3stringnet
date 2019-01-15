@@ -29,13 +29,50 @@ pub struct Lattice {
     pub number_filled_links: i64,
 }
 impl Lattice {
-    // Only storing one sublattice so other vertices are implied.
-    // Lets call the ones in our `vertices` vector "real" and the
-    // implied ones "fake".
+    /// Only storing one sublattice so other vertices are implied.
+    /// Lets call the ones in our `vertices` vector "real" and the
+    /// implied ones "fake".
     pub fn point_real(&self, p: &Point) -> bool {
         assert!((p.x >= 0) && (p.y >= 0), "Function point_real requires positive x and y");
         ((p.x + p.y) % 2) == 0
     }
+
+    /// The location of vertex in the vector. This works becuase integers division rounds down.
+    pub fn get_vector_location_of_vertex(&mut self, loc: &Point) -> i64 {
+        loc.y * (self.size.x/2) + loc.x/2
+    }
+
+    /// This function will return a "fake" vertex given a point.
+    ///
+    /// In a `Lattice` object verticies (`Vertex` objects) only belong to 1 sublattice because 
+    /// that is the only necessary information you need to store to represent the lattice.
+    /// You can have a vertex of the other sublattice and it is really converniet to be able to
+    /// get the verticies of any sublattice as well as their constituent directions off the links.
+    /// This function will return a `Vertex` regardles of the sublattice. This is a fake vertex
+    /// because it may not belong to the sublattice that `Lattice` is made out of and most
+    /// importantly changes to the links will not be reflected anywhere else. The returned
+    /// `Vertex` does not (&) reference any "real" information of the lattice.
+    pub fn get_vertex_from_point(&mut self, loc: &Point) -> Vertex {
+
+        let mut to_return_vertex: Vertex;
+        let is_real = self.point_real(&loc);
+        if is_real {
+            let vloc = self.get_vector_location_of_vertex(&loc);
+            to_return_vertex = Vertex {
+                n: self.get_link_from_point(loc, &Direction::N).clone(),
+                e: self.get_link_from_point(loc, &Direction::E).clone(),
+                s: self.get_link_from_point(loc, &Direction::S).clone(),
+                w: self.get_link_from_point(loc, &Direction::W).clone(),
+                xy: *loc.clone(),
+            }
+        }
+
+        else {
+        }
+
+        to_return_vertex
+    }
+
     pub fn get_link_from_point(&mut self, loc: &Point, direction: &Direction) -> &mut Link{
         // See if this point is on the sublattice of the stored vertices.
         // Only storing one sublattice so other vertices are implied.
@@ -43,7 +80,7 @@ impl Lattice {
         // implied ones "fake".
         let is_real = self.point_real(&loc);
         // The location of vertex in the vector. This works becuase integers division rounds down.
-        let vloc = loc.y * (self.size.x/2) + loc.x/2;
+        let vloc = self.get_vector_location_of_vertex(&loc);
         //println!("vector location: {}",vloc);
         if is_real {
             match *direction {

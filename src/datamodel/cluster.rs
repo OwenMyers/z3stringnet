@@ -166,8 +166,10 @@ pub fn directions_of_filled_links(vertex: &Vertex) -> Option<Vec<Direction>> {
 pub fn recusiveish_cluster(vertex: &Vertex, 
                            lat_size: &Point, 
                            clustered: &mut HashMap<BoundPoint, u64>,
-                           available_cluster_num: u64
+                           available_cluster_num: u64,
+                           lattice: &Lattice
                            ) -> Option<HashMap<Point, bool>> {
+    
     // general stack to keep track of directions not gone in
     let mut stack: Vec<Vec<Direction>> = Vec::new();
     // initilize vector for direction path "walk list"
@@ -176,6 +178,7 @@ pub fn recusiveish_cluster(vertex: &Vertex,
         size: lat_size.clone(),
         location: vertex.xy.clone()
     };
+
     //let mut clustered: HashMap<BoundPoint, u64> = HashMap::new();
     let vertex_available: Vec<Direction> = match directions_of_filled_links(vertex) {
         Some(to_return_directions) => to_return_directions,
