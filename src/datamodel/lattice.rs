@@ -1,7 +1,28 @@
 use super::Direction;
 use super::Link;
 use super::Point;
+use super::BoundPoint;
 use super::Vertex;
+use super::cluster::increment_location;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_blank_vertex_from_real_point() {
+        let lat: Lattice = build_blank_lat(Point{x: 4, y: 4});
+    }
+    #[test]
+    fn test_get_blank_vertex_from_fake_point() {
+    }
+    #[test]
+    fn test_get_in_out_vertext_from_real_point() {
+    }
+    #[test]
+    fn test_get_in_out_vertext_from_fake_point() {
+    }
+}
 
 /// Stores the representation of the sytem
 /// 
@@ -52,22 +73,58 @@ impl Lattice {
     /// because it may not belong to the sublattice that `Lattice` is made out of and most
     /// importantly changes to the links will not be reflected anywhere else. The returned
     /// `Vertex` does not (&) reference any "real" information of the lattice.
-    pub fn get_vertex_from_point(&mut self, loc: &Point) -> Vertex {
-
+    pub fn get_vertex_from_point(&mut self, loc: &BoundPoint) -> Vertex {
+        let point_from_bound = Point{x: loc.location.x, y: loc.location.y};
         let mut to_return_vertex: Vertex;
-        let is_real = self.point_real(&loc);
+        let is_real = self.point_real(&point_from_bound);
         if is_real {
-            let vloc = self.get_vector_location_of_vertex(&loc);
+            let vloc = self.get_vector_location_of_vertex(&point_from_bound);
             to_return_vertex = Vertex {
-                n: self.get_link_from_point(loc, &Direction::N).clone(),
-                e: self.get_link_from_point(loc, &Direction::E).clone(),
-                s: self.get_link_from_point(loc, &Direction::S).clone(),
-                w: self.get_link_from_point(loc, &Direction::W).clone(),
-                xy: *loc.clone(),
+                n: self.get_link_from_point(&point_from_bound, &Direction::N).clone(),
+                e: self.get_link_from_point(&point_from_bound, &Direction::E).clone(),
+                s: self.get_link_from_point(&point_from_bound, &Direction::S).clone(),
+                w: self.get_link_from_point(&point_from_bound, &Direction::W).clone(),
+                xy: Point {x: loc.location.x, y: loc.location.y},
             }
         }
 
         else {
+            // Step in all 4 directions.
+            
+            // E.g. 
+            // * Step in direction E. 
+            // * Return W link from new location
+            // * Flip link to add to retern vertex
+            
+            // Start with E direction like above
+            let new_loc: BoundPoint = increment_location(*loc, &Direction::E);
+            let new_point_from_bound = Point{x: new_loc.location.x, y: new_loc.location.y};
+            let east_link: Link = self.get_link_from_point(
+                &new_point_from_bound, &Direction::W).clone().flip();
+
+            // W direction 
+            let new_loc: BoundPoint = increment_location(*loc, &Direction::W);
+            let west_link: Link = self.get_link_from_point(
+                &new_point_from_bound, &Direction::E).clone().flip();
+
+            // N direction 
+            let new_loc: BoundPoint = increment_location(*loc, &Direction::N);
+            let north_link: Link = self.get_link_from_point(
+                &new_point_from_bound, &Direction::S).clone().flip();
+
+            // S direction 
+            let new_loc: BoundPoint = increment_location(*loc, &Direction::S);
+            let south_link: Link = self.get_link_from_point(
+                &new_point_from_bound, &Direction::N).clone().flip();
+
+            // TODO
+            to_return_vertex = Vertex {
+                n: north_link,
+                e: east_link,
+                s: south_link,
+                w: west_link,
+                xy: Point {x: loc.location.x, y: loc.location.y},
+            }
         }
 
         to_return_vertex
