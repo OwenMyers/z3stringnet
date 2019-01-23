@@ -83,6 +83,7 @@ mod tests {
             Some(dir_vec) => panic!("In test_directions_of_filled_links we recived Some."),
             None => (),
         };
+        assert_eq!(post_match, ());
     }
 }
 
