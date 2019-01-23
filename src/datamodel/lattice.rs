@@ -11,16 +11,55 @@ mod tests {
 
     #[test]
     fn test_get_blank_vertex_from_real_point() {
-        let lat: Lattice = build_blank_lat(Point{x: 4, y: 4});
+        let mut lat: Lattice = build_blank_lat(Point{x: 4, y: 4});
+        let loc: BoundPoint = BoundPoint{
+            size: Point{x: 4, y: 4},
+            location: Point{x: 0, y: 0},
+        };
+        let vertex: Vertex = lat.get_vertex_from_point(&loc);
+        assert_eq!(vertex.n, Link::Blank);
+        assert_eq!(vertex.e, Link::Blank);
+        assert_eq!(vertex.s, Link::Blank);
+        assert_eq!(vertex.w, Link::Blank);
     }
     #[test]
     fn test_get_blank_vertex_from_fake_point() {
+        let mut lat: Lattice = build_blank_lat(Point{x: 4, y: 4});
+        let loc: BoundPoint = BoundPoint{
+            size: Point{x: 4, y: 4},
+            location: Point{x: 1, y: 0},
+        };
+        let vertex: Vertex = lat.get_vertex_from_point(&loc);
+        assert_eq!(vertex.n, Link::Blank);
+        assert_eq!(vertex.e, Link::Blank);
+        assert_eq!(vertex.s, Link::Blank);
+        assert_eq!(vertex.w, Link::Blank);
     }
     #[test]
     fn test_get_in_out_vertext_from_real_point() {
+        let mut lat: Lattice = build_z3_striped_lat(Point{x: 4, y: 4});
+        let loc: BoundPoint = BoundPoint{
+            size: Point{x: 4, y: 4},
+            location: Point{x: 0, y: 0},
+        };
+        let vertex: Vertex = lat.get_vertex_from_point(&loc);
+        assert_eq!(vertex.w, Link::In);
+        assert_eq!(vertex.e, Link::Out);
+        assert_eq!(vertex.n, Link::Blank);
+        assert_eq!(vertex.s, Link::Blank);
     }
     #[test]
     fn test_get_in_out_vertext_from_fake_point() {
+        let mut lat: Lattice = build_z3_striped_lat(Point{x: 4, y: 4});
+        let loc: BoundPoint = BoundPoint{
+            size: Point{x: 4, y: 4},
+            location: Point{x: 1, y: 0},
+        };
+        let vertex: Vertex = lat.get_vertex_from_point(&loc);
+        assert_eq!(vertex.w, Link::In);
+        assert_eq!(vertex.e, Link::Out);
+        assert_eq!(vertex.n, Link::Blank);
+        assert_eq!(vertex.s, Link::Blank);
     }
 }
 
@@ -97,25 +136,28 @@ impl Lattice {
             // * Flip link to add to retern vertex
             
             // Start with E direction like above
-            let new_loc: BoundPoint = increment_location(*loc, &Direction::E);
-            let new_point_from_bound = Point{x: new_loc.location.x, y: new_loc.location.y};
+            let _e_new_loc: BoundPoint = increment_location(*loc, &Direction::E);
+            let e_new_point_from_bound = Point{x: _e_new_loc.location.x, y: _e_new_loc.location.y};
             let east_link: Link = self.get_link_from_point(
-                &new_point_from_bound, &Direction::W).clone().flip();
+                &e_new_point_from_bound, &Direction::W).clone().flip();
 
             // W direction 
-            let new_loc: BoundPoint = increment_location(*loc, &Direction::W);
+            let _w_new_loc: BoundPoint = increment_location(*loc, &Direction::W);
+            let w_new_point_from_bound = Point{x: _w_new_loc.location.x, y: _w_new_loc.location.y};
             let west_link: Link = self.get_link_from_point(
-                &new_point_from_bound, &Direction::E).clone().flip();
+                &w_new_point_from_bound, &Direction::E).clone().flip();
 
             // N direction 
-            let new_loc: BoundPoint = increment_location(*loc, &Direction::N);
+            let _n_new_loc: BoundPoint = increment_location(*loc, &Direction::N);
+            let n_new_point_from_bound = Point{x: _n_new_loc.location.x, y: _n_new_loc.location.y};
             let north_link: Link = self.get_link_from_point(
-                &new_point_from_bound, &Direction::S).clone().flip();
+                &n_new_point_from_bound, &Direction::S).clone().flip();
 
             // S direction 
-            let new_loc: BoundPoint = increment_location(*loc, &Direction::S);
+            let _s_new_loc: BoundPoint = increment_location(*loc, &Direction::S);
+            let s_new_point_from_bound = Point{x: _s_new_loc.location.x, y: _s_new_loc.location.y};
             let south_link: Link = self.get_link_from_point(
-                &new_point_from_bound, &Direction::N).clone().flip();
+                &s_new_point_from_bound, &Direction::N).clone().flip();
 
             // TODO
             to_return_vertex = Vertex {
