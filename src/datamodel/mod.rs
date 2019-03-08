@@ -8,7 +8,7 @@ use std::ops::Add;
 use std::slice::Iter;
 
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum Link {
     In,
     Out,
