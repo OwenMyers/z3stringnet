@@ -32,6 +32,18 @@ fn main() {
     let weights_arg: f64 = weights_arg_str.parse().unwrap();
     println!("Weight parameter from argument: {}", weights_arg);
 
+    let n_updates_arg_str = matches.value_of("nupdates").unwrap_or("5");
+    let n_updates_arg: u64 = n_updates_arg_str.parse().unwrap();
+    println!("Number of updates from argument: {}", n_updates_arg);
+
+    let n_measure_arg_str = matches.value_of("nmeasure").unwrap_or("500");
+    let n_measure_arg: u64 = n_measure_arg_str.parse().unwrap();
+    println!("Number of measurements to make per bin: {}", n_measure_arg);
+
+    let n_bins_arg_str = matches.value_of("nbins").unwrap_or("10");
+    let n_bins_arg: u64 = n_bins_arg_str.parse().unwrap();
+    println!("Number of bins: {}", n_bins_arg);
+
     let equilibrate = true;
     let write_configurations = false;
     let update_type: &UpdateType = &UpdateType::Walk;
@@ -47,11 +59,11 @@ fn main() {
     //lat = build_z3_striped_lat(size);
 
     // number_bins: The number of lines in the data file (10000)
-    let number_bins: u64 = 200000;
+    let number_bins: u64 = n_bins_arg;
     // number_measure: How many measurements to average over per bin (500)
-    let number_measure: u64 = 500;
+    let number_measure: u64 = n_measure_arg;
     // number_update: How many updated before a measurement (5)
-    let number_update: u64 = 5;
+    let number_update: u64 = n_updates_arg;
     // for local updates it should be
     //let number_update: u64 = 2 * lat.size.x * lat.size.y;
 

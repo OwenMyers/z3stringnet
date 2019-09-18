@@ -21,6 +21,30 @@ args:
           the weights used in the Metropolis algorithm.
         takes_value: true
         required: true
+    - nbins:
+        short: b
+        long: nbins
+        value_name: N_BINS
+        multiple: false
+        help: The number of bins you want to generate during a run.
+        takes_value: true
+        required: true
+    - nmeasure:
+        short: m
+        long: nmeasure
+        value_name: N_MEASURE
+        multiple: false
+        help: The number of measurements to be made in a bin
+        takes_value: true
+        required: true
+    - nupdate:
+        short: u
+        long: nupdate
+        value_name: N_UPDATE
+        multiple: false
+        help: The number of updates to make between measurements
+        takes_value: true
+        required: true
 #    - verbose:
 #        short: v
 #        multiple: true
