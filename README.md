@@ -34,7 +34,7 @@ cargo build --release
 From the root:
 
 ```
-target/debug/z3stringnet --size <int> --weights <float>
+target/debug/z3stringnet --size <int> --weights <float> --nbins 200000 --nmeasure 500 --nupdate 5
 ```
 
 or if you compiled with the `--release` flag
