@@ -44,8 +44,19 @@ fn main() {
     let n_bins_arg: u64 = n_bins_arg_str.parse().unwrap();
     println!("Number of bins: {}", n_bins_arg);
 
+    let write_update_configurations_str = matches.value_of("write-update-confs").unwrap_or("false");
+    let write_update_configurations: bool = write_update_configurations_str.parse().unwrap();
+    println!("Write update configs: {}", write_update_configurations);
+
+    let write_measure_configurations_str = matches.value_of("write-measure-confs").unwrap_or("false");
+    let write_measure_configurations: bool = write_measure_configurations_str.parse().unwrap();
+    println!("Write measure configs: {}", write_measure_configurations);
+
+    let write_bin_configurations_str = matches.value_of("write-bin-confs").unwrap_or("false");
+    let write_bin_configurations: bool = write_bin_configurations_str.parse().unwrap();
+    println!("Write bin configs: {}", write_bin_configurations);
+
     let equilibrate = true;
-    let write_configurations = false;
     let update_type: &UpdateType = &UpdateType::Walk;
 
     let size: Point = Point {
@@ -101,14 +112,18 @@ fn main() {
     let mut total_update_count: u64 = 0;
     for _i in 0..number_bins {
         println!("Working on bin {}", _i);
+        if write_bin_configurations {
+            write_lattice(String::from(format!("lattice_bin_{}.csv", total_update_count)), &lat);
+        }
         for _j in 0..number_measure {
             //println!("j {}", _j);
+            if write_measure_configurations {
+                write_lattice(String::from(format!("lattice_measure_{}.csv", total_update_count)), &lat);
+            }
             for _k in 0..number_update {
                 //println!("k {}", _k);
-                if write_configurations {
-                    write_lattice(
-                        String::from(format!("lattice_{}.csv", total_update_count)), &lat
-                    );
+                if write_update_configurations {
+                    write_lattice(String::from(format!("lattice_{}.csv", total_update_count)), &lat);
                 }
                 updater.main_update(&mut lat, &update_type);
                 total_update_count += 1;

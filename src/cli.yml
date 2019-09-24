@@ -45,6 +45,28 @@ args:
         help: The number of updates to make between measurements
         takes_value: true
         required: true
+    - write-update-confs:
+        long: write-update-confs
+        value_name: WRITE_UPDATE_CONFS
+        multiple: false
+        help: Boolean to trigger writing configuration after every update
+        takes_value: true
+        required: false
+    - write-measure-confs:
+        long: write-measure-confs
+        value_name: WRITE_UPDATE_CONFS
+        multiple: false
+        help: Boolean to trigger writing configuration after every measurement
+        takes_value: true
+        required: false
+    - write-bin-confs:
+        long: write-bin-confs
+        value_name: WRITE_UPDATE_CONFS
+        multiple: false
+        help: Boolean to trigger writing configuration after every binment
+        takes_value: true
+        required: false
+
 #    - verbose:
 #        short: v
 #        multiple: true
