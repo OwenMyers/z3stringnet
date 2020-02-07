@@ -63,12 +63,13 @@ args:
         long: write-bin-confs
         value_name: WRITE_UPDATE_CONFS
         multiple: false
-        help: Boolean to trigger writing configuration after every binment
+        help: Boolean to trigger writing configuration after every bin
         takes_value: true
         required: false
-
-#    - verbose:
-#        short: v
-#        multiple: true
-#        help: Sets the level of verbosity
+    - loop-update:
+        long: loop-update
+        help: Boolean to trigger the use of loop updates instead of local
+              plaquett flips.
+        takes_value: false
+        required: false
 
