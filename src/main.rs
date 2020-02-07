@@ -32,7 +32,7 @@ fn main() {
     let weights_arg: f64 = weights_arg_str.parse().unwrap();
     println!("Weight parameter from argument: {}", weights_arg);
 
-    let n_updates_arg_str = matches.value_of("nupdates").unwrap_or("5");
+    let n_updates_arg_str = matches.value_of("nupdate").unwrap_or("5");
     let n_updates_arg: u64 = n_updates_arg_str.parse().unwrap();
     println!("Number of updates from argument: {}", n_updates_arg);
 
