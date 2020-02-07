@@ -21,6 +21,13 @@ impl Link {
             Link::Blank => {Link::Blank}
         }
     }
+    pub fn soft_flip(link: &Link) -> Link {
+        match link{
+            Link::In => {Link::Out}
+            Link::Out => {Link::In}
+            Link::Blank => {Link::Blank}
+        }
+    }
 }
 
 #[derive(Debug)]
