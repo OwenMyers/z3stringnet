@@ -56,8 +56,15 @@ fn main() {
     let write_bin_configurations: bool = write_bin_configurations_str.parse().unwrap();
     println!("Write bin configs: {}", write_bin_configurations);
 
+    let update_type: &UpdateType = &UpdateType::Local;
+    if matches.is_present("loop-update") {
+        let update_type: &UpdateType = &UpdateType::Walk;
+        println!("Lattice will be updated using random walk.");
+    } else {
+        println!("Lattice will be updated using plaquette flips.");
+    }
+
     let equilibrate = true;
-    let update_type: &UpdateType = &UpdateType::Walk;
 
     let size: Point = Point {
         x: lattice_size_arg,
