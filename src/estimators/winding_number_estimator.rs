@@ -1,6 +1,5 @@
 use std::fs::File;
 use std::path::Path;
-use std::error::Error;
 use std::io::BufWriter;
 use super::Measurable;
 use std::io::prelude::*;
@@ -26,7 +25,7 @@ impl WindingNumberCountEstimator {
         let file = match File::create(&path) {
             Err(err) => panic!("could not create {}: {}",
                 display,
-                err.description()),
+                err),
             Ok(good_file) => good_file,
         };
 
@@ -214,7 +213,7 @@ impl Measurable for WindingNumberCountEstimator {
 
         match self.result_file_buffer.write(out_string.as_bytes()) {
             Err(err) => panic!("Can not write to winding count estimator file {}",
-                err.description()
+                err
             ),
             Ok(_) => (),
         }

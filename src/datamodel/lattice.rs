@@ -4,14 +4,14 @@ use super::Point;
 use super::Vertex;
 
 /// Stores the representation of the sytem
-/// 
-/// 
+///
+///
 /// All links can be defined by the vertices of one sublattice.
 /// This means the len of vertices will always be N/2, where N is the
 /// total number of vertices.
 /// TODO: Do a check or asertation to ensure the length of vertices
-/// is correct given Point. 
-/// 
+/// is correct given Point.
+///
 /// ```
 ///     |   |   |   |
 ///     +---6---+---7---
@@ -183,15 +183,16 @@ pub fn build_blank_lat(size: Point) -> Lattice {
     lat
 }
 
-
-//     |   |   |   |
-//     +->-6->-+->-7->-
-//     |   |   |   |
-//     4->-+->-5->-+->-
-//     |   |   |   |
-//     +->-2->-+->-3->-
-//     |   |   |   |
-//     0->-+->-1->-+->-
+/// ```
+///     |   |   |   |
+///     +->-6->-+->-7->-
+///     |   |   |   |
+///     4->-+->-5->-+->-
+///     |   |   |   |
+///     +->-2->-+->-3->-
+///     |   |   |   |
+///     0->-+->-1->-+->-
+///  ```
 pub fn build_z3_striped_lat(size: Point) -> Lattice {
     println!("Building stagard lattice of size x {}, y {}",
              size.x, size.y);

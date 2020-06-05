@@ -9,7 +9,6 @@ use std::io::BufWriter;
 use std::fs::File;
 use std::path::Path;
 use std::io::prelude::*;
-use std::error::Error;
 
 fn simple_file_make_helper_function(direction_string: &str,
                                     orientation_string: &str) -> BufWriter<File> {
@@ -22,7 +21,7 @@ fn simple_file_make_helper_function(direction_string: &str,
     let path = Path::new(&file_name_string);
     let display = path.display();
     let file = match File::create(&path){
-        Err(err) => panic!("could not create {}: {}", display, err.description()),
+        Err(err) => panic!("could not create {}: {}", display, err),
         Ok(good_file) => good_file,
     };
     return BufWriter::new(file);
@@ -163,25 +162,25 @@ impl Measurable for CorrelationOriginEstimator {
 
         match self.result_file_buffer_horizontal_out
                 .write(ho_out_string.as_bytes()){
-            Err(err) => panic!("Can't write to origin estimator buff: {}", err.description()),
+            Err(err) => panic!("Can't write to origin estimator buff: {}", err),
             //Ok(_) => println!("Wrote measurment to origin estimator buffer.") ,
             Ok(_) => (),
         }
         match self.result_file_buffer_horizontal_in
                 .write(hi_out_string.as_bytes()){
-            Err(err) => panic!("Can't write to origin estimator buff: {}", err.description()),
+            Err(err) => panic!("Can't write to origin estimator buff: {}", err),
             //Ok(_) => println!("Wrote measurment to origin estimator buffer.") ,
             Ok(_) => (),
         }
         match self.result_file_buffer_vertical_out
                 .write(vo_out_string.as_bytes()){
-            Err(err) => panic!("Can't write to origin estimator buff: {}", err.description()),
+            Err(err) => panic!("Can't write to origin estimator buff: {}", err),
             //Ok(_) => println!("Wrote measurment to origin estimator buffer.") ,
             Ok(_) => (),
         }
         match self.result_file_buffer_vertical_in
                 .write(vi_out_string.as_bytes()){
-            Err(err) => panic!("Can't write to origin estimator buff: {}", err.description()),
+            Err(err) => panic!("Can't write to origin estimator buff: {}", err),
             //Ok(_) => println!("Wrote measurment to origin estimator buffer.") ,
             Ok(_) => (),
         }

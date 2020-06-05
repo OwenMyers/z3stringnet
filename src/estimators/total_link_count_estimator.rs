@@ -24,7 +24,7 @@ impl TotalLinkCountEstimator {
         let file = match File::create(&path) {
             Err(err) => panic!("could not create {}: {}",
                 display,
-                err.description()),
+                err),
             Ok(good_file) => good_file,
         };
 
@@ -60,7 +60,7 @@ impl Measurable for TotalLinkCountEstimator {
 
         match self.result_file_buffer.write(out_string.as_bytes()){
             Err(err) => panic!("Can not write to total link count estimator buffer {}",
-                err.description()),
+                err),
             Ok(_) => (),
         }
     }
