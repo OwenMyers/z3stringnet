@@ -23,7 +23,7 @@ fn main() {
     // Parse arguments
     let yaml = load_yaml!("cli.yml");
     let matches = App::from_yaml(yaml).get_matches();
-    
+
     let lattice_size_arg_str = matches.value_of("size").unwrap_or("4");
     let lattice_size_arg: i64 = lattice_size_arg_str.parse().unwrap();
     println!("Lattice size from argument: {}", lattice_size_arg);

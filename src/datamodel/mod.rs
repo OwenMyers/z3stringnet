@@ -7,6 +7,31 @@ use std::ops::Add;
 use std::slice::Iter;
 
 
+/// An AbsolutePlaquett is a plaquett view of the surounding links where the links are specified
+/// using the absolute reference of the axes. The vertex objexts have links with directions
+/// that are specified relative to the vertex, ie "In", "Out". An "Absolute" object will specify
+/// link values with respect to the axis.
+///
+/// A plaquett view:
+/// ```
+/// -----
+/// | + |
+/// -----
+/// ```
+/// `|` and `--` denote the horizontal and vertical links respectively.
+/// The `+` marks the center of the plaquett
+//#[derive(Debug, Clone, Copy)]
+//pub enum AbsolutePlaquett {
+//
+//}
+
+//#[derive(Debug, Clone, Copy)]
+//pub enum AbsoluteLink {
+//    PlussOne,
+//    MinusOne,
+//    Blank
+//}
+
 #[derive(Debug, Clone, Copy)]
 pub enum Link {
     In,

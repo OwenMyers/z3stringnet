@@ -7,10 +7,43 @@ use super::datamodel::Vertex;
 use super::datamodel::Point;
 use super::datamodel::BoundPoint;
 use super::datamodel::lattice::Lattice;
-use std::error::Error;
 
+/// real_bool: If true this is link from a real vertex (lower left of plaquett)
+/// If false this is link from a fake vertex (upper right of plaquett)
+fn get_plaquett_out_string_from_link<'a>(link: &'a Link, real_bool: bool, direction: &'a Direction) -> &'a str {
+    if real_bool {
+        match direction {
+            &Direction::N => match link{
+                &Link::In => "S",
+                &Link::Out => "N",
+                &Link::Blank => "B",
+            },
+            &Direction::E => match link {
+                &Link::In => "W",
+                &Link::Out => "E",
+                &Link::Blank => "B",
+            }
+            _ => panic!("Unexpected direction for determining plaquett string.")
+        }
+    }
+    else {
+        match direction {
+            &Direction::S => match link{
+                &Link::In => "N",
+                &Link::Out => "S",
+                &Link::Blank => "B",
+            },
+            &Direction::W => match link {
+                &Link::In => "E",
+                &Link::Out => "W",
+                &Link::Blank => "B",
+            }
+            _ => panic!("Unexpected direction for determining plaquett string.")
+        }
+    }
+}
 
-fn get_out_string_from_link(link: &Link) -> &str{
+fn get_out_string_from_link(link: &Link) -> &str {
     match link{
         &Link::In => "In",
         &Link::Out => "Out",
@@ -40,23 +73,24 @@ pub fn increment_loc(direction: &Direction, location_in: &BoundPoint) -> BoundPo
     }
 }
 
-pub fn write_lattice(f_str: String, lat: &Lattice) {
-    let path = Path::new(&f_str);
-    let display = path.display();
+pub fn write_lattice(f_str: String, lat: &Lattice) -> std::io::Result<()> {
+    let vertex_f_str: String = format!("{}_{}", "vertex", f_str);
+    let plaquett_f_str: String = format!("{}_{}", "plaquett", f_str);
+    let vertex_path = Path::new(&vertex_f_str);
+    let plaquett_path = Path::new(&plaquett_f_str);
 
-    let mut file = match File::create(&path){
-        Err(err) => panic!("could not create {}: {}",
-                           display,
-                           err.description()),
-        Ok(good_file) => good_file,
-    };
+    let mut vertex_file = File::create(&vertex_path)?;
+    let mut plaquett_file = File::create(&plaquett_path)?;
 
-    let mut out_string = String::new();
-    out_string.push_str("x,y,N,E,S,W\n");
+    let mut vertex_out_str= String::new();
+    vertex_out_str.push_str("x,y,N,E,S,W\n");
+    let mut plaquett_out_str= String::new();
+    plaquett_out_str.push_str("x,y,N,E,S,W\n");
 
     let mut working_loc: BoundPoint;
     for vertex in &lat.vertices{
-        out_string.push_str(
+
+        vertex_out_str.push_str(
             &format!("{},{},{},{},{},{}\n",
                 vertex.xy.x,
                 vertex.xy.y,
@@ -67,47 +101,76 @@ pub fn write_lattice(f_str: String, lat: &Lattice) {
                 )
         );
         // Write the other sublattice as well
-
         working_loc = BoundPoint {
             size: lat.size,
             location: vertex.xy,
         };
         working_loc = &working_loc + Point{x: 1, y: 0};
-
         let temp_loc1 = increment_loc(&Direction::N, &working_loc);
+        let temp_loc2 = increment_loc(&Direction::E, &working_loc);
+        let temp_loc3 = increment_loc(&Direction::S, &working_loc);
         let fake_vertex = Vertex{
             n: Link::soft_flip(lat.safe_get_link_from_point(&temp_loc1.location, &Direction::S)),
-            e: Link::soft_flip(lat.safe_get_link_from_point(&temp_loc1.location, &Direction::S)),
-            s: Link::soft_flip(lat.safe_get_link_from_point(&temp_loc1.location, &Direction::S)),
-            w: Link::soft_flip(lat.safe_get_link_from_point(&temp_loc1.location, &Direction::S)),
+            e: Link::soft_flip(lat.safe_get_link_from_point(&temp_loc2.location, &Direction::W)),
+            s: Link::soft_flip(lat.safe_get_link_from_point(&temp_loc3.location, &Direction::N)),
+            w: Link::soft_flip(&vertex.e),
             xy: working_loc.location
         };
-        out_string.push_str(
-            &format!("{},{},{},{},{},{}\n",
+        vertex_out_str.push_str(
+            &format!(
+                "{},{},{},{},{},{}\n",
                 fake_vertex.xy.x,
                 fake_vertex.xy.y,
                 get_out_string_from_link(&fake_vertex.n),
                 get_out_string_from_link(&fake_vertex.e),
                 get_out_string_from_link(&fake_vertex.s),
                 get_out_string_from_link(&fake_vertex.w),
-                )
+            )
         );
-        //temp_loc = increment_loc(&Direction::E, &working_loc);
-        //fake_vertex.n = lat.get_link_from_point(&temp_loc.location, &Direction::W).flip();
-        //temp_loc = increment_loc(&Direction::S, &working_loc);
-        //fake_vertex.n = lat.get_link_from_point(&temp_loc.location, &Direction::N).flip();
-        //temp_loc = increment_loc(&Direction::W, &working_loc);
-        //fake_vertex.n = lat.get_link_from_point(&temp_loc.location, &Direction::E).flip();
+        // Upper corner of plaquett 1
+        let vertex_corner = Vertex{
+            n: *lat.safe_get_link_from_point(&temp_loc1.location, &Direction::N),
+            e: *lat.safe_get_link_from_point(&temp_loc1.location, &Direction::E),
+            s: *lat.safe_get_link_from_point(&temp_loc1.location, &Direction::S),
+            w: *lat.safe_get_link_from_point(&temp_loc1.location, &Direction::W),
+            xy: temp_loc1.location
+        };
+        plaquett_out_str.push_str(
+            &format!(
+                "{},{},{},{},{},{}\n",
+                vertex.xy.x,
+                vertex.xy.y,
+                get_plaquett_out_string_from_link(&vertex_corner.w, false, &Direction::W),
+                get_plaquett_out_string_from_link(&vertex_corner.s, false, &Direction::S),
+                get_plaquett_out_string_from_link(&vertex.e, true, &Direction::E),
+                get_plaquett_out_string_from_link(&vertex.n, true, &Direction::N),
+             )
+        );
+        // Upper corner of plaquett 2
+        let temp_loc4 = increment_loc(&Direction::N, &temp_loc2);
+        println!("x: {} y: {}", temp_loc4.location.x, temp_loc4.location.y);
+        let vertex_corner_2 = Vertex {
+            
+        };
+        plaquett_out_str.push_str(
+            &format!(
+                "{},{},{},{},{},{}\n",
+                fake_vertex.xy.x,
+                fake_vertex.xy.y,
+                get_plaquett_out_string_from_link(&vertex_corner_2.w, false, &Direction::W),
+                get_plaquett_out_string_from_link(&vertex_corner_2.s, false, &Direction::S),
+                get_plaquett_out_string_from_link(&fake_vertex.e, true, &Direction::E),
+                get_plaquett_out_string_from_link(&fake_vertex.n, true, &Direction::N),
+            )
+        );
     }
-    out_string.push_str("\n");
-    println!("{}", out_string);
+    vertex_out_str.push_str("\n");
+    plaquett_out_str.push_str("\n");
 
-    match file.write_all(out_string.as_bytes()){
-        Err(err) => panic!("could not create {}: {}",
-                           display,
-                           err.description()),
-        Ok(_) => println!("file out worked"),
-    }
+    vertex_file.write_all(vertex_out_str.as_bytes())?;
+    plaquett_file.write_all(plaquett_out_str.as_bytes())?;
+
+    Ok(())
 }
 
 pub fn write_vec(f_str: String, vec: &Vec<u8>) {
@@ -117,7 +180,7 @@ pub fn write_vec(f_str: String, vec: &Vec<u8>) {
     let mut file = match File::create(&path){
         Err(err) => panic!("could not create {}: {}",
                            display,
-                           err.description()),
+                           err),
         Ok(good_file) => good_file,
     };
 
@@ -131,11 +194,9 @@ pub fn write_vec(f_str: String, vec: &Vec<u8>) {
     match file.write_all(out_string.as_bytes()){
         Err(err) => panic!("could not create {}: {}",
                            display,
-                           err.description()),
-        Ok(_) => println!("fjile out worked"),
+                           err),
+        Ok(_) => println!("file out worked"),
     }
-
-
 }
 
 
@@ -147,7 +208,7 @@ pub fn write_2d_vec(vec: &Vec<Vec<i32>>) {
     let mut file = match File::create(&path){
         Err(err) => panic!("could not create {}: {}",
                            display,
-                           err.description()),
+                           err),
         Ok(good_file) => good_file,
     };
 
@@ -163,7 +224,7 @@ pub fn write_2d_vec(vec: &Vec<Vec<i32>>) {
     match file.write_all(out_string.as_bytes()){
         Err(err) => panic!("could not create {}: {}",
                            display,
-                           err.description()),
+                           err),
         Ok(_) => println!("fjile out worked"),
     }
 }
