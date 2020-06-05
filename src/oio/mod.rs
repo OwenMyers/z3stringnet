@@ -148,9 +148,17 @@ pub fn write_lattice(f_str: String, lat: &Lattice) -> std::io::Result<()> {
         );
         // Upper corner of plaquett 2
         let temp_loc4 = increment_loc(&Direction::N, &temp_loc2);
+        let temp_loc5 = increment_loc(&Direction::N, &temp_loc4);
+        let temp_loc6 = increment_loc(&Direction::E, &temp_loc4);
+        let temp_loc7 = increment_loc(&Direction::S, &temp_loc4);
+        let temp_loc8 = increment_loc(&Direction::W, &temp_loc4);
         println!("x: {} y: {}", temp_loc4.location.x, temp_loc4.location.y);
         let vertex_corner_2 = Vertex {
-            
+            n: Link::soft_flip(lat.safe_get_link_from_point(&temp_loc5.location, &Direction::S)),
+            e: Link::soft_flip(lat.safe_get_link_from_point(&temp_loc6.location, &Direction::W)),
+            s: Link::soft_flip(lat.safe_get_link_from_point(&temp_loc7.location, &Direction::N)),
+            w: Link::soft_flip(lat.safe_get_link_from_point(&temp_loc8.location, &Direction::E)),
+            xy: working_loc.location
         };
         plaquett_out_str.push_str(
             &format!(
