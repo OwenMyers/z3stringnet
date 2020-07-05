@@ -4,8 +4,11 @@ extern crate clap;
 extern crate z3stringnet;
 extern crate conrod_glium;
 extern crate glium;
+extern crate conrod_core;
+
 use clap::App;
 use conrod_glium::Renderer;
+use conrod_core::Dimensions;
 use z3stringnet::datamodel::Point;
 use z3stringnet::datamodel::BoundPoint;
 use z3stringnet::datamodel::lattice::Lattice;
@@ -21,11 +24,19 @@ use z3stringnet::estimators::winding_variance_estimator::WindingNumberVarianceEs
 use z3stringnet::estimators::Measurable;
 use z3stringnet::oio::*;
 use z3stringnet::gui::*;
+use glium::Surface;
+use conrod_core::widget::Image;
 
 
 fn main() {
     // Parse arguments
     let yaml = load_yaml!("cli.yml");
+
+    let matches = App::from_yaml(yaml).get_matches();
+
+    let lattice_size_arg_str = matches.value_of("size").unwrap_or("4");
+    let lattice_size_arg: i64 = lattice_size_arg_str.parse().unwrap();
+    println!("Lattice size from argument: {}", lattice_size_arg);
 
     // Conrod Start
     let mut events_loop = glium::glutin::EventsLoop::new();
@@ -42,6 +53,9 @@ fn main() {
     let mut ui = conrod_core::UiBuilder::new([WIN_W as f64, WIN_H as f64])
         .theme(theme())
         .build();
+
+    let mut image_map = conrod_core::image::Map::<glium::texture::Texture2d>::new();
+    //let try_rectangle = Rectangle::fill([WIN_H as f64/10.0, WIN_W as f64/5.0]);
 
     // The `widget::Id` of each widget instantiated in `conrod_example_shared::gui`.
     let ids = Ids::new(ui.widget_id_generator());
@@ -62,17 +76,45 @@ fn main() {
     // - Render the current state of the `Ui`.
     // - Repeat.
     let mut event_loop = EventLoop::new();
+    // A demonstration of some app state that we want to control with the conrod GUI.
+    let mut app = DemoApp::new();
     'main: loop {
         // Handle all events.
         for event in event_loop.next(&mut events_loop) {
+            // Use the `winit` backend feature to convert the winit event to a conrod one.
+            if let Some(event) = convert_event(event.clone(), &display) {
+                ui.handle_event(event);
+                event_loop.needs_update();
+            }
+
+            match event {
+                glium::glutin::Event::WindowEvent { event, .. } => match event {
+                    // Break from the loop upon `Escape`.
+                    glium::glutin::WindowEvent::CloseRequested
+                    | glium::glutin::WindowEvent::KeyboardInput {
+                        input:
+                        glium::glutin::KeyboardInput {
+                            virtual_keycode: Some(glium::glutin::VirtualKeyCode::Escape),
+                            ..
+                        },
+                        ..
+                    } => break 'main,
+                    _ => (),
+                },
+                _ => (),
+            }
+        }
+        gui(&mut ui.set_widgets(), &ids, &mut app, lattice_size_arg);
+        // Draw the `Ui`.
+        if let Some(primitives) = ui.draw_if_changed() {
+            renderer.fill(&display.0, primitives, &image_map);
+            let mut target = display.0.draw();
+            target.clear_color(0.0, 0.0, 0.0, 1.0);
+            renderer.draw(&display.0, &mut target, &image_map).unwrap();
+            target.finish().unwrap();
         }
     }
     // Conrod End
-    let matches = App::from_yaml(yaml).get_matches();
-
-    let lattice_size_arg_str = matches.value_of("size").unwrap_or("4");
-    let lattice_size_arg: i64 = lattice_size_arg_str.parse().unwrap();
-    println!("Lattice size from argument: {}", lattice_size_arg);
 
     let weights_arg_str = matches.value_of("weights").unwrap_or("1.0");
     let weights_arg: f64 = weights_arg_str.parse().unwrap();

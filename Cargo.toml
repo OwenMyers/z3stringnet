@@ -6,10 +6,11 @@ authors = ["OwenMyers <owendalemyers@gmail.com>"]
 [dependencies]
 rand = "0.5"
 clap = {version = "2.32", features = ["yaml"]}
-conrod_core = {version = "0.70.0"}
-glium = {version = "0.24.0"}
+conrod_core = "0.70.0"
+glium = "0.24.0"
 conrod_winit = "0.70.0"
 conrod_glium = "0.70.0"
+winit = "0.19"
 
 
 # The development profile, used for `cargo build`.
