@@ -1,6 +1,8 @@
 use conrod_core;
 use conrod_glium;
 use conrod_winit;
+use std::path::Iter;
+use conrod_core::Point;
 
 
 // For conrod
@@ -64,7 +66,7 @@ widget_ids! {
         //shapes_right_col,
         //shapes_title,
         line,
-        //point_path,
+        point_path,
         //rectangle_fill,
         //rectangle_outline,
         //trapezoid,
@@ -74,6 +76,27 @@ widget_ids! {
         // Button, XyPad, Toggle.
         //button_title,
         //button,
+    }
+}
+
+struct LatticeShapeIter {
+    lattice_size: u32,
+    count: u8
+}
+
+impl Iterator for LatticeShapeIter {
+    type Item = Point;
+
+    fn next(&mut self) -> Option<Point> {
+        self.count += 1;
+        if self.count > 5 {
+            None
+        }
+        else {
+            //let cur_point = Point::new(count, 0.0);
+            let cur_point = Point{x: count, y: 0.0};
+            Some(cur_point)
+        }
     }
 }
 
@@ -106,9 +129,11 @@ pub fn gui(ui: &mut conrod_core::UiCell,
         .mid_left_of(ids.canvas)
         .set(ids.line, ui);
 
-    for i in 0..lattice_dim {
-    }
+    //for i in 0..lattice_dim {
+    //}
 
+    let lattice_shape_iter = LatticeShapeIter{lattice_size: 4, count: 0};
+    widget::PointPath::new(lattice_shape_iter).set(ids.point_path, ui);
 }
 
 pub struct GliumDisplayWinitWrapper(pub glium::Display);
