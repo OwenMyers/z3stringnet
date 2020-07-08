@@ -3,6 +3,7 @@ use conrod_glium;
 use conrod_winit;
 use std::path::Iter;
 use conrod_core::Point;
+use conrod_core::widget::grid::Lines;
 
 
 // For conrod
@@ -59,6 +60,7 @@ widget_ids! {
         // The title and introduction widgets.
         title,
         introduction,
+        grid,
         // Shapes.
         //shapes_canvas,
         //rounded_rectangle,
@@ -81,7 +83,7 @@ widget_ids! {
 
 struct LatticeShapeIter {
     lattice_size: u32,
-    count: u8
+    count: u32
 }
 
 impl Iterator for LatticeShapeIter {
@@ -94,9 +96,37 @@ impl Iterator for LatticeShapeIter {
         }
         else {
             //let cur_point = Point::new(count, 0.0);
-            let cur_point = Point{x: count, y: 0.0};
+            //let cur_point = Point{x: self.count * WIN_H / 5, y: 0.0};
+            let cur_point = [((self.count % 2) * 100) as f64, (self.count * 100) as f64];
             Some(cur_point)
         }
+    }
+}
+
+struct Olines {
+    x: u32
+}
+
+impl Iterator for Olines {
+    type Item = Lines<u32>;
+
+    fn next(&mut self) -> Option<Lines<u32>> {
+        Some(
+            Lines {
+                /// The distance that separates each line.
+                step: self.x,
+                /// An optional offset for the lines along they're axis.
+                offset: None,
+                /// The thickness of each of the lines drawn.
+                ///
+                /// If `None`, the `thickness` specified within the `Style` is used.
+                thickness: None,
+                /// The color of each of the lines drawn.
+                ///
+                /// If `None`, the `color` specified within the `Style` is used.
+                color: None,
+            }
+        )
     }
 }
 
@@ -134,6 +164,30 @@ pub fn gui(ui: &mut conrod_core::UiCell,
 
     let lattice_shape_iter = LatticeShapeIter{lattice_size: 4, count: 0};
     widget::PointPath::new(lattice_shape_iter).set(ids.point_path, ui);
+
+    let cur_olines = Olines{x: 100};
+    widget::Grid::new( -400, 400, -400, 400,
+        widget::grid::Axis::X(cur_olines.next())
+    ).set(ids.grid, ui);
+//    let grid = widget::Grid {
+//        /// The minimum visible bound along the *x* axis.
+//        min_x: X,
+//        /// The maximum visible bound along the *x* axis.
+//        max_x: X,
+//        /// The minimum visible bound along the *y* axis.
+//        min_y: Y,
+//        /// The maximum visible bound along the *y* axis.
+//        max_y: Y,
+//        /// An offset for all vertical lines distributed across the *x* axis.
+//        x_offset: None,
+//        /// An offset for all horizontal lines distributed across the *y* axis.
+//        y_offset: None,
+//        /// An iterator yielding each sequence of lines to be distributed across the grid.
+//        lines: [
+//
+//        ],
+//    }
+
 }
 
 pub struct GliumDisplayWinitWrapper(pub glium::Display);
