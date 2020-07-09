@@ -34,6 +34,8 @@ impl DemoApp {
     }
 }
 
+
+///
 fn add_in_lattice_link(initial_offset: f64,
                        x: i64,
                        y: i64,
@@ -41,23 +43,23 @@ fn add_in_lattice_link(initial_offset: f64,
                        ui: &mut conrod_core::UiCell,
                        color: Color,
                        vertical: bool,
-                       direction: f64) -> () {
+                       shift_direction: f64) -> () {
     use conrod_core::widget;
     let mut link_x = LINK_MINOR;
     let mut link_y = LINK_MAJOR;
     let mut x_pos_mod = 0.0;
-    let mut y_pos_mod = LINK_MAJOR as f64 / 2.0;
+    let mut y_pos_mod = LINK_MAJOR as f64 / 2.0 * shift_direction;
     if !vertical {
         link_x = LINK_MAJOR;
         link_y = LINK_MINOR;
-        x_pos_mod = LINK_MAJOR as f64 / 2.0;
+        x_pos_mod = LINK_MAJOR as f64 / 2.0 * shift_direction;
         y_pos_mod = 0.0;
     }
     let dimensions = [link_x as f64, link_y as f64];
     widget::RoundedRectangle::fill(dimensions, 2.0).x_position(
-        Absolute(initial_offset + (x as f64 + x_pos_mod) * (LINK_MAJOR as f64))
+        Absolute(initial_offset + (x as f64) * (LINK_MAJOR as f64) + x_pos_mod)
     ).y_position(
-        Absolute(initial_offset + (y as f64 + y_pos_mod) * (LINK_MAJOR as f64))
+        Absolute(initial_offset + (y as f64) * (LINK_MAJOR as f64) + y_pos_mod)
     ).color(color).set(next_id, ui)
 }
 
