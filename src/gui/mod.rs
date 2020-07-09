@@ -2,13 +2,19 @@ use conrod_core;
 use conrod_glium;
 use conrod_winit;
 use std::path::Iter;
-use conrod_core::Point;
+use conrod_core::{Point, Positionable, Colorable, Widget};
 use conrod_core::widget::grid::Lines;
+use conrod_core::position::Position::Absolute;
+use conrod_core::Color;
+use datamodel::lattice::Lattice;
+use datamodel::Link;
 
 
 // For conrod
 pub const WIN_W: u32 = 1000;
 pub const WIN_H: u32 = 1000;
+pub const LINK_MINOR: u32 = 20;
+pub const LINK_MAJOR: u32 = 40;
 
 /// A demonstration of some application state we want to control with a conrod GUI.
 pub struct DemoApp {
@@ -26,6 +32,33 @@ impl DemoApp {
             sine_frequency: 1.0,
         }
     }
+}
+
+fn add_in_lattice_link(initial_offset: f64,
+                       x: i64,
+                       y: i64,
+                       next_id: conrod_core::widget::Id,
+                       ui: &mut conrod_core::UiCell,
+                       color: Color,
+                       vertical: bool,
+                       direction: f64) -> () {
+    use conrod_core::widget;
+    let mut link_x = LINK_MINOR;
+    let mut link_y = LINK_MAJOR;
+    let mut x_pos_mod = 0.0;
+    let mut y_pos_mod = LINK_MAJOR as f64 / 2.0;
+    if !vertical {
+        link_x = LINK_MAJOR;
+        link_y = LINK_MINOR;
+        x_pos_mod = LINK_MAJOR as f64 / 2.0;
+        y_pos_mod = 0.0;
+    }
+    let dimensions = [link_x as f64, link_y as f64];
+    widget::RoundedRectangle::fill(dimensions, 2.0).x_position(
+        Absolute(initial_offset + (x as f64 + x_pos_mod) * (LINK_MAJOR as f64))
+    ).y_position(
+        Absolute(initial_offset + (y as f64 + y_pos_mod) * (LINK_MAJOR as f64))
+    ).color(color).set(next_id, ui)
 }
 
 /// A set of reasonable stylistic defaults that works for the `gui` below.
@@ -60,7 +93,6 @@ widget_ids! {
         // The title and introduction widgets.
         title,
         introduction,
-        grid,
         // Shapes.
         //shapes_canvas,
         //rounded_rectangle,
@@ -68,8 +100,9 @@ widget_ids! {
         //shapes_right_col,
         //shapes_title,
         line,
-        point_path,
+        //point_path,
         //rectangle_fill,
+        lattice_links[]
         //rectangle_outline,
         //trapezoid,
         //oval_fill,
@@ -81,60 +114,12 @@ widget_ids! {
     }
 }
 
-struct LatticeShapeIter {
-    lattice_size: u32,
-    count: u32
-}
-
-impl Iterator for LatticeShapeIter {
-    type Item = Point;
-
-    fn next(&mut self) -> Option<Point> {
-        self.count += 1;
-        if self.count > 5 {
-            None
-        }
-        else {
-            //let cur_point = Point::new(count, 0.0);
-            //let cur_point = Point{x: self.count * WIN_H / 5, y: 0.0};
-            let cur_point = [((self.count % 2) * 100) as f64, (self.count * 100) as f64];
-            Some(cur_point)
-        }
-    }
-}
-
-struct Olines {
-    x: u32
-}
-
-impl Iterator for Olines {
-    type Item = Lines<u32>;
-
-    fn next(&mut self) -> Option<Lines<u32>> {
-        Some(
-            Lines {
-                /// The distance that separates each line.
-                step: self.x,
-                /// An optional offset for the lines along they're axis.
-                offset: None,
-                /// The thickness of each of the lines drawn.
-                ///
-                /// If `None`, the `thickness` specified within the `Style` is used.
-                thickness: None,
-                /// The color of each of the lines drawn.
-                ///
-                /// If `None`, the `color` specified within the `Style` is used.
-                color: None,
-            }
-        )
-    }
-}
-
 
 pub fn gui(ui: &mut conrod_core::UiCell,
-           ids: &Ids,
+           ids: &mut Ids,
            app: &mut DemoApp,
-           lattice_dim: i64) {
+           lattice_dim: i64,
+           lattice: &Lattice) {
     use conrod_core::{widget, Colorable, Labelable, Positionable, Sizeable, Widget};
     use std::iter::once;
 
@@ -159,34 +144,108 @@ pub fn gui(ui: &mut conrod_core::UiCell,
         .mid_left_of(ids.canvas)
         .set(ids.line, ui);
 
-    //for i in 0..lattice_dim {
-    //}
+    // For now just do the horizontal links. Add factor of 2 when you do all of them
+    ids.lattice_links.resize(
+        (2 * lattice_dim * lattice_dim) as usize, &mut ui.widget_id_generator()
+    );
 
-    let lattice_shape_iter = LatticeShapeIter{lattice_size: 4, count: 0};
-    widget::PointPath::new(lattice_shape_iter).set(ids.point_path, ui);
+    let mut lattice_link_id_iter = ids.lattice_links.iter();
+    let in_color = conrod_core::color::rgb(0.7, 0.0, 0.3);
+    let out_color = conrod_core::color::rgb(3.0, 0.0, 0.7);
 
-    let cur_olines = Olines{x: 100};
-    widget::Grid::new( -400, 400, -400, 400,
-        widget::grid::Axis::X(cur_olines.next())
-    ).set(ids.grid, ui);
-//    let grid = widget::Grid {
-//        /// The minimum visible bound along the *x* axis.
-//        min_x: X,
-//        /// The maximum visible bound along the *x* axis.
-//        max_x: X,
-//        /// The minimum visible bound along the *y* axis.
-//        min_y: Y,
-//        /// The maximum visible bound along the *y* axis.
-//        max_y: Y,
-//        /// An offset for all vertical lines distributed across the *x* axis.
-//        x_offset: None,
-//        /// An offset for all horizontal lines distributed across the *y* axis.
-//        y_offset: None,
-//        /// An iterator yielding each sequence of lines to be distributed across the grid.
-//        lines: [
+    let initial_offset = -200.0;
+    for (i, cur_vertex) in lattice.vertices.iter().enumerate() {
+        let x = cur_vertex.xy.x;
+        let y = cur_vertex.xy.y;
+
+        let &next_id = match lattice_link_id_iter.next() {
+            Some(id) => id,
+            None => panic!("Need a widget ID.")
+        };
+        match cur_vertex.n {
+            Link::In => {
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, true, 1.0)
+            },
+            Link::Out => {
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, true, 1.0)
+            },
+            Link::Blank => {
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, true, 1.0)
+            }
+        }
+        let &next_id = match lattice_link_id_iter.next() {
+            Some(id) => id,
+            None => panic!("Need a widget ID (2).")
+        };
+        match cur_vertex.e {
+            Link::In => {
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, false, 1.0)
+            },
+            Link::Out => {
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, false, 1.0)
+            },
+            Link::Blank => {
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, false, 1.0)
+            }
+        }
+        let &next_id = match lattice_link_id_iter.next() {
+            Some(id) => id,
+            None => panic!("Need a widget ID.")
+        };
+        match cur_vertex.s {
+            Link::In => {
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, true, -1.0)
+            },
+            Link::Out => {
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, true, -1.0)
+            },
+            Link::Blank => {
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, true, -1.0)
+            }
+        }
+        let &next_id = match lattice_link_id_iter.next() {
+            Some(id) => id,
+            None => panic!("Need a widget ID (2).")
+        };
+        match cur_vertex.w {
+            Link::In => {
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, false, -1.0)
+            },
+            Link::Out => {
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, false, -1.0)
+            },
+            Link::Blank => {
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, false, -1.0)
+            }
+        }
+    }
+
+//    let mut count = 0;
+//    let initial_offset = -200.0;
+//    for &id in ids.lattice_links.iter() {
+//        widget::RoundedRectangle::fill([
+//            LINK_MAJOR as f64, LINK_MINOR as f64],
+//      2.0
+//        ).x_position(Absolute(
+//            initial_offset + ((count % lattice_dim) as f64) * (LINK_MAJOR as f64)
+//        ))
+//        .y_position(Absolute(
+//            initial_offset + (count as f64 / lattice_dim as f64).floor() * (LINK_MAJOR as f64)
+//        )).set(id, ui);
 //
-//        ],
+//        widget::RoundedRectangle::fill(
+//                [LINK_MINOR as f64, LINK_MAJOR as f64],
+//                2.0
+//        ).x_position(Absolute(
+//                initial_offset + ((count % lattice_dim) as f64) * (LINK_MAJOR as f64)
+//        ))
+//        .y_position(Absolute(
+//            initial_offset + (count as f64 / lattice_dim as f64).floor() * (LINK_MAJOR as f64)
+//        )).set(id, ui);
+//        count += 1;
 //    }
+    //widget::RoundedRectangle::fill([100.0, 200.0], 10.0).x_position(Absolute(-100.0))
+    //    .y_position(Absolute(-100.0)).set(ids.rectangle_fill, ui);
 
 }
 

@@ -58,7 +58,7 @@ fn main() {
     //let try_rectangle = Rectangle::fill([WIN_H as f64/10.0, WIN_W as f64/5.0]);
 
     // The `widget::Id` of each widget instantiated in `conrod_example_shared::gui`.
-    let ids = Ids::new(ui.widget_id_generator());
+    let mut ids = Ids::new(ui.widget_id_generator());
     // A type used for converting `conrod_core::render::Primitives` into `Command`s that can be used
     // for drawing to the glium `Surface`.
     //
@@ -78,42 +78,7 @@ fn main() {
     let mut event_loop = EventLoop::new();
     // A demonstration of some app state that we want to control with the conrod GUI.
     let mut app = DemoApp::new();
-    'main: loop {
-        // Handle all events.
-        for event in event_loop.next(&mut events_loop) {
-            // Use the `winit` backend feature to convert the winit event to a conrod one.
-            if let Some(event) = convert_event(event.clone(), &display) {
-                ui.handle_event(event);
-                event_loop.needs_update();
-            }
 
-            match event {
-                glium::glutin::Event::WindowEvent { event, .. } => match event {
-                    // Break from the loop upon `Escape`.
-                    glium::glutin::WindowEvent::CloseRequested
-                    | glium::glutin::WindowEvent::KeyboardInput {
-                        input:
-                        glium::glutin::KeyboardInput {
-                            virtual_keycode: Some(glium::glutin::VirtualKeyCode::Escape),
-                            ..
-                        },
-                        ..
-                    } => break 'main,
-                    _ => (),
-                },
-                _ => (),
-            }
-        }
-        gui(&mut ui.set_widgets(), &ids, &mut app, lattice_size_arg);
-        // Draw the `Ui`.
-        if let Some(primitives) = ui.draw_if_changed() {
-            renderer.fill(&display.0, primitives, &image_map);
-            let mut target = display.0.draw();
-            target.clear_color(0.0, 0.0, 0.0, 1.0);
-            renderer.draw(&display.0, &mut target, &image_map).unwrap();
-            target.finish().unwrap();
-        }
-    }
     // Conrod End
 
     let weights_arg_str = matches.value_of("weights").unwrap_or("1.0");
@@ -161,8 +126,47 @@ fn main() {
 
     let mut lat: Lattice;
     // lat now owns size -> That is good and intentional
-    lat = build_blank_lat(size);
-    //lat = build_z3_striped_lat(size);
+    // lat = build_blank_lat(size);
+    lat = build_z3_striped_lat(size);
+
+    // More Conrod
+    'main: loop {
+        // Handle all events.
+        for event in event_loop.next(&mut events_loop) {
+            // Use the `winit` backend feature to convert the winit event to a conrod one.
+            if let Some(event) = convert_event(event.clone(), &display) {
+                ui.handle_event(event);
+                event_loop.needs_update();
+            }
+
+            match event {
+                glium::glutin::Event::WindowEvent { event, .. } => match event {
+                    // Break from the loop upon `Escape`.
+                    glium::glutin::WindowEvent::CloseRequested
+                    | glium::glutin::WindowEvent::KeyboardInput {
+                        input:
+                        glium::glutin::KeyboardInput {
+                            virtual_keycode: Some(glium::glutin::VirtualKeyCode::Escape),
+                            ..
+                        },
+                        ..
+                    } => break 'main,
+                    _ => (),
+                },
+                _ => (),
+            }
+        }
+        gui(&mut ui.set_widgets(), &mut ids, &mut app, lattice_size_arg, &lat);
+        // Draw the `Ui`.
+        if let Some(primitives) = ui.draw_if_changed() {
+            renderer.fill(&display.0, primitives, &image_map);
+            let mut target = display.0.draw();
+            target.clear_color(0.0, 0.0, 0.0, 1.0);
+            renderer.draw(&display.0, &mut target, &image_map).unwrap();
+            target.finish().unwrap();
+        }
+    }
+    // End More Coonrod
 
     // number_bins: The number of lines in the data file (10000)
     let number_bins: u64 = n_bins_arg;

@@ -105,10 +105,9 @@ impl VertexLinkCount {
         VertexLinkCount {
             n: 0, e: 0, s: 0, w: 0,
             xy: Point{
-                        x: x_from_vertex_vec_position(vec_position, size),
-                        y: y_from_vertex_vec_position(vec_position, size)
-                     }
- 
+                x: x_from_vertex_vec_position(vec_position, size),
+                y: y_from_vertex_vec_position(vec_position, size)
+            }
         }
     }
     
