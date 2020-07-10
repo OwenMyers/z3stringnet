@@ -8,6 +8,8 @@ use conrod_core::position::Position::Absolute;
 use conrod_core::Color;
 use datamodel::lattice::Lattice;
 use datamodel::Link;
+use conrod_core::widget;
+use datamodel::Direction as Compass;
 
 
 // For conrod
@@ -34,8 +36,30 @@ impl DemoApp {
     }
 }
 
+pub fn draw_triangle(tip: Point, point_direction: Compass) {
+    let long_side: f64 = LINK_MAJOR / 3.0;
+    let short_side: f64 = LINK_MINOR / 2.0;
 
-///
+    let end_1 = match point_direction {
+        Compass::N => [tip[0] - short_side, tip[1] - long_side],
+        Compass::E => [tip[0] - long_side, tip[1] - short_side],
+        Compass::S => [tip[0] + short_side, tip[1] + long_side],
+        Compass::W => [tip[0] + long_side, tip[1] + short_side],
+    };
+    let end_2 = match point_direction {
+        Compass::N => [end_1[0] + 2.0 * short_side, end_1[1]],
+        Compass::E => [end_1[0], end_1[1] + 2.0 * short_side],
+        Compass::S => [end_1[0] - 2.0 * short_side, end_1[1]],
+        Compass::W => [end_1[0], end_1[1] - 2.0 * short_side],
+    };
+
+    widget::Line::centred(
+        tip,
+        [tip[0]]
+    ).set(ids.line, ui);
+}
+
+
 fn add_in_lattice_link(initial_offset: f64,
                        x: i64,
                        y: i64,
@@ -44,11 +68,11 @@ fn add_in_lattice_link(initial_offset: f64,
                        color: Color,
                        vertical: bool,
                        shift_direction: f64) -> () {
-    use conrod_core::widget;
     let mut link_x = LINK_MINOR;
     let mut link_y = LINK_MAJOR;
     let mut x_pos_mod = 0.0;
     let mut y_pos_mod = LINK_MAJOR as f64 / 2.0 * shift_direction;
+
     if !vertical {
         link_x = LINK_MAJOR;
         link_y = LINK_MINOR;
@@ -56,7 +80,7 @@ fn add_in_lattice_link(initial_offset: f64,
         y_pos_mod = 0.0;
     }
     let dimensions = [link_x as f64, link_y as f64];
-    widget::RoundedRectangle::fill(dimensions, 2.0).x_position(
+    widget::RoundedRectangle::fill(dimensions, 8.0).x_position(
         Absolute(initial_offset + (x as f64) * (LINK_MAJOR as f64) + x_pos_mod)
     ).y_position(
         Absolute(initial_offset + (y as f64) * (LINK_MAJOR as f64) + y_pos_mod)
@@ -104,7 +128,8 @@ widget_ids! {
         line,
         //point_path,
         //rectangle_fill,
-        lattice_links[]
+        lattice_links[],
+        triangle
         //rectangle_outline,
         //trapezoid,
         //oval_fill,
