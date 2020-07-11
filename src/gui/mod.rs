@@ -9,7 +9,9 @@ use conrod_core::Color;
 use datamodel::lattice::Lattice;
 use datamodel::Link;
 use conrod_core::widget;
+use conrod_core::widget::Id;
 use datamodel::Direction as Compass;
+use conrod_core::text::line::width;
 
 
 // For conrod
@@ -36,9 +38,9 @@ impl DemoApp {
     }
 }
 
-pub fn draw_triangle(tip: Point, point_direction: Compass) {
-    let long_side: f64 = LINK_MAJOR / 3.0;
-    let short_side: f64 = LINK_MINOR / 2.0;
+pub fn draw_triangle(tip: Point, point_direction: Compass, id1: Id, id2: Id, id3: Id, ui: &mut conrod_core::UiCell) {
+    let long_side: f64 = LINK_MAJOR as f64/ 3.0;
+    let short_side: f64 = LINK_MINOR as f64/ 2.0;
 
     let end_1 = match point_direction {
         Compass::N => [tip[0] - short_side, tip[1] - long_side],
@@ -52,11 +54,19 @@ pub fn draw_triangle(tip: Point, point_direction: Compass) {
         Compass::S => [end_1[0] - 2.0 * short_side, end_1[1]],
         Compass::W => [end_1[0], end_1[1] - 2.0 * short_side],
     };
+    let end_1a = match point_direction {
+        Compass::N => [tip[0] + short_side, tip[1] - long_side],
+        Compass::E => [tip[0] - long_side, tip[1] + short_side],
+        Compass::S => [tip[0] - short_side, tip[1] + long_side],
+        Compass::W => [tip[0] + long_side, tip[1] - short_side],
+    };
 
-    widget::Line::centred(
-        tip,
-        [tip[0]]
-    ).set(ids.line, ui);
+    widget::Line::new(tip,end_1).x_position(Absolute(tip[0])).y_position(Absolute(tip[1])).set(id1, ui);
+    widget::Line::new(tip,end_1a).x_position(Absolute(tip[0])).y_position(Absolute(tip[1])).set(id2, ui);
+    widget::Line::new(end_1,end_2).x_position(Absolute(tip[0])).y_position(Absolute(tip[1])).set(id3, ui);
+
+    //widget::Line::centred(tip,end_1). //.x_position(Absolute(tip[0])).y_position(Absolute(tip[1])).set(id1, ui);
+    //widget::Line::
 }
 
 
@@ -126,6 +136,7 @@ widget_ids! {
         //shapes_right_col,
         //shapes_title,
         line,
+        lines[],
         //point_path,
         //rectangle_fill,
         lattice_links[],
@@ -171,6 +182,12 @@ pub fn gui(ui: &mut conrod_core::UiCell,
         .mid_left_of(ids.canvas)
         .set(ids.line, ui);
 
+    ids.lines.resize(
+        (6 * lattice_dim * lattice_dim) as usize, &mut ui.widget_id_generator()
+    );
+    let mut triangle_line_iter = ids.lines.iter();
+
+
     // For now just do the horizontal links. Add factor of 2 when you do all of them
     ids.lattice_links.resize(
         (2 * lattice_dim * lattice_dim) as usize, &mut ui.widget_id_generator()
@@ -185,6 +202,9 @@ pub fn gui(ui: &mut conrod_core::UiCell,
         let x = cur_vertex.xy.x;
         let y = cur_vertex.xy.y;
 
+        let tri_x = initial_offset + (x as u32 * LINK_MAJOR) as f64;
+        let tri_y = initial_offset + (y as u32 * LINK_MAJOR) as f64;
+
         let &next_id = match lattice_link_id_iter.next() {
             Some(id) => id,
             None => panic!("Need a widget ID.")
@@ -192,6 +212,7 @@ pub fn gui(ui: &mut conrod_core::UiCell,
         match cur_vertex.n {
             Link::In => {
                 add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, true, 1.0)
+
             },
             Link::Out => {
                 add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, true, 1.0)
@@ -204,9 +225,22 @@ pub fn gui(ui: &mut conrod_core::UiCell,
             Some(id) => id,
             None => panic!("Need a widget ID (2).")
         };
+        let &id1 =  match triangle_line_iter.next() {
+            Some(id) => id,
+            None => panic!("Need a widget ID.")
+        };
+        let &id2 =  match triangle_line_iter.next() {
+            Some(id) => id,
+            None => panic!("Need a widget ID.")
+        };
+        let &id3 =  match triangle_line_iter.next() {
+            Some(id) => id,
+            None => panic!("Need a widget ID.")
+        };
         match cur_vertex.e {
             Link::In => {
-                add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, false, 1.0)
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, false, 1.0);
+                draw_triangle([tri_x, tri_y], Compass::W, id1, id2, id3, ui);
             },
             Link::Out => {
                 add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, false, 1.0)
