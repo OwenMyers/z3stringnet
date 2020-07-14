@@ -61,12 +61,9 @@ pub fn draw_triangle(tip: Point, point_direction: Compass, id1: Id, id2: Id, id3
         Compass::W => [tip[0] + long_side, tip[1] - short_side],
     };
 
-    widget::Line::new(tip,end_1).x_position(Absolute(tip[0])).y_position(Absolute(tip[1])).set(id1, ui);
-    widget::Line::new(tip,end_1a).x_position(Absolute(tip[0])).y_position(Absolute(tip[1])).set(id2, ui);
-    widget::Line::new(end_1,end_2).x_position(Absolute(tip[0])).y_position(Absolute(tip[1])).set(id3, ui);
-
-    //widget::Line::centred(tip,end_1). //.x_position(Absolute(tip[0])).y_position(Absolute(tip[1])).set(id1, ui);
-    //widget::Line::
+    widget::Line::abs(tip,end_1).set(id1, ui);
+    widget::Line::abs(tip,end_1a).set(id2, ui);
+    widget::Line::abs(end_1,end_2).set(id3, ui);
 }
 
 
@@ -197,10 +194,10 @@ pub fn gui(ui: &mut conrod_core::UiCell,
     let in_color = conrod_core::color::rgb(0.7, 0.0, 0.3);
     let out_color = conrod_core::color::rgb(3.0, 0.0, 0.7);
 
-    let initial_offset = -200.0;
+    let initial_offset = -100.0;
     for (i, cur_vertex) in lattice.vertices.iter().enumerate() {
-        let x = cur_vertex.xy.x;
-        let y = cur_vertex.xy.y;
+        let x = cur_vertex.xy.x.clone();
+        let y = cur_vertex.xy.y.clone();
 
         let tri_x = initial_offset + (x as u32 * LINK_MAJOR) as f64;
         let tri_y = initial_offset + (y as u32 * LINK_MAJOR) as f64;
@@ -240,10 +237,10 @@ pub fn gui(ui: &mut conrod_core::UiCell,
         match cur_vertex.e {
             Link::In => {
                 add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, false, 1.0);
-                draw_triangle([tri_x, tri_y], Compass::W, id1, id2, id3, ui);
             },
             Link::Out => {
-                add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, false, 1.0)
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, false, 1.0);
+                draw_triangle([tri_x, tri_y], Compass::W, id1, id2, id3, ui);
             },
             Link::Blank => {
                 add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, false, 1.0)
