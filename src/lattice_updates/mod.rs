@@ -133,6 +133,8 @@ impl Update {
 
         assert_eq!(z3string.cur_loc, z3string.start_loc);
         self.link_number_change = totatal_link_number_change;
+        lat.number_filled_links += self.link_number_change;
+        assert!(lat.number_filled_links >= 0);
     }
 
     pub fn random_walk_update(&mut self, lat: &mut Lattice) {
