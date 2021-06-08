@@ -38,9 +38,37 @@ impl DemoApp {
     }
 }
 
-pub fn draw_triangle(tip: Point, point_direction: Compass, id1: Id, id2: Id, id3: Id, ui: &mut conrod_core::UiCell) {
+pub fn draw_triangle(tip: Point, point_direction: Compass, id1: Id, id2: Id, id3: Id, ui: &mut conrod_core::UiCell, quadrent: bool) {
     let long_side: f64 = LINK_MAJOR as f64/ 3.0;
     let short_side: f64 = LINK_MINOR as f64/ 2.0;
+    println!("{}", quadrent);
+    let mut tip = tip;
+    if quadrent == false {
+        tip = match point_direction
+        {
+            Compass::N => [tip[0], tip[1] + 3.0 * short_side],
+            Compass::E => [tip[0] + 3.0 * short_side, tip[1]],
+            Compass::S => [tip[0], tip[1] - 3.0 * short_side],
+            Compass::W => [tip[0] - 3.0 * short_side, tip[1]]
+        };
+    } else {
+        tip = match point_direction
+        {
+            Compass::N => [tip[0], tip[1] - 1.0 * short_side],
+            Compass::E => [tip[0] - 1.0 * short_side, tip[1]],
+            Compass::S => [tip[0], tip[1] + 1.0 * short_side],
+            Compass::W => [tip[0] + 1.0 * short_side, tip[1]]
+        };
+    }
+    //} else {
+    //    let tip = match point_direction
+    //    {
+    //        Compass::N => [tip[0], tip[1] - 3.0 * short_side],
+    //        Compass::E => [tip[0] - 3.0 * short_side, tip[1]],
+    //        Compass::S => [tip[0], tip[1] + 3.0 * short_side],
+    //        Compass::W => [tip[0] + 3.0 * short_side, tip[1]]
+    //    };
+    //};
 
     let end_1 = match point_direction {
         Compass::N => [tip[0] - short_side, tip[1] - long_side],
@@ -180,7 +208,7 @@ pub fn gui(ui: &mut conrod_core::UiCell,
         .set(ids.line, ui);
 
     ids.lines.resize(
-        (6 * lattice_dim * lattice_dim) as usize, &mut ui.widget_id_generator()
+        (12 * lattice_dim * lattice_dim) as usize, &mut ui.widget_id_generator()
     );
     let mut triangle_line_iter = ids.lines.iter();
 
@@ -206,16 +234,29 @@ pub fn gui(ui: &mut conrod_core::UiCell,
             Some(id) => id,
             None => panic!("Need a widget ID.")
         };
+        let &id1 =  match triangle_line_iter.next() {
+            Some(id) => id,
+            None => panic!("Need a widget ID.")
+        };
+        let &id2 =  match triangle_line_iter.next() {
+            Some(id) => id,
+            None => panic!("Need a widget ID.")
+        };
+        let &id3 =  match triangle_line_iter.next() {
+            Some(id) => id,
+            None => panic!("Need a widget ID.")
+        };
         match cur_vertex.n {
             Link::In => {
-                add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, true, 1.0)
-
+                //add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, true, 1.0);
+                draw_triangle([tri_x, tri_y], Compass::N, id1, id2, id3, ui, true);
             },
             Link::Out => {
-                add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, true, 1.0)
+                //add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, true, 1.0);
+                draw_triangle([tri_x, tri_y], Compass::S, id1, id2, id3, ui, true);
             },
             Link::Blank => {
-                add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, true, 1.0)
+                //add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, true, 1.0)
             }
         }
         let &next_id = match lattice_link_id_iter.next() {
@@ -237,10 +278,11 @@ pub fn gui(ui: &mut conrod_core::UiCell,
         match cur_vertex.e {
             Link::In => {
                 add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, false, 1.0);
+                draw_triangle([tri_x, tri_y], Compass::W, id1, id2, id3, ui, false);
             },
             Link::Out => {
                 add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, false, 1.0);
-                draw_triangle([tri_x, tri_y], Compass::W, id1, id2, id3, ui);
+                draw_triangle([tri_x, tri_y], Compass::E, id1, id2, id3, ui, false);
             },
             Link::Blank => {
                 add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, false, 1.0)
@@ -250,30 +292,58 @@ pub fn gui(ui: &mut conrod_core::UiCell,
             Some(id) => id,
             None => panic!("Need a widget ID.")
         };
+        let &id1 =  match triangle_line_iter.next() {
+            Some(id) => id,
+            None => panic!("Need a widget ID.")
+        };
+        let &id2 =  match triangle_line_iter.next() {
+            Some(id) => id,
+            None => panic!("Need a widget ID.")
+        };
+        let &id3 =  match triangle_line_iter.next() {
+            Some(id) => id,
+            None => panic!("Need a widget ID.")
+        };
         match cur_vertex.s {
             Link::In => {
-                add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, true, -1.0)
+                //add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, true, -1.0);
+                draw_triangle([tri_x, tri_y], Compass::S, id1, id2, id3, ui, false);
             },
             Link::Out => {
-                add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, true, -1.0)
+                //add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, true, -1.0);
+                draw_triangle([tri_x, tri_y], Compass::N, id1, id2, id3, ui, false);
             },
             Link::Blank => {
-                add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, true, -1.0)
+                //add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, true, -1.0);
             }
         }
         let &next_id = match lattice_link_id_iter.next() {
             Some(id) => id,
             None => panic!("Need a widget ID (2).")
         };
+        let &id1 =  match triangle_line_iter.next() {
+            Some(id) => id,
+            None => panic!("Need a widget ID.")
+        };
+        let &id2 =  match triangle_line_iter.next() {
+            Some(id) => id,
+            None => panic!("Need a widget ID.")
+        };
+        let &id3 =  match triangle_line_iter.next() {
+            Some(id) => id,
+            None => panic!("Need a widget ID.")
+        };
         match cur_vertex.w {
             Link::In => {
-                add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, false, -1.0)
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, false, -1.0);
+                draw_triangle([tri_x, tri_y], Compass::E, id1, id2, id3, ui, true);
             },
             Link::Out => {
-                add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, false, -1.0)
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, false, -1.0);
+                draw_triangle([tri_x, tri_y], Compass::W, id1, id2, id3, ui, true);
             },
             Link::Blank => {
-                add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, false, -1.0)
+                //add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, false, -1.0)
             }
         }
     }
