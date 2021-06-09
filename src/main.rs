@@ -42,7 +42,7 @@ fn main() {
     // Conrod Start
     let mut events_loop = glium::glutin::event_loop::EventLoop::new();
     let window = glium::glutin::window::WindowBuilder::new()
-        .with_title("Conrod with glium!").with_inner_size(glium::glutin::dpi::LogicalSize::new(1024.0, 768.0));
+        .with_title("Conrod with glium!").with_inner_size(glium::glutin::dpi::LogicalSize::new(1000.0, 1000.0));
         //.with_dimensions((WIN_W, WIN_H).into());
     let context = glium::glutin::ContextBuilder::new()
         .with_vsync(true)
@@ -148,7 +148,7 @@ fn main() {
             //    target.finish().unwrap();
             //}
         }
-    });
+    );
 
     // Conrod End
 
@@ -187,46 +187,6 @@ fn main() {
     } else {
         println!("Lattice will be updated using plaquette flips.");
     }
-
-
-    // More Conrod
-    //'main: loop {
-    //    // Handle all events.
-    //    for event in event_loop.next(&mut events_loop) {
-    //        // Use the `winit` backend feature to convert the winit event to a conrod one.
-    //        if let Some(event) = convert_event(event.clone(), &display) {
-    //            ui.handle_event(event);
-    //            event_loop.needs_update();
-    //        }
-
-    //        match event {
-    //            glium::glutin::event::Event::WindowEvent { event, .. } => match event {
-    //                // Break from the loop upon `Escape`.
-    //                glium::glutin::event::WindowEvent::CloseRequested
-    //                | glium::glutin::event::WindowEvent::KeyboardInput {
-    //                    input:
-    //                    glium::glutin::event::KeyboardInput {
-    //                        virtual_keycode: Some(glium::glutin::event::VirtualKeyCode::Escape),
-    //                        ..
-    //                    },
-    //                    ..
-    //                } => break 'main,
-    //                _ => (),
-    //            },
-    //            _ => (),
-    //        }
-    //    }
-    //    gui(&mut ui.set_widgets(), &mut ids, &mut app, lattice_size_arg, &lat);
-    //    // Draw the `Ui`.
-    //    if let Some(primitives) = ui.draw_if_changed() {
-    //        renderer.fill(&display.0, primitives, &image_map);
-    //        let mut target = display.0.draw();
-    //        target.clear_color(0.0, 0.0, 0.0, 1.0);
-    //        renderer.draw(&display.0, &mut target, &image_map).unwrap();
-    //        target.finish().unwrap();
-    //    }
-    //}
-    // End More Coonrod
 
     // number_bins: The number of lines in the data file (10000)
     let number_bins: u64 = n_bins_arg;

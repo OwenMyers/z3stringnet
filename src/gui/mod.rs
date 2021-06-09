@@ -248,15 +248,15 @@ pub fn gui(ui: &mut conrod_core::UiCell,
         };
         match cur_vertex.n {
             Link::In => {
-                //add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, true, 1.0);
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, true, 1.0);
                 draw_triangle([tri_x, tri_y], Compass::N, id1, id2, id3, ui, true);
             },
             Link::Out => {
-                //add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, true, 1.0);
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, true, 1.0);
                 draw_triangle([tri_x, tri_y], Compass::S, id1, id2, id3, ui, true);
             },
             Link::Blank => {
-                //add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, true, 1.0)
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, true, 1.0)
             }
         }
         let &next_id = match lattice_link_id_iter.next() {
@@ -306,15 +306,15 @@ pub fn gui(ui: &mut conrod_core::UiCell,
         };
         match cur_vertex.s {
             Link::In => {
-                //add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, true, -1.0);
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, true, -1.0);
                 draw_triangle([tri_x, tri_y], Compass::S, id1, id2, id3, ui, false);
             },
             Link::Out => {
-                //add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, true, -1.0);
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, true, -1.0);
                 draw_triangle([tri_x, tri_y], Compass::N, id1, id2, id3, ui, false);
             },
             Link::Blank => {
-                //add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, true, -1.0);
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, true, -1.0);
             }
         }
         let &next_id = match lattice_link_id_iter.next() {
@@ -343,7 +343,7 @@ pub fn gui(ui: &mut conrod_core::UiCell,
                 draw_triangle([tri_x, tri_y], Compass::W, id1, id2, id3, ui, true);
             },
             Link::Blank => {
-                //add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, false, -1.0)
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, false, -1.0)
             }
         }
     }
