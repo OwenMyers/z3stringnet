@@ -47,16 +47,16 @@ pub fn draw_triangle(tip: Point, point_direction: Compass, id1: Id, id2: Id, id3
         {
             Compass::N => [tip[0], tip[1] + 3.0 * short_side],
             Compass::E => [tip[0] + 3.0 * short_side, tip[1]],
-            Compass::S => [tip[0], tip[1] - 3.0 * short_side],
-            Compass::W => [tip[0] - 3.0 * short_side, tip[1]]
+            Compass::S => [tip[0], tip[1] + 1.0 * short_side],
+            Compass::W => [tip[0] + 1.0 * short_side, tip[1]]
         };
     } else {
         tip = match point_direction
         {
             Compass::N => [tip[0], tip[1] - 1.0 * short_side],
             Compass::E => [tip[0] - 1.0 * short_side, tip[1]],
-            Compass::S => [tip[0], tip[1] + 1.0 * short_side],
-            Compass::W => [tip[0] + 1.0 * short_side, tip[1]]
+            Compass::S => [tip[0], tip[1] - 3.0 * short_side],
+            Compass::W => [tip[0] - 3.0 * short_side, tip[1]]
         };
     }
     //} else {
