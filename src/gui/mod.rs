@@ -41,7 +41,6 @@ impl DemoApp {
 pub fn draw_triangle(tip: Point, point_direction: Compass, id1: Id, id2: Id, id3: Id, ui: &mut conrod_core::UiCell, quadrent: bool) {
     let long_side: f64 = LINK_MAJOR as f64/ 3.0;
     let short_side: f64 = LINK_MINOR as f64/ 2.0;
-    println!("{}", quadrent);
     let mut tip = tip;
     if quadrent == false {
         tip = match point_direction
