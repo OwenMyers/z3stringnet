@@ -91,7 +91,7 @@ fn main() {
     // - Update the widgets via the `conrod_example_shared::gui` fn.
     // - Render the current state of the `Ui`.
     // - Repeat.
-    run_loop(display, events_loop, move |request, display| {
+    run_loop(display, events_loop, move | request, display| {
         match request {
             Request::Event {
                 event,
@@ -146,7 +146,7 @@ fn main() {
             //    target.clear_color(0.0, 0.0, 0.0, 1.0);
             //    renderer.draw(display, &mut target, &image_map).unwrap();
             //    target.finish().unwrap();
-            //}
+            }
         }
     );
 
