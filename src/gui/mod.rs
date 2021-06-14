@@ -164,15 +164,15 @@ widget_ids! {
         //point_path,
         //rectangle_fill,
         lattice_links[],
-        triangle
+        triangle,
         //rectangle_outline,
         //trapezoid,
         //oval_fill,
         //oval_outline,
         //circle,
         // Button, XyPad, Toggle.
-        //button_title,
-        //button,
+        button_title,
+        button
     }
 }
 
@@ -187,7 +187,7 @@ pub fn gui(ui: &mut conrod_core::UiCell,
 
     const MARGIN: conrod_core::Scalar = 30.0;
     const TITLE_SIZE: conrod_core::FontSize = 42;
-    const SUBTITLE_SIZE: conrod_core::FontSize = 32;
+    const SUBTITLE_SIZE: conrod_core::FontSize = 42;
 
     const TITLE: &'static str = "Stringnet";
     widget::Canvas::new()
@@ -205,6 +205,24 @@ pub fn gui(ui: &mut conrod_core::UiCell,
     widget::Line::centred(start, end)
         .mid_left_of(ids.canvas)
         .set(ids.line, ui);
+
+    //widget::Text::new("Button, XYPad and Toggle")
+    //    .down_from(ids.button, 60.0)
+    //    .align_middle_x_of(ids.canvas)
+    //    .font_size(SUBTITLE_SIZE)
+    //    .set(ids.button_title, ui);
+    let mut tmp_test_button:i8 = 0;
+    for _press in widget::Button::new()
+        .label("PRESS ME")
+        .mid_left_with_margin_on(ids.canvas, MARGIN)
+        .down_from(ids.button_title, 60.0)
+        .w_h(120.0, 30.0)
+        .set(ids.button, ui) {
+        tmp_test_button = 1;
+    };
+    if tmp_test_button > 0 {
+        println!("oooooooooooooooooooooooooooooooooooooooooooooo");
+    };
 
     ids.lines.resize(
         (12 * lattice_dim * lattice_dim) as usize, &mut ui.widget_id_generator()
