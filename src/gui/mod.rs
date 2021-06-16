@@ -181,7 +181,8 @@ pub fn gui(ui: &mut conrod_core::UiCell,
            ids: &mut Ids,
            app: &mut DemoApp,
            lattice_dim: i64,
-           lattice: &Lattice) {
+           lattice: &Lattice,
+           winding_estimator: &mut WindingNumberCountEstimator) {
     use conrod_core::{widget, Colorable, Labelable, Positionable, Sizeable, Widget};
     use std::iter::once;
 
@@ -222,6 +223,8 @@ pub fn gui(ui: &mut conrod_core::UiCell,
     };
     if tmp_test_button > 0 {
         println!("oooooooooooooooooooooooooooooooooooooooooooooo");
+        let winding_estimator_display = winding_estimator.next();
+        println!("{:?}", winding_estimator_display);
     };
 
     ids.lines.resize(
@@ -409,6 +412,7 @@ use glium::{
     glutin::{event, event_loop},
     Display,
 };
+use estimators::winding_number_estimator::WindingNumberCountEstimator;
 
 pub enum Request<'a, 'b: 'a> {
     Event {

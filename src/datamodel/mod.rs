@@ -130,7 +130,7 @@ impl VertexLinkCount {
 /// `|` and `--` denote the horizontal and vertical links respectively.
 /// 
 /// `Vertex.xy` is a `Point` specifying the position of the vertex.
-#[derive(Clone)]
+#[derive(Clone, Debug, Copy)]
 pub struct Vertex {
     pub n: Link,
     pub e: Link,

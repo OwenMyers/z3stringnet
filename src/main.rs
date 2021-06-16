@@ -76,10 +76,9 @@ fn main() {
         x: lattice_size_arg,
         y: lattice_size_arg,
     };
-    let mut lat: Lattice;
     // lat now owns size -> That is good and intentional
     // lat = build_blank_lat(size);
-    lat = build_z3_striped_lat(size);
+    let mut lat: Lattice = build_z3_striped_lat(size);
     //lat.vertices[0].e = lat.vertices[0].e.flip();
 
     let equilibrate = true;
@@ -143,7 +142,7 @@ fn main() {
     let mut density_estimator = DensityEstimator::new(&lat.size);
     let mut correlation_origin_estimator = CorrelationOriginEstimator::new(&lat.size);
     let mut total_link_count_estimator = TotalLinkCountEstimator::new();
-    let mut winding_count_estimator = WindingNumberCountEstimator::new();
+    let mut winding_count_estimator = WindingNumberCountEstimator::new(lat.clone());
     let mut winding_variance_estimator = WindingNumberVarianceEstimator::new();
 
     // Equilibrate
@@ -199,7 +198,8 @@ fn main() {
                 }
             }
             Request::SetUi { needs_redraw } => {
-                gui(&mut ui.set_widgets(), &mut ids, &mut app, lattice_size_arg, &lat);
+                gui(&mut ui.set_widgets(), &mut ids, &mut app, lattice_size_arg,
+                    &lat, &mut winding_count_estimator);
                 // Instantiate a GUI demonstrating every widget type provided by conrod.
                 //conrod_example_shared::gui(&mut ui.set_widgets(), &ids, &mut app);
 
@@ -231,43 +231,43 @@ fn main() {
 
 
     // Actual run
-    let mut total_update_count: u64 = 0;
-    for _i in 0..number_bins {
-        println!("Working on bin {}", _i);
-        if write_bin_configurations {
-            write_lattice(String::from(format!("lattice_bin_{}.csv", total_update_count)), &lat);
-        }
-        for _j in 0..number_measure {
-            //println!("j {}", _j);
-            if write_measure_configurations {
-                write_lattice(String::from(format!("lattice_measure_{}.csv", total_update_count)), &lat);
-            }
-            for _k in 0..number_update {
-                //println!("k {}", _k);
-                if write_update_configurations {
-                    write_lattice(String::from(format!("lattice_{}.csv", total_update_count)), &lat);
-                }
-                updater.main_update(&mut lat, &update_type);
-                total_update_count += 1;
-            }
-            density_estimator.measure(&lat);
-            correlation_origin_estimator.measure(&lat);
-            total_link_count_estimator.measure(&lat);
-            winding_variance_estimator.measure(&lat);
-        }
-
-        density_estimator.finalize_bin_and_write(number_measure);
-        correlation_origin_estimator.finalize_bin_and_write(number_measure);
-        total_link_count_estimator.finalize_bin_and_write(number_measure);
-        winding_variance_estimator.finalize_bin_and_write(number_measure);
-
-        density_estimator.clear();
-        correlation_origin_estimator.clear();
-        total_link_count_estimator.clear();
-        winding_variance_estimator.clear();
-
-        winding_count_estimator.measure(&lat);
-        winding_count_estimator.finalize_bin_and_write(1);
-    }
-    winding_count_estimator.clear();
+//    let mut total_update_count: u64 = 0;
+//    for _i in 0..number_bins {
+//        println!("Working on bin {}", _i);
+//        if write_bin_configurations {
+//            write_lattice(String::from(format!("lattice_bin_{}.csv", total_update_count)), &lat);
+//        }
+//        for _j in 0..number_measure {
+//            //println!("j {}", _j);
+//            if write_measure_configurations {
+//                write_lattice(String::from(format!("lattice_measure_{}.csv", total_update_count)), &lat);
+//            }
+//            for _k in 0..number_update {
+//                //println!("k {}", _k);
+//                if write_update_configurations {
+//                    write_lattice(String::from(format!("lattice_{}.csv", total_update_count)), &lat);
+//                }
+//                updater.main_update(&mut lat, &update_type);
+//                total_update_count += 1;
+//            }
+//            density_estimator.measure(&lat);
+//            correlation_origin_estimator.measure(&lat);
+//            total_link_count_estimator.measure(&lat);
+//            winding_variance_estimator.measure(&lat);
+//        }
+//
+//        density_estimator.finalize_bin_and_write(number_measure);
+//        correlation_origin_estimator.finalize_bin_and_write(number_measure);
+//        total_link_count_estimator.finalize_bin_and_write(number_measure);
+//        winding_variance_estimator.finalize_bin_and_write(number_measure);
+//
+//        density_estimator.clear();
+//        correlation_origin_estimator.clear();
+//        total_link_count_estimator.clear();
+//        winding_variance_estimator.clear();
+//
+//        winding_count_estimator.measure(&lat);
+//        winding_count_estimator.finalize_bin_and_write(1);
+//    }
+//    winding_count_estimator.clear();
 }
