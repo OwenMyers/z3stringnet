@@ -38,6 +38,21 @@ impl DemoApp {
     }
 }
 
+pub fn draw_winding_number_display(
+    wnd: WindingNumberCountEstimatorDisplay,
+    ids: &mut Ids,
+    ui: &mut conrod_core::UiCell
+) {
+
+    const size: conrod_core::FontSize = 200;
+    let in_color = conrod_core::color::rgb(0.7, 0.0, 0.3);
+    const INTRODUCTION: &'static str = "Testing Text";
+    widget::Text::new(INTRODUCTION)
+        .font_size(size).x_position(Absolute(100.0)).y_position(Absolute(100.0))
+        .line_spacing(5.0).color(in_color)
+        .set(ids.winding_text_box, ui);
+}
+
 pub fn draw_triangle(tip: Point, point_direction: Compass, id1: Id, id2: Id, id3: Id, ui: &mut conrod_core::UiCell, quadrent: bool) {
     let long_side: f64 = LINK_MAJOR as f64/ 3.0;
     let short_side: f64 = LINK_MINOR as f64/ 2.0;
@@ -132,7 +147,7 @@ pub fn theme() -> conrod_core::Theme {
         background_color: conrod_core::color::DARK_CHARCOAL,
         shape_color: conrod_core::color::LIGHT_CHARCOAL,
         border_color: conrod_core::color::BLACK,
-        border_width: 0.0,
+        border_width: 5.0,
         label_color: conrod_core::color::WHITE,
         font_id: None,
         font_size_large: 26,
@@ -153,6 +168,7 @@ widget_ids! {
         // The title and introduction widgets.
         title,
         introduction,
+        winding_text_box,
         // Shapes.
         //shapes_canvas,
         //rounded_rectangle,
@@ -175,7 +191,6 @@ widget_ids! {
         button
     }
 }
-
 
 pub fn gui(ui: &mut conrod_core::UiCell,
            ids: &mut Ids,
@@ -225,6 +240,10 @@ pub fn gui(ui: &mut conrod_core::UiCell,
         println!("oooooooooooooooooooooooooooooooooooooooooooooo");
         let winding_estimator_display = winding_estimator.next();
         println!("{:?}", winding_estimator_display);
+        match winding_estimator_display {
+            Some(wind_disp) => draw_winding_number_display(wind_disp, ids, ui),
+            None => println!("Got no winding number display")
+        }
     };
 
     ids.lines.resize(
@@ -412,7 +431,7 @@ use glium::{
     glutin::{event, event_loop},
     Display,
 };
-use estimators::winding_number_estimator::WindingNumberCountEstimator;
+use estimators::winding_number_estimator::{WindingNumberCountEstimator, WindingNumberCountEstimatorDisplay};
 
 pub enum Request<'a, 'b: 'a> {
     Event {
