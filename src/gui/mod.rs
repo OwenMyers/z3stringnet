@@ -47,9 +47,9 @@ pub fn draw_winding_number_display(
     const size: conrod_core::FontSize = 200;
     let in_color = conrod_core::color::rgb(0.7, 0.0, 0.3);
     const INTRODUCTION: &'static str = "Testing Text";
-    widget::Text::new(INTRODUCTION)
-        .font_size(size).x_position(Absolute(100.0)).y_position(Absolute(100.0))
-        .line_spacing(5.0).color(in_color)
+    widget::TextBox::new(INTRODUCTION)
+        .font_size(size).x_position(Absolute(10.0)).y_position(Absolute(10.0))
+        //.line_spacing(5.0).text_color(in_color)
         .set(ids.winding_text_box, ui);
 }
 
