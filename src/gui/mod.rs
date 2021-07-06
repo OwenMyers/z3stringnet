@@ -44,12 +44,12 @@ pub fn draw_winding_number_display(
     ui: &mut conrod_core::UiCell
 ) {
 
-    const size: conrod_core::FontSize = 200;
+    const size: conrod_core::FontSize = 20;
     let in_color = conrod_core::color::rgb(0.7, 0.0, 0.3);
     const INTRODUCTION: &'static str = "Testing Text";
     widget::TextBox::new(INTRODUCTION)
-        .font_size(size).x_position(Absolute(10.0)).y_position(Absolute(10.0))
-        //.line_spacing(5.0).text_color(in_color)
+        .font_size(size).x_position(Absolute(0.0)).y_position(Absolute(200.0))
+        .text_color(in_color)
         .set(ids.winding_text_box, ui);
 }
 
@@ -244,6 +244,12 @@ pub fn gui(ui: &mut conrod_core::UiCell,
             Some(wind_disp) => draw_winding_number_display(wind_disp, ids, ui),
             None => println!("Got no winding number display")
         }
+    };
+    let winding_estimator_display = winding_estimator.next();
+    println!("{:?}", winding_estimator_display);
+    match winding_estimator_display {
+        Some(wind_disp) => draw_winding_number_display(wind_disp, ids, ui),
+        None => println!("Got no winding number display")
     };
 
     ids.lines.resize(

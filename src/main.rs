@@ -54,6 +54,8 @@ fn main() {
     let mut ui = conrod_core::UiBuilder::new([WIN_W as f64, WIN_H as f64])
         .theme(theme())
         .build();
+    const FONT_PATH: &'static str = "/home/owen/Downloads/NotoSans-Regular.ttf";
+    ui.fonts.insert_from_file(FONT_PATH).unwrap();
 
     //let mut image_map = conrod_core::image::Map::new();
     let mut image_map = conrod_core::image::Map::<glium::texture::Texture2d>::new();
