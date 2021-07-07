@@ -10,8 +10,8 @@ use super::super::datamodel::Direction;
 
 #[derive(Debug)]
 pub struct WindingNumberCountEstimatorDisplay {
-    local_text: String,
-    position: Point,
+    pub local_text: String,
+    pub position: Point,
 }
 
 #[derive(Debug)]

@@ -10,8 +10,10 @@ use datamodel::lattice::Lattice;
 use datamodel::Link;
 use conrod_core::widget;
 use conrod_core::widget::Id;
+use datamodel;
 use datamodel::Direction as Compass;
 use conrod_core::text::line::width;
+use estimators::winding_number_estimator::{WindingNumberCountEstimator, WindingNumberCountEstimatorDisplay};
 
 
 // For conrod
@@ -25,6 +27,7 @@ pub struct DemoApp {
     ball_xy: conrod_core::Point,
     ball_color: conrod_core::Color,
     sine_frequency: f32,
+    winding_number_display: WindingNumberCountEstimatorDisplay,
 }
 
 impl DemoApp {
@@ -34,23 +37,39 @@ impl DemoApp {
             ball_xy: [0.0, 0.0],
             ball_color: conrod_core::color::WHITE,
             sine_frequency: 1.0,
+            winding_number_display: WindingNumberCountEstimatorDisplay {
+                local_text: String::from("Not Started"),
+                position: datamodel::Point { x: -1, y: -1 },
+            },
         }
     }
 }
 
 pub fn draw_winding_number_display(
-    wnd: WindingNumberCountEstimatorDisplay,
+    wnd: & WindingNumberCountEstimatorDisplay,
     ids: &mut Ids,
-    ui: &mut conrod_core::UiCell
+    ui: &mut conrod_core::UiCell,
+    initial_offset: f64,
 ) {
+    let mut x_pos_mod = 0.0;
+    let mut y_pos_mod = LINK_MAJOR as f64 / 2.0 * 1.0;
 
-    const size: conrod_core::FontSize = 20;
+    const size: conrod_core::FontSize = 12;
     let in_color = conrod_core::color::rgb(0.7, 0.0, 0.3);
-    const INTRODUCTION: &'static str = "Testing Text";
-    widget::TextBox::new(INTRODUCTION)
-        .font_size(size).x_position(Absolute(0.0)).y_position(Absolute(200.0))
+    //const INTRODUCTION: &'static str = "Testing Text\nSome more";
+    widget::TextBox::new(&wnd.local_text)
+        .font_size(size).x_position(Absolute(150.0)).y_position(Absolute(150.0))
         .text_color(in_color)
         .set(ids.winding_text_box, ui);
+
+    if wnd.position.y >= 0 {
+        let dimensions = [LINK_MINOR as f64, LINK_MAJOR as f64];
+        widget::RoundedRectangle::fill(dimensions, 8.0)
+            .x_position(Absolute(initial_offset + (wnd.position.x as f64) * ( LINK_MINOR as f64)))
+            .y_position(Absolute(initial_offset + (wnd.position.y as f64) * ( LINK_MAJOR as f64)))
+            .color(in_color).set(ids.winding_link, ui);
+    }
+
 }
 
 pub fn draw_triangle(tip: Point, point_direction: Compass, id1: Id, id2: Id, id3: Id, ui: &mut conrod_core::UiCell, quadrent: bool) {
@@ -169,6 +188,7 @@ widget_ids! {
         title,
         introduction,
         winding_text_box,
+        winding_link,
         // Shapes.
         //shapes_canvas,
         //rounded_rectangle,
@@ -222,35 +242,9 @@ pub fn gui(ui: &mut conrod_core::UiCell,
         .mid_left_of(ids.canvas)
         .set(ids.line, ui);
 
-    //widget::Text::new("Button, XYPad and Toggle")
-    //    .down_from(ids.button, 60.0)
-    //    .align_middle_x_of(ids.canvas)
-    //    .font_size(SUBTITLE_SIZE)
-    //    .set(ids.button_title, ui);
-    let mut tmp_test_button:i8 = 0;
-    for _press in widget::Button::new()
-        .label("PRESS ME")
-        .mid_left_with_margin_on(ids.canvas, MARGIN)
-        .down_from(ids.button_title, 60.0)
-        .w_h(120.0, 30.0)
-        .set(ids.button, ui) {
-        tmp_test_button = 1;
-    };
-    if tmp_test_button > 0 {
-        println!("oooooooooooooooooooooooooooooooooooooooooooooo");
-        let winding_estimator_display = winding_estimator.next();
-        println!("{:?}", winding_estimator_display);
-        match winding_estimator_display {
-            Some(wind_disp) => draw_winding_number_display(wind_disp, ids, ui),
-            None => println!("Got no winding number display")
-        }
-    };
-    let winding_estimator_display = winding_estimator.next();
-    println!("{:?}", winding_estimator_display);
-    match winding_estimator_display {
-        Some(wind_disp) => draw_winding_number_display(wind_disp, ids, ui),
-        None => println!("Got no winding number display")
-    };
+    let initial_offset = -100.0;
+
+
 
     ids.lines.resize(
         (12 * lattice_dim * lattice_dim) as usize, &mut ui.widget_id_generator()
@@ -267,7 +261,6 @@ pub fn gui(ui: &mut conrod_core::UiCell,
     let in_color = conrod_core::color::rgb(0.7, 0.0, 0.3);
     let out_color = conrod_core::color::rgb(3.0, 0.0, 0.7);
 
-    let initial_offset = -100.0;
     for (i, cur_vertex) in lattice.vertices.iter().enumerate() {
         let x = cur_vertex.xy.x.clone();
         let y = cur_vertex.xy.y.clone();
@@ -391,7 +384,30 @@ pub fn gui(ui: &mut conrod_core::UiCell,
                 add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, false, -1.0)
             }
         }
+
     }
+    for _press in widget::Button::new()
+        .label("Winding Number")
+        .mid_left_with_margin_on(ids.canvas, MARGIN)
+        .down_from(ids.button_title, 60.0)
+        .w_h(120.0, 30.0)
+        .set(ids.button, ui) {
+        app.winding_number_display = match winding_estimator.next() {
+            Some(w) => w,
+            None => //println!("Got no winding number display")
+                WindingNumberCountEstimatorDisplay {
+                    local_text: String::from("Started Something "),
+                    position: datamodel::Point { x: -1, y: -1 },
+                }
+        }
+    };
+    //println!("{:?}", winding_estimator_display);
+    match Some(&app.winding_number_display){
+        Some(wind_disp) => draw_winding_number_display(
+            wind_disp, ids, ui, initial_offset
+        ),
+        None => println!("Got no winding number display")
+    };
 
 //    let mut count = 0;
 //    let initial_offset = -200.0;
@@ -437,7 +453,6 @@ use glium::{
     glutin::{event, event_loop},
     Display,
 };
-use estimators::winding_number_estimator::{WindingNumberCountEstimator, WindingNumberCountEstimatorDisplay};
 
 pub enum Request<'a, 'b: 'a> {
     Event {
