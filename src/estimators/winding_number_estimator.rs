@@ -138,7 +138,7 @@ impl Iterator for WindingNumberCountEstimator {
         } else {
             Some(WindingNumberCountEstimatorDisplay {
                 local_text: String::from(format!("Display winding iterator: {}", self.count_vertical)),
-                position: Point { x: 2, y: self.iterator_location },
+                position: Point { x: 2, y: self.iterator_location - 1},
             })
         }
     }
