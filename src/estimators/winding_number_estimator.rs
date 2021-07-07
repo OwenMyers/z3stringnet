@@ -104,10 +104,10 @@ impl Iterator for WindingNumberCountEstimator {
         }
         if !self.iter_done {
             if self.iterator_location % 2 == 0 {
-                self.cur_point = Point { x: 0, y: self.iterator_location };
+                self.cur_point = Point { x: 2, y: self.iterator_location };
                 self.cur_grab_direction = Direction::E;
             } else {
-                self.cur_point = Point { x: 1, y: self.iterator_location };
+                self.cur_point = Point { x: 3, y: self.iterator_location };
                 self.cur_grab_direction = Direction::W;
             }
 
@@ -137,8 +137,8 @@ impl Iterator for WindingNumberCountEstimator {
             })
         } else {
             Some(WindingNumberCountEstimatorDisplay {
-                local_text: String::from("Display winding iterator"),
-                position: Point { x: 0, y: self.iterator_location },
+                local_text: String::from(format!("Display winding iterator: {}", self.count_vertical)),
+                position: Point { x: 2, y: self.iterator_location },
             })
         }
     }
