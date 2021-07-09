@@ -79,11 +79,11 @@ fn main() {
         y: lattice_size_arg,
     };
     // lat now owns size -> That is good and intentional
-    // lat = build_blank_lat(size);
-    let mut lat: Lattice = build_z3_striped_lat(size);
+    let mut lat: Lattice = build_blank_lat(size);
+    //let mut lat: Lattice = build_z3_striped_lat(size);
     //lat.vertices[0].e = lat.vertices[0].e.flip();
 
-    let equilibrate = true;
+    let equilibrate = false;
 
     let weights_arg_str = matches.value_of("weights").unwrap_or("1.0");
     let weights_arg: f64 = weights_arg_str.parse().unwrap();

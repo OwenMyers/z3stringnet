@@ -63,9 +63,9 @@ pub fn draw_winding_number_display(
         .set(ids.winding_text_box, ui);
 
     if wnd.position.y >= 0 {
-        let dimensions = [LINK_MINOR as f64, LINK_MAJOR as f64];
+        let dimensions = [(LINK_MINOR as f64)/2.0, LINK_MAJOR as f64];
         widget::RoundedRectangle::fill(dimensions, 8.0)
-            .x_position(Absolute(initial_offset + (wnd.position.x as f64) * ( LINK_MINOR as f64)))
+            .x_position(Absolute(initial_offset + ((wnd.position.x as f64) * 2.0 + 1.0) * (LINK_MINOR as f64)))
             .y_position(Absolute(initial_offset + (wnd.position.y as f64) * ( LINK_MAJOR as f64)))
             .color(in_color).set(ids.winding_link, ui);
     }
