@@ -2,7 +2,7 @@ use conrod_core;
 use conrod_glium;
 use conrod_winit;
 use std::path::Iter;
-use conrod_core::{Point, Positionable, Colorable, Widget};
+use conrod_core::{Point, Positionable, Colorable, Widget, Borderable};
 use conrod_core::widget::grid::Lines;
 use conrod_core::position::Position::Absolute;
 use conrod_core::Color;
@@ -21,6 +21,12 @@ pub const WIN_W: u32 = 1100;
 pub const WIN_H: u32 = 1100;
 pub const LINK_MINOR: u32 = 20;
 pub const LINK_MAJOR: u32 = 40;
+
+use glium::{
+    glutin::{event, event_loop},
+    Display,
+};
+use conrod_core::color::TRANSPARENT;
 
 /// A demonstration of some application state we want to control with a conrod GUI.
 pub struct DemoApp {
@@ -57,19 +63,18 @@ pub fn draw_winding_number_display(
     const size: conrod_core::FontSize = 12;
     let in_color = conrod_core::color::rgb(0.7, 0.0, 0.3);
     //const INTRODUCTION: &'static str = "Testing Text\nSome more";
-    widget::TextBox::new(&wnd.local_text)
+    widget::TextBox::new(&wnd.local_text).border(0.0)
         .font_size(size).x_position(Absolute(150.0)).y_position(Absolute(150.0))
-        .text_color(in_color)
+        .text_color(in_color).color(TRANSPARENT)
         .set(ids.winding_text_box, ui);
 
     if wnd.position.y >= 0 {
         let dimensions = [(LINK_MINOR as f64)/2.0, LINK_MAJOR as f64];
-        widget::RoundedRectangle::fill(dimensions, 8.0)
+        widget::Rectangle::fill(dimensions)
             .x_position(Absolute(initial_offset + ((wnd.position.x as f64) * 2.0 + 1.0) * (LINK_MINOR as f64)))
             .y_position(Absolute(initial_offset + (wnd.position.y as f64) * ( LINK_MAJOR as f64)))
             .color(in_color).set(ids.winding_link, ui);
     }
-
 }
 
 pub fn draw_triangle(tip: Point, point_direction: Compass, id1: Id, id2: Id, id3: Id, ui: &mut conrod_core::UiCell, quadrent: bool) {
@@ -166,7 +171,7 @@ pub fn theme() -> conrod_core::Theme {
         background_color: conrod_core::color::DARK_CHARCOAL,
         shape_color: conrod_core::color::LIGHT_CHARCOAL,
         border_color: conrod_core::color::BLACK,
-        border_width: 5.0,
+        border_width: 0.0,
         label_color: conrod_core::color::WHITE,
         font_id: None,
         font_size_large: 26,
@@ -189,24 +194,10 @@ widget_ids! {
         introduction,
         winding_text_box,
         winding_link,
-        // Shapes.
-        //shapes_canvas,
-        //rounded_rectangle,
-        //shapes_left_col,
-        //shapes_right_col,
-        //shapes_title,
         line,
         lines[],
-        //point_path,
-        //rectangle_fill,
         lattice_links[],
         triangle,
-        //rectangle_outline,
-        //trapezoid,
-        //oval_fill,
-        //oval_outline,
-        //circle,
-        // Button, XyPad, Toggle.
         button_title,
         button
     }
@@ -235,22 +226,11 @@ pub fn gui(ui: &mut conrod_core::UiCell,
         .mid_top_of(ids.canvas)
         .set(ids.title, ui);
 
-    //let start = [-(WIN_W as f64/2.0), -(WIN_H as f64/2.0)];
-    let start = [0.0, 0.0];
-    let end= [WIN_W as f64/2.0 , WIN_H as f64/2.0];
-    widget::Line::centred(start, end)
-        .mid_left_of(ids.canvas)
-        .set(ids.line, ui);
-
     let initial_offset = -100.0;
-
-
-
     ids.lines.resize(
         (12 * lattice_dim * lattice_dim) as usize, &mut ui.widget_id_generator()
     );
     let mut triangle_line_iter = ids.lines.iter();
-
 
     // For now just do the horizontal links. Add factor of 2 when you do all of them
     ids.lattice_links.resize(
@@ -388,9 +368,11 @@ pub fn gui(ui: &mut conrod_core::UiCell,
     }
     for _press in widget::Button::new()
         .label("Winding Number")
-        .mid_left_with_margin_on(ids.canvas, MARGIN)
-        .down_from(ids.button_title, 60.0)
-        .w_h(120.0, 30.0)
+        .x_position(Absolute(-25.0)).y_position(Absolute(150.0))
+        //.top_left()
+        //.top_left_with_margin_on(ids.canvas, MARGIN)
+        //.down_from(ids.button_title, 60.0)
+        .w_h(160.0, 40.0)
         .set(ids.button, ui) {
         app.winding_number_display = match winding_estimator.next() {
             Some(w) => w,
@@ -408,51 +390,8 @@ pub fn gui(ui: &mut conrod_core::UiCell,
         ),
         None => println!("Got no winding number display")
     };
-
-//    let mut count = 0;
-//    let initial_offset = -200.0;
-//    for &id in ids.lattice_links.iter() {
-//        widget::RoundedRectangle::fill([
-//            LINK_MAJOR as f64, LINK_MINOR as f64],
-//      2.0
-//        ).x_position(Absolute(
-//            initial_offset + ((count % lattice_dim) as f64) * (LINK_MAJOR as f64)
-//        ))
-//        .y_position(Absolute(
-//            initial_offset + (count as f64 / lattice_dim as f64).floor() * (LINK_MAJOR as f64)
-//        )).set(id, ui);
-//
-//        widget::RoundedRectangle::fill(
-//                [LINK_MINOR as f64, LINK_MAJOR as f64],
-//                2.0
-//        ).x_position(Absolute(
-//                initial_offset + ((count % lattice_dim) as f64) * (LINK_MAJOR as f64)
-//        ))
-//        .y_position(Absolute(
-//            initial_offset + (count as f64 / lattice_dim as f64).floor() * (LINK_MAJOR as f64)
-//        )).set(id, ui);
-//        count += 1;
-//    }
-    //widget::RoundedRectangle::fill([100.0, 200.0], 10.0).x_position(Absolute(-100.0))
-    //    .y_position(Absolute(-100.0)).set(ids.rectangle_fill, ui);
-
 }
 
-//pub struct GliumDisplayWinitWrapper(pub glium::Display);
-
-//impl conrod_winit::WinitWindow for GliumDisplayWinitWrapper {
-//    fn get_inner_size(&self) -> Option<(u32, u32)> {
-//        self.0.gl_window().get_inner_size().map()
-//    }
-//    fn hidpi_factor(&self) -> f32 {
-//        self.0.gl_window().get_hidpi_factor() as _
-//    }
-//}
-
-use glium::{
-    glutin::{event, event_loop},
-    Display,
-};
 
 pub enum Request<'a, 'b: 'a> {
     Event {
