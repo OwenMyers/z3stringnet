@@ -38,6 +38,9 @@ fn main() {
     let lattice_size_arg_str = matches.value_of("size").unwrap_or("4");
     let lattice_size_arg: i64 = lattice_size_arg_str.parse().unwrap();
     println!("Lattice size from argument: {}", lattice_size_arg);
+    let run_with_gui_str = matches.value_of("gui").unwrap_or("false");
+    let run_with_gui: bool = run_with_gui_str.parse().unwrap();
+    println!("Run with GUI? {}", run_with_gui);
 
     // Conrod Start
     let mut events_loop = glium::glutin::event_loop::EventLoop::new();
@@ -216,21 +219,10 @@ fn main() {
                     target.finish().unwrap();
                 }
             }
-            //    // Render the `Ui` and then display it on the screen.
-            //    let primitives = ui.draw();
-
-            //    renderer.fill(display, primitives, &image_map);
-            //    let mut target = display.draw();
-            //    target.clear_color(0.0, 0.0, 0.0, 1.0);
-            //    renderer.draw(display, &mut target, &image_map).unwrap();
-            //    target.finish().unwrap();
-            }
         }
-    );
+    });
 
     // Conrod End
-
-
 
     // Actual run
 //    let mut total_update_count: u64 = 0;
