@@ -6,9 +6,15 @@ authors = ["OwenMyers <owendalemyers@gmail.com>"]
 [dependencies]
 rand = "0.5"
 clap = {version = "2.32", features = ["yaml"]}
+conrod_core = "0.73.0"
+glium = "0.28.0"
+conrod_winit = "0.73.0"
+conrod_glium = "0.73.0"
+winit = "0.23.0"
+
 
 # The development profile, used for `cargo build`.
-[profile.dev]
-opt-level = 1      # controls the `--opt-level` the compiler builds with.
+#[profile.dev]
+#opt-level = 0      # controls the `--opt-level` the compiler builds with.
                    # 0-1 is good for debugging. 2 is well-optimized. Max is 3.
                    # 's' attempts to reduce size, 'z' reduces size even more.

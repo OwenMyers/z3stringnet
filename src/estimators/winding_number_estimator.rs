@@ -9,14 +9,27 @@ use super::super::datamodel::lattice::Lattice;
 use super::super::datamodel::Direction;
 
 #[derive(Debug)]
+pub struct WindingNumberCountEstimatorDisplay {
+    pub local_text: String,
+    pub position: Point,
+}
+
+#[derive(Debug)]
 pub struct WindingNumberCountEstimator {
     count_horizontal: i64,
     count_vertical: i64,
     result_file_buffer: BufWriter<File>,
+    // Additions for the iterator
+    iterator_location: i64,
+    cur_point: Point,
+    cur_grab_direction: Direction,
+    vert_winding_count: i64,
+    iter_done: bool,
+    lat: Lattice
 }
 
 impl WindingNumberCountEstimator {
-    pub fn new() -> WindingNumberCountEstimator{
+    pub fn new(lat: Lattice) -> WindingNumberCountEstimator{
         println!("Initializing WindingNumberCountEstimator");
 
         println!("Opening WindingNumberCountEstimator file");
@@ -35,6 +48,12 @@ impl WindingNumberCountEstimator {
             count_horizontal: 0,
             count_vertical: 0,
             result_file_buffer,
+            iterator_location: 0,
+            cur_point: Point {x: 0, y: 0},
+            cur_grab_direction: Direction::N,
+            vert_winding_count: 0,
+            iter_done: false,
+            lat
         };
 
         let mut header_string = String::new();
@@ -73,6 +92,55 @@ impl WindingNumberCountEstimator {
         }
         //println!("to_return here 2 {}", to_return);
         to_return
+    }
+}
+
+impl Iterator for WindingNumberCountEstimator {
+    type Item = WindingNumberCountEstimatorDisplay;
+
+    fn next(&mut self) -> Option<WindingNumberCountEstimatorDisplay> {
+        if self.iterator_location == self.lat.size.x {
+            self.iter_done = true;
+        }
+        if !self.iter_done {
+            if self.iterator_location % 2 == 0 {
+                self.cur_point = Point { x: 2, y: self.iterator_location };
+                self.cur_grab_direction = Direction::E;
+            } else {
+                self.cur_point = Point { x: 3, y: self.iterator_location };
+                self.cur_grab_direction = Direction::W;
+            }
+
+            let cur_link: &Link = self.lat.safe_get_link_from_point(&self.cur_point, &self.cur_grab_direction);
+            let maybe_flipped_link: Link;
+            if self.iterator_location % 2 == 1 {
+                maybe_flipped_link = cur_link.clone().flip();
+            } else {
+                maybe_flipped_link = *cur_link;
+            }
+
+            WindingNumberCountEstimator::simple_add_sub_from_link_direction(
+                &mut self.vert_winding_count, &maybe_flipped_link
+            );
+
+            let mod_count = WindingNumberCountEstimator::modulo_winding_number(self.vert_winding_count) as i64;
+
+            self.count_vertical = self.vert_winding_count;
+
+            self.iterator_location += 1;
+        }
+        return if self.iter_done {
+            println!("Winding Number Iterator Complete");
+            Some(WindingNumberCountEstimatorDisplay {
+                local_text: String::from("Done"),
+                position: Point { x: -1, y: -1 },
+            })
+        } else {
+            Some(WindingNumberCountEstimatorDisplay {
+                local_text: String::from(format!("Display winding iterator: {}", self.count_vertical)),
+                position: Point { x: 2, y: self.iterator_location - 1},
+            })
+        }
     }
 }
 

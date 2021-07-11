@@ -72,4 +72,9 @@ args:
               plaquett flips.
         takes_value: false
         required: false
+    - gui:
+        long: gui
+        help: Boolean for the use of a GUI. Currently, limited capabilities
+        takes_value: true
+        required: false
 

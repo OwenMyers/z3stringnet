@@ -12,7 +12,6 @@ use super::Vertex;
 /// TODO: Do a check or asertation to ensure the length of vertices
 /// is correct given Point.
 ///
-/// ```
 ///     |   |   |   |
 ///     +---6---+---7---
 ///     |   |   |   |
@@ -21,8 +20,7 @@ use super::Vertex;
 ///     +---2---+---3---
 ///     |   |   |   |
 ///     0---+---1---+---
-/// ```
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Lattice {
     pub vertices: Vec<Vertex>,
     pub size: Point,
@@ -183,7 +181,7 @@ pub fn build_blank_lat(size: Point) -> Lattice {
     lat
 }
 
-/// ```
+///
 ///     |   |   |   |
 ///     +->-6->-+->-7->-
 ///     |   |   |   |
@@ -192,7 +190,7 @@ pub fn build_blank_lat(size: Point) -> Lattice {
 ///     +->-2->-+->-3->-
 ///     |   |   |   |
 ///     0->-+->-1->-+->-
-///  ```
+///
 pub fn build_z3_striped_lat(size: Point) -> Lattice {
     println!("Building stagard lattice of size x {}, y {}",
              size.x, size.y);

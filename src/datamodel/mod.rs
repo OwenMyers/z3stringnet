@@ -105,10 +105,9 @@ impl VertexLinkCount {
         VertexLinkCount {
             n: 0, e: 0, s: 0, w: 0,
             xy: Point{
-                        x: x_from_vertex_vec_position(vec_position, size),
-                        y: y_from_vertex_vec_position(vec_position, size)
-                     }
- 
+                x: x_from_vertex_vec_position(vec_position, size),
+                y: y_from_vertex_vec_position(vec_position, size)
+            }
         }
     }
     
@@ -131,7 +130,7 @@ impl VertexLinkCount {
 /// `|` and `--` denote the horizontal and vertical links respectively.
 /// 
 /// `Vertex.xy` is a `Point` specifying the position of the vertex.
-#[derive(Clone)]
+#[derive(Clone, Debug, Copy)]
 pub struct Vertex {
     pub n: Link,
     pub e: Link,

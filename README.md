@@ -108,3 +108,7 @@ The values in the example are
 * The right link is pointing up
 * The bottom link is blank
 * The left link is blank
+
+# Conrod
+
+You need to `apt` install `libxcb-composite0-dev`
