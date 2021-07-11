@@ -1,25 +1,27 @@
 use rand;
 use rand::Rng;
 pub mod lattice;
+pub mod cluster;
 use self::lattice::x_from_vertex_vec_position;
 use self::lattice::y_from_vertex_vec_position;
 use std::ops::Add;
 use std::slice::Iter;
 
 
-/// An AbsolutePlaquett is a plaquett view of the surounding links where the links are specified
-/// using the absolute reference of the axes. The vertex objexts have links with directions
-/// that are specified relative to the vertex, ie "In", "Out". An "Absolute" object will specify
-/// link values with respect to the axis.
-///
-/// A plaquett view:
-/// ```
-/// -----
-/// | + |
-/// -----
-/// ```
-/// `|` and `--` denote the horizontal and vertical links respectively.
-/// The `+` marks the center of the plaquett
+//#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+///// An AbsolutePlaquett is a plaquett view of the surounding links where the links are specified
+///// using the absolute reference of the axes. The vertex objexts have links with directions
+///// that are specified relative to the vertex, ie "In", "Out". An "Absolute" object will specify
+///// link values with respect to the axis.
+/////
+///// A plaquett view:
+///// ```
+///// -----
+///// | + |
+///// -----
+///// ```
+///// `|` and `--` denote the horizontal and vertical links respectively.
+///// The `+` marks the center of the plaquett
 //#[derive(Debug, Clone, Copy)]
 //pub enum AbsolutePlaquett {
 //
@@ -55,7 +57,7 @@ impl Link {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Direction {
     N,
     E,
@@ -84,7 +86,7 @@ impl Direction {
     }
     pub fn iterator() -> Iter<'static, Direction> {
         static DIRECTIONS: [Direction;  4] = [
-            Direction::N, Direction::S, Direction::E, Direction::W
+            Direction::N, Direction::E, Direction::S, Direction::W
         ];
         DIRECTIONS.into_iter()
     }
@@ -122,7 +124,7 @@ impl VertexLinkCount {
 /// A `Lattice` is built exclusively with these objects each containing `Links` that
 /// touch the vertex.
 /// 
-/// ```
+/// ```ignore
 ///   |
 /// --+--
 ///   |
@@ -139,13 +141,13 @@ pub struct Vertex {
     pub xy: Point,
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq)]
 pub struct Point {
     pub x: i64,
     pub y: i64,
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq)]
 pub struct BoundPoint {
     pub size: Point, 
     pub location: Point,

@@ -1,7 +1,67 @@
 use super::Direction;
 use super::Link;
 use super::Point;
+use super::BoundPoint;
 use super::Vertex;
+use super::cluster::increment_location;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_blank_vertex_from_real_point() {
+        let mut lat: Lattice = build_blank_lat(Point{x: 4, y: 4});
+        let loc: BoundPoint = BoundPoint{
+            size: Point{x: 4, y: 4},
+            location: Point{x: 0, y: 0},
+        };
+        let vertex: Vertex = lat.get_vertex_from_point(&loc);
+        assert_eq!(vertex.n, Link::Blank);
+        assert_eq!(vertex.e, Link::Blank);
+        assert_eq!(vertex.s, Link::Blank);
+        assert_eq!(vertex.w, Link::Blank);
+    }
+    #[test]
+    fn test_get_blank_vertex_from_fake_point() {
+        let mut lat: Lattice = build_blank_lat(Point{x: 4, y: 4});
+        let loc: BoundPoint = BoundPoint{
+            size: Point{x: 4, y: 4},
+            location: Point{x: 1, y: 0},
+        };
+        let vertex: Vertex = lat.get_vertex_from_point(&loc);
+        assert_eq!(vertex.n, Link::Blank);
+        assert_eq!(vertex.e, Link::Blank);
+        assert_eq!(vertex.s, Link::Blank);
+        assert_eq!(vertex.w, Link::Blank);
+    }
+    #[test]
+    fn test_get_in_out_vertext_from_real_point() {
+        let mut lat: Lattice = build_z3_striped_lat(Point{x: 4, y: 4});
+        let loc: BoundPoint = BoundPoint{
+            size: Point{x: 4, y: 4},
+            location: Point{x: 0, y: 0},
+        };
+        let vertex: Vertex = lat.get_vertex_from_point(&loc);
+        assert_eq!(vertex.w, Link::In);
+        assert_eq!(vertex.e, Link::Out);
+        assert_eq!(vertex.n, Link::Blank);
+        assert_eq!(vertex.s, Link::Blank);
+    }
+    #[test]
+    fn test_get_in_out_vertext_from_fake_point() {
+        let mut lat: Lattice = build_z3_striped_lat(Point{x: 4, y: 4});
+        let loc: BoundPoint = BoundPoint{
+            size: Point{x: 4, y: 4},
+            location: Point{x: 1, y: 0},
+        };
+        let vertex: Vertex = lat.get_vertex_from_point(&loc);
+        assert_eq!(vertex.w, Link::In);
+        assert_eq!(vertex.e, Link::Out);
+        assert_eq!(vertex.n, Link::Blank);
+        assert_eq!(vertex.s, Link::Blank);
+    }
+}
 
 /// Stores the representation of the sytem
 ///
@@ -27,13 +87,89 @@ pub struct Lattice {
     pub number_filled_links: i64,
 }
 impl Lattice {
-    // Only storing one sublattice so other vertices are implied.
-    // Lets call the ones in our `vertices` vector "real" and the
-    // implied ones "fake".
+    /// Only storing one sublattice so other vertices are implied.
+    /// Lets call the ones in our `vertices` vector "real" and the
+    /// implied ones "fake".
     pub fn point_real(&self, p: &Point) -> bool {
         assert!((p.x >= 0) && (p.y >= 0), "Function point_real requires positive x and y");
         ((p.x + p.y) % 2) == 0
     }
+
+    /// The location of vertex in the vector. This works becuase integers division rounds down.
+    pub fn get_vector_location_of_vertex(&mut self, loc: &Point) -> i64 {
+        loc.y * (self.size.x/2) + loc.x/2
+    }
+
+    /// This function will return a "fake" vertex given a point.
+    ///
+    /// In a `Lattice` object verticies (`Vertex` objects) only belong to 1 sublattice because 
+    /// that is the only necessary information you need to store to represent the lattice.
+    /// You can have a vertex of the other sublattice and it is really converniet to be able to
+    /// get the verticies of any sublattice as well as their constituent directions off the links.
+    /// This function will return a `Vertex` regardles of the sublattice. This is a fake vertex
+    /// because it may not belong to the sublattice that `Lattice` is made out of and most
+    /// importantly changes to the links will not be reflected anywhere else. The returned
+    /// `Vertex` does not (&) reference any "real" information of the lattice.
+    pub fn get_vertex_from_point(&mut self, loc: &BoundPoint) -> Vertex {
+        let point_from_bound = Point{x: loc.location.x, y: loc.location.y};
+        let mut to_return_vertex: Vertex;
+        let is_real = self.point_real(&point_from_bound);
+        if is_real {
+            let vloc = self.get_vector_location_of_vertex(&point_from_bound);
+            to_return_vertex = Vertex {
+                n: self.get_link_from_point(&point_from_bound, &Direction::N).clone(),
+                e: self.get_link_from_point(&point_from_bound, &Direction::E).clone(),
+                s: self.get_link_from_point(&point_from_bound, &Direction::S).clone(),
+                w: self.get_link_from_point(&point_from_bound, &Direction::W).clone(),
+                xy: Point {x: loc.location.x, y: loc.location.y},
+            }
+        }
+
+        else {
+            // Step in all 4 directions.
+            
+            // E.g. 
+            // * Step in direction E. 
+            // * Return W link from new location
+            // * Flip link to add to retern vertex
+            
+            // Start with E direction like above
+            let _e_new_loc: BoundPoint = increment_location(*loc, &Direction::E);
+            let e_new_point_from_bound = Point{x: _e_new_loc.location.x, y: _e_new_loc.location.y};
+            let east_link: Link = self.get_link_from_point(
+                &e_new_point_from_bound, &Direction::W).clone().flip();
+
+            // W direction 
+            let _w_new_loc: BoundPoint = increment_location(*loc, &Direction::W);
+            let w_new_point_from_bound = Point{x: _w_new_loc.location.x, y: _w_new_loc.location.y};
+            let west_link: Link = self.get_link_from_point(
+                &w_new_point_from_bound, &Direction::E).clone().flip();
+
+            // N direction 
+            let _n_new_loc: BoundPoint = increment_location(*loc, &Direction::N);
+            let n_new_point_from_bound = Point{x: _n_new_loc.location.x, y: _n_new_loc.location.y};
+            let north_link: Link = self.get_link_from_point(
+                &n_new_point_from_bound, &Direction::S).clone().flip();
+
+            // S direction 
+            let _s_new_loc: BoundPoint = increment_location(*loc, &Direction::S);
+            let s_new_point_from_bound = Point{x: _s_new_loc.location.x, y: _s_new_loc.location.y};
+            let south_link: Link = self.get_link_from_point(
+                &s_new_point_from_bound, &Direction::N).clone().flip();
+
+            // TODO
+            to_return_vertex = Vertex {
+                n: north_link,
+                e: east_link,
+                s: south_link,
+                w: west_link,
+                xy: Point {x: loc.location.x, y: loc.location.y},
+            }
+        }
+
+        to_return_vertex
+    }
+
     pub fn get_link_from_point(&mut self, loc: &Point, direction: &Direction) -> &mut Link{
         // See if this point is on the sublattice of the stored vertices.
         // Only storing one sublattice so other vertices are implied.
@@ -41,7 +177,7 @@ impl Lattice {
         // implied ones "fake".
         let is_real = self.point_real(&loc);
         // The location of vertex in the vector. This works becuase integers division rounds down.
-        let vloc = loc.y * (self.size.x/2) + loc.x/2;
+        let vloc = self.get_vector_location_of_vertex(&loc);
         //println!("vector location: {}",vloc);
         if is_real {
             match *direction {
@@ -180,6 +316,7 @@ pub fn build_blank_lat(size: Point) -> Lattice {
 
     lat
 }
+
 
 ///
 ///     |   |   |   |
