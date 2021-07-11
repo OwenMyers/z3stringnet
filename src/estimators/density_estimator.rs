@@ -7,7 +7,6 @@ use super::super::datamodel::lattice::Lattice;
 use std::io::prelude::*;
 use std::fs::File;
 use std::path::Path;
-use std::error::Error;
 use std::io::BufWriter;
 
 /// Measures the string density
@@ -34,7 +33,7 @@ impl DensityEstimator {
         let file = match File::create(&path){
             Err(err) => panic!("could not create {}: {}",
                             display,
-                            err.description()),
+                            err),
             Ok(good_file) => good_file,
         };
 
@@ -73,7 +72,7 @@ impl DensityEstimator {
         let mut file = match File::create(&path){
             Err(err) => panic!("could not create {}: {}",
                             display,
-                            err.description()),
+                            err),
             Ok(good_file) => good_file,
         };
         
@@ -98,7 +97,7 @@ impl DensityEstimator {
         match file.write_all(out_string.as_bytes()){
             Err(err) => panic!("could not create {}: {}",
                             display,
-                            err.description()),
+                            err),
             Ok(_) => println!("file out worked"),
         }
     }
@@ -127,7 +126,7 @@ impl Measurable for DensityEstimator {
         out_string.push_str("\n");
         match self.result_file_buffer.write(out_string.as_bytes()){
             Err(err) => panic!("Can not write to density estimator buffer: {}",
-                err.description()),
+                err),
             //Ok(_) => println!("Wrote measurement to density estimator buffer.") ,
             Ok(_) => (),
         }

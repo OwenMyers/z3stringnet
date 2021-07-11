@@ -9,6 +9,32 @@ use std::slice::Iter;
 
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
+/// An AbsolutePlaquett is a plaquett view of the surounding links where the links are specified
+/// using the absolute reference of the axes. The vertex objexts have links with directions
+/// that are specified relative to the vertex, ie "In", "Out". An "Absolute" object will specify
+/// link values with respect to the axis.
+///
+/// A plaquett view:
+/// ```
+/// -----
+/// | + |
+/// -----
+/// ```
+/// `|` and `--` denote the horizontal and vertical links respectively.
+/// The `+` marks the center of the plaquett
+//#[derive(Debug, Clone, Copy)]
+//pub enum AbsolutePlaquett {
+//
+//}
+
+//#[derive(Debug, Clone, Copy)]
+//pub enum AbsoluteLink {
+//    PlussOne,
+//    MinusOne,
+//    Blank
+//}
+
+#[derive(Debug, Clone, Copy)]
 pub enum Link {
     In,
     Out,
@@ -17,6 +43,13 @@ pub enum Link {
 impl Link {
     pub fn flip(&self) -> Link {
         match *self{
+            Link::In => {Link::Out}
+            Link::Out => {Link::In}
+            Link::Blank => {Link::Blank}
+        }
+    }
+    pub fn soft_flip(link: &Link) -> Link {
+        match link{
             Link::In => {Link::Out}
             Link::Out => {Link::In}
             Link::Blank => {Link::Blank}
@@ -74,10 +107,9 @@ impl VertexLinkCount {
         VertexLinkCount {
             n: 0, e: 0, s: 0, w: 0,
             xy: Point{
-                        x: x_from_vertex_vec_position(vec_position, size),
-                        y: y_from_vertex_vec_position(vec_position, size)
-                     }
- 
+                x: x_from_vertex_vec_position(vec_position, size),
+                y: y_from_vertex_vec_position(vec_position, size)
+            }
         }
     }
     
@@ -100,7 +132,7 @@ impl VertexLinkCount {
 /// `|` and `--` denote the horizontal and vertical links respectively.
 /// 
 /// `Vertex.xy` is a `Point` specifying the position of the vertex.
-#[derive(Clone)]
+#[derive(Clone, Debug, Copy)]
 pub struct Vertex {
     pub n: Link,
     pub e: Link,

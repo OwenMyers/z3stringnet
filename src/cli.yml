@@ -21,8 +21,60 @@ args:
           the weights used in the Metropolis algorithm.
         takes_value: true
         required: true
-#    - verbose:
-#        short: v
-#        multiple: true
-#        help: Sets the level of verbosity
+    - nbins:
+        short: b
+        long: nbins
+        value_name: N_BINS
+        multiple: false
+        help: The number of bins you want to generate during a run.
+        takes_value: true
+        required: true
+    - nmeasure:
+        short: m
+        long: nmeasure
+        value_name: N_MEASURE
+        multiple: false
+        help: The number of measurements to be made in a bin
+        takes_value: true
+        required: true
+    - nupdate:
+        short: u
+        long: nupdate
+        value_name: N_UPDATE
+        multiple: false
+        help: The number of updates to make between measurements
+        takes_value: true
+        required: true
+    - write-update-confs:
+        long: write-update-confs
+        value_name: WRITE_UPDATE_CONFS
+        multiple: false
+        help: Boolean to trigger writing configuration after every update
+        takes_value: true
+        required: false
+    - write-measure-confs:
+        long: write-measure-confs
+        value_name: WRITE_UPDATE_CONFS
+        multiple: false
+        help: Boolean to trigger writing configuration after every measurement
+        takes_value: true
+        required: false
+    - write-bin-confs:
+        long: write-bin-confs
+        value_name: WRITE_UPDATE_CONFS
+        multiple: false
+        help: Boolean to trigger writing configuration after every bin
+        takes_value: true
+        required: false
+    - loop-update:
+        long: loop-update
+        help: Boolean to trigger the use of loop updates instead of local
+              plaquett flips.
+        takes_value: false
+        required: false
+    - gui:
+        long: gui
+        help: Boolean for the use of a GUI. Currently, limited capabilities
+        takes_value: true
+        required: false
 

@@ -133,6 +133,8 @@ impl Update {
 
         assert_eq!(z3string.cur_loc, z3string.start_loc);
         self.link_number_change = totatal_link_number_change;
+        lat.number_filled_links += self.link_number_change;
+        assert!(lat.number_filled_links >= 0);
     }
 
     pub fn random_walk_update(&mut self, lat: &mut Lattice) {
@@ -187,6 +189,7 @@ impl Update {
         let old_weight = f64::powf(self.link_number_tuning, old_number_filled_links as f64);
         let check_against: f64 = new_weight / old_weight;
         let mut rng = thread_rng();
+        // Gen range produces number in  [lower, upper)
         let rand_number: f64 = rng.gen_range(0.0, 1.0);
 
         //println!("number_filled_links {:?}", number_filled_links);
@@ -196,6 +199,9 @@ impl Update {
         //println!("new_weight {:?}", new_weight);
         //println!("self.link_number_tuning {:?}", self.link_number_tuning);
         //println!("AcceptReject {:?}", AcceptReject::Reject);
+
+        // Gen range produces number in  [lower, upper) so the lessthan without the equals is
+        // what we want here.
         if rand_number < check_against{
             return AcceptReject::Accept
         }
