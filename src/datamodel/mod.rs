@@ -34,7 +34,8 @@ use std::slice::Iter;
 //    Blank
 //}
 
-#[derive(Debug, Clone, Copy)]
+//#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum Link {
     In,
     Out,

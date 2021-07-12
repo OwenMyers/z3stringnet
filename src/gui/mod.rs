@@ -208,7 +208,8 @@ pub fn gui(ui: &mut conrod_core::UiCell,
            app: &mut DemoApp,
            lattice_dim: i64,
            lattice: &Lattice,
-           winding_estimator: &mut WindingNumberCountEstimator) {
+           winding_estimator: &mut WindingNumberCountEstimator,
+           ) {
     use conrod_core::{widget, Colorable, Labelable, Positionable, Sizeable, Widget};
     use std::iter::once;
 
