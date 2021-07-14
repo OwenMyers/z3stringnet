@@ -232,7 +232,7 @@ pub fn recusiveish_cluster(vertex: &Vertex,
                 //    Thats good. Time to start backtracking
                 //    pop direction from walk list and
                 //    -> reverse step direction (change current location)
-                if cur_loc_cluster_num == available_cluster_num {
+                if cur_loc_cluster_num == *available_cluster_num {
                     let last_direction: Direction = match walk_list.pop() {
                         Some(to_return_direction) => to_return_direction,
                         None => panic!("Walk list should not be empty at this point.")

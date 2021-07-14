@@ -16,5 +16,6 @@ impl Iterator for ClusterSizeEstimator {
 
     fn next(&mut self) -> Option<ClusterSizeEstimatorDisplay>{
         let x = 2;
+        return Some(ClusterSizeEstimatorDisplay {tmp: 18})
     }
 }
