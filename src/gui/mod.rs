@@ -14,6 +14,12 @@ use datamodel;
 use datamodel::Direction as Compass;
 use conrod_core::text::line::width;
 use estimators::winding_number_estimator::{WindingNumberCountEstimator, WindingNumberCountEstimatorDisplay};
+use estimators::cluster_size_estimator::{ClusterSizeEstimatorDisplay, ClusterSizeEstimator};
+use glium::{
+    glutin::{event, event_loop},
+    Display,
+};
+use conrod_core::color::TRANSPARENT;
 
 
 // For conrod
@@ -22,11 +28,6 @@ pub const WIN_H: u32 = 1100;
 pub const LINK_MINOR: u32 = 20;
 pub const LINK_MAJOR: u32 = 40;
 
-use glium::{
-    glutin::{event, event_loop},
-    Display,
-};
-use conrod_core::color::TRANSPARENT;
 
 /// A demonstration of some application state we want to control with a conrod GUI.
 pub struct DemoApp {
@@ -379,9 +380,26 @@ pub fn gui(ui: &mut conrod_core::UiCell,
             Some(w) => w,
             None => //println!("Got no winding number display")
                 WindingNumberCountEstimatorDisplay {
-                    local_text: String::from("Started Something "),
+                    local_text: String::from("Failed to start winding number display"),
                     position: datamodel::Point { x: -1, y: -1 },
                 }
+        }
+    };
+    for _press in widget::Button::new()
+        .label("Clustering")
+        .x_position(Absolute(50.0)).y_position(Absolute(150.0))
+        //.top_left()
+        //.top_left_with_margin_on(ids.canvas, MARGIN)
+        //.down_from(ids.button_title, 60.0)
+        .w_h(160.0, 40.0)
+        .set(ids.button_clustering, ui) {
+        app.clustering_display = match clustering_estimator.next() {
+            Some(c) => c,
+            None => ClusterSizeEstimatorDisplay {
+                        tmp: 0,
+                        local_text: String::from("Failed to start clustering display"),
+                        cluster_size_est_current: ClusterSizeEstimator::new(&lat)
+                    }
         }
     };
     //println!("{:?}", winding_estimator_display);
