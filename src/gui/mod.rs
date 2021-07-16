@@ -58,6 +58,21 @@ impl DemoApp {
     }
 }
 
+fn draw_walk_path(
+    clust: &ClusterSizeEstimatorDisplay,
+    ids: &mut Ids,
+    ui: &mut conrod_core::UiCell,
+    initial_offset: f64,
+)
+{
+    let dimensions = [(LINK_MINOR as f64)/2.0, LINK_MAJOR as f64];
+    for current_walk_direction in clust.walk_list
+    //widget::Rectangle::fill(dimensions)
+    //    .x_position(Absolute(initial_offset + ((wnd.position.x as f64) * 2.0 + 1.0) * (LINK_MINOR as f64)))
+    //    .y_position(Absolute(initial_offset + (wnd.position.y as f64) * ( LINK_MAJOR as f64)))
+    //    .color(in_color).set(ids.winding_link, ui);
+}
+
 pub fn draw_cluster_number_display(
     clust: &ClusterSizeEstimatorDisplay,
     ids: &mut Ids,
