@@ -27,6 +27,7 @@ use z3stringnet::oio::*;
 use z3stringnet::gui::*;
 use glium::Surface;
 use conrod_core::widget::Image;
+use z3stringnet::estimators::cluster_size_estimator::ClusterSizeEstimator;
 
 
 fn main() {
@@ -41,10 +42,6 @@ fn main() {
     let run_with_gui_str = matches.value_of("gui").unwrap_or("false");
     let run_with_gui: bool = run_with_gui_str.parse().unwrap();
     println!("Run with GUI? {}", run_with_gui);
-
-    if run_with_gui {
-
-    }
 
     let size: Point = Point {
         x: lattice_size_arg,
@@ -118,6 +115,7 @@ fn main() {
     let mut total_link_count_estimator = TotalLinkCountEstimator::new();
     let mut winding_count_estimator = WindingNumberCountEstimator::new(lat.clone());
     let mut winding_variance_estimator = WindingNumberVarianceEstimator::new();
+    let mut cluster_size_estimator = ClusterSizeEstimator::new(&lat);
 
     // Equilibrate
     if equilibrate {
@@ -168,7 +166,7 @@ fn main() {
         // - a `Vec` of commands that describe how to draw the vertices.
         let mut renderer = Renderer::new(&display).unwrap();
         // A demonstration of some app state that we want to control with the conrod GUI.
-        let mut app = DemoApp::new();
+        let mut app = DemoApp::new(&lat);
         // Start the loop:
         //
         // - Send available events to the `Ui`.
@@ -208,7 +206,7 @@ fn main() {
                 }
                 Request::SetUi { needs_redraw } => {
                     gui(&mut ui.set_widgets(), &mut ids, &mut app, lattice_size_arg,
-                        &lat, &mut winding_count_estimator);
+                        &lat, &mut winding_count_estimator, &mut cluster_size_estimator);
                     // Instantiate a GUI demonstrating every widget type provided by conrod.
                     //conrod_example_shared::gui(&mut ui.set_widgets(), &ids, &mut app);
 

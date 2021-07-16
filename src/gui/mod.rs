@@ -40,7 +40,7 @@ pub struct DemoApp {
 
 impl DemoApp {
     /// Simple constructor for the `DemoApp`.
-    pub fn new() -> Self {
+    pub fn new(lat: &Lattice) -> Self {
         DemoApp {
             ball_xy: [0.0, 0.0],
             ball_color: conrod_core::color::WHITE,
@@ -52,15 +52,25 @@ impl DemoApp {
             clustering_estimator_display: ClusterSizeEstimatorDisplay {
                 tmp: 0,
                 local_text: String::from("C Not Started"),
-                cluster_size_est_current: ClusterSizeEstimator::new(&lat)
+                cluster_size_est_current: ClusterSizeEstimator::new(lat)
             }
         }
     }
 }
 
-pub fn draw_cluster_number_display() {
+pub fn draw_cluster_number_display(
     clust: &ClusterSizeEstimatorDisplay,
-    ids
+    ids: &mut Ids,
+    ui: &mut conrod_core::UiCell,
+    initial_offset: f64,
+)
+{
+    const size: conrod_core::FontSize = 12;
+    let in_color = conrod_core::color::rgb(0.7, 0.0, 0.3);
+    widget::TextBox::new(&clust.local_text).border(0.0)
+        .font_size(size).x_position(Absolute(150.0)).y_position(Absolute(250.0))
+        .text_color(in_color).color(TRANSPARENT)
+        .set(ids.clustering_text_box, ui);
 }
 
 pub fn draw_winding_number_display(
@@ -211,7 +221,13 @@ widget_ids! {
         lattice_links[],
         triangle,
         button_title,
-        button
+        button,
+        button_clustering_est_step,
+        clustering_text_box,
+        clustering_walk_path[],
+        clustering_current_avaliable_directions[],
+        clustering_detected[],
+        clustering_start_location
     }
 }
 
@@ -221,6 +237,7 @@ pub fn gui(ui: &mut conrod_core::UiCell,
            lattice_dim: i64,
            lattice: &Lattice,
            winding_estimator: &mut WindingNumberCountEstimator,
+           clustering_estimator: &mut ClusterSizeEstimator
            ) {
     use conrod_core::{widget, Colorable, Labelable, Positionable, Sizeable, Widget};
     use std::iter::once;
@@ -377,8 +394,8 @@ pub fn gui(ui: &mut conrod_core::UiCell,
                 add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, false, -1.0)
             }
         }
-
     }
+
     for _press in widget::Button::new()
         .label("Winding Number")
         .x_position(Absolute(-25.0)).y_position(Absolute(150.0))
@@ -396,30 +413,32 @@ pub fn gui(ui: &mut conrod_core::UiCell,
                 }
         }
     };
+
     for _press in widget::Button::new()
         .label("Clustering")
-        .x_position(Absolute(50.0)).y_position(Absolute(150.0))
+        .x_position(Absolute(-25.0)).y_position(Absolute(250.0))
         //.top_left()
         //.top_left_with_margin_on(ids.canvas, MARGIN)
         //.down_from(ids.button_title, 60.0)
         .w_h(160.0, 40.0)
-        .set(ids.button_clustering, ui) {
-        app.clustering_display = match clustering_estimator.next() {
+        .set(ids.button_clustering_est_step, ui) {
+        app.clustering_estimator_display = match clustering_estimator.next() {
             Some(c) => c,
             None => ClusterSizeEstimatorDisplay {
                         tmp: 0,
                         local_text: String::from("Failed to start clustering display"),
-                        cluster_size_est_current: ClusterSizeEstimator::new(&lat)
+                        cluster_size_est_current: ClusterSizeEstimator::new(lattice)
                     }
         }
     };
-    //println!("{:?}", winding_estimator_display);
+
     match Some(&app.winding_number_display){
         Some(wind_disp) => draw_winding_number_display(
             wind_disp, ids, ui, initial_offset
         ),
         None => println!("Got no winding number display")
     };
+
     match Some(&app.clustering_estimator_display){
         Some(clust_disp) => draw_cluster_number_display(
             clust_disp, ids, ui, initial_offset

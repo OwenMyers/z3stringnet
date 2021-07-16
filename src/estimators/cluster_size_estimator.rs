@@ -32,12 +32,14 @@ pub struct ClusterSizeEstimatorDisplay {
 #[derive(Debug, Clone)]
 pub struct ClusterSizeEstimator{
     cluster_sizes: Vec<i64>,
+    clustered: HashMap<BoundPoint, u64>,
     cluster_covered_points: Vec<BoundPoint>,
     // general stack to keep track of directions not gone in
     stack: Vec<Vec<Direction>>,
     // initialize vector for direction path "walk list"
     walk_list: Vec<Direction>,
     current_location: BoundPoint,
+    available_cluster_num: u64,
 }
 
 
@@ -75,16 +77,16 @@ impl Iterator for ClusterSizeEstimator {
             self.walk_list.push(direction);
             // check if vertex belongs to other cluster
             // if yes:
-            if clustered.contains_key(&self.current_location) {
-                let cur_loc_cluster_num: u64 = match clustered.get(&self.current_location) {
+            if self.clustered.contains_key(&self.current_location) {
+                let cur_loc_cluster_num: u64 = match self.clustered.get(&self.current_location) {
                     Some(to_return_cluster_num) => *to_return_cluster_num,
                     None => panic!("There should be something because we just checked contains_key.")
                 };
                 // if it belong to the current cluster:
-                //    Thats good. Time to start backtracking
+                //    That's good. Time to start backtracking
                 //    pop direction from walk list and
                 //    -> reverse step direction (change current location)
-                if cur_loc_cluster_num == *available_cluster_num {
+                if cur_loc_cluster_num == self.available_cluster_num {
                     let last_direction: Direction = match self.walk_list.pop() {
                         Some(to_return_direction) => to_return_direction,
                         None => panic!("Walk list should not be empty at this point.")
@@ -115,6 +117,7 @@ impl Iterator for ClusterSizeEstimator {
         }
         return Some(
             ClusterSizeEstimatorDisplay {
+                local_text: "Running Cluster Estimator".to_string(),
                 tmp: 18,
                 cluster_size_est_current: self.clone()
             }
@@ -144,6 +147,7 @@ impl ClusterSizeEstimator {
     pub fn new(lat: &Lattice) -> ClusterSizeEstimator {
         ClusterSizeEstimator{
             cluster_sizes: Vec::new(),
+            clustered: Default::default(),
             cluster_covered_points: Vec::new(),
             // general stack to keep track of directions not gone in
             stack: Vec::new(),
@@ -153,6 +157,7 @@ impl ClusterSizeEstimator {
                 size: lat.size.clone(),
                 location: Point{x: 0, y: 0}
             },
+            available_cluster_num: 0
         }
     }
     /// I think the HashMap `clustered` will only ever contain points that are clustered. Mostly
