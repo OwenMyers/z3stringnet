@@ -35,6 +35,7 @@ pub struct DemoApp {
     ball_color: conrod_core::Color,
     sine_frequency: f32,
     winding_number_display: WindingNumberCountEstimatorDisplay,
+    clustering_estimator_display: ClusterSizeEstimatorDisplay
 }
 
 impl DemoApp {
@@ -45,11 +46,21 @@ impl DemoApp {
             ball_color: conrod_core::color::WHITE,
             sine_frequency: 1.0,
             winding_number_display: WindingNumberCountEstimatorDisplay {
-                local_text: String::from("Not Started"),
+                local_text: String::from("W Not Started"),
                 position: datamodel::Point { x: -1, y: -1 },
             },
+            clustering_estimator_display: ClusterSizeEstimatorDisplay {
+                tmp: 0,
+                local_text: String::from("C Not Started"),
+                cluster_size_est_current: ClusterSizeEstimator::new(&lat)
+            }
         }
     }
+}
+
+pub fn draw_cluster_number_display() {
+    clust: &ClusterSizeEstimatorDisplay,
+    ids
 }
 
 pub fn draw_winding_number_display(
@@ -406,6 +417,12 @@ pub fn gui(ui: &mut conrod_core::UiCell,
     match Some(&app.winding_number_display){
         Some(wind_disp) => draw_winding_number_display(
             wind_disp, ids, ui, initial_offset
+        ),
+        None => println!("Got no winding number display")
+    };
+    match Some(&app.clustering_estimator_display){
+        Some(clust_disp) => draw_cluster_number_display(
+            clust_disp, ids, ui, initial_offset
         ),
         None => println!("Got no winding number display")
     };
