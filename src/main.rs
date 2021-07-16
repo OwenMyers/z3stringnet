@@ -48,8 +48,8 @@ fn main() {
         y: lattice_size_arg,
     };
     // lat now owns size -> That is good and intentional
-    let mut lat: Lattice = build_blank_lat(size);
-    //let mut lat: Lattice = build_z3_striped_lat(size);
+    //let mut lat: Lattice = build_blank_lat(size);
+    let mut lat: Lattice = build_z3_striped_lat(size);
     //lat.vertices[0].e = lat.vertices[0].e.flip();
 
     let equilibrate = false;
@@ -206,7 +206,7 @@ fn main() {
                 }
                 Request::SetUi { needs_redraw } => {
                     gui(&mut ui.set_widgets(), &mut ids, &mut app, lattice_size_arg,
-                        &lat, &mut winding_count_estimator, &mut cluster_size_estimator);
+                        &mut lat, &mut winding_count_estimator, &mut cluster_size_estimator);
                     // Instantiate a GUI demonstrating every widget type provided by conrod.
                     //conrod_example_shared::gui(&mut ui.set_widgets(), &ids, &mut app);
 

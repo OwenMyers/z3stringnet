@@ -40,6 +40,8 @@ pub struct ClusterSizeEstimator{
     walk_list: Vec<Direction>,
     current_location: BoundPoint,
     available_cluster_num: u64,
+    pub is_initialized: bool,
+    starting_location: BoundPoint
 }
 
 
@@ -54,6 +56,15 @@ impl Iterator for ClusterSizeEstimator {
         };
         // if vec empty:
         if filled_directions.len() == 0 {
+            if self.current_location == self.starting_location {
+                return Some(
+                    ClusterSizeEstimatorDisplay {
+                        local_text: "Done with this cluster".to_string(),
+                        tmp: 19,
+                        cluster_size_est_current: self.clone()
+                    }
+                )
+            }
             // pop direction from walk list
             let reverse_step_dir: Direction = match self.walk_list.pop() {
                 Some(to_return_direction) => to_return_direction,
@@ -136,6 +147,10 @@ impl ClusterSizeEstimator {
             size: lat.size.clone(),
             location: point
         };
+        self.starting_location = BoundPoint {
+            size: lat.size.clone(),
+            location: point
+        };
         let vertex = lat.get_vertex_from_point(&self.current_location);
         let vertex_available: Vec<Direction> = match directions_of_filled_links(&vertex) {
             Some(to_return_directions) => to_return_directions,
@@ -143,6 +158,7 @@ impl ClusterSizeEstimator {
         };
         self.stack.push(vertex_available);
         self.cluster_covered_points.push(self.current_location);
+        self.is_initialized = true;
     }
     pub fn new(lat: &Lattice) -> ClusterSizeEstimator {
         ClusterSizeEstimator{
@@ -157,7 +173,12 @@ impl ClusterSizeEstimator {
                 size: lat.size.clone(),
                 location: Point{x: 0, y: 0}
             },
-            available_cluster_num: 0
+            available_cluster_num: 0,
+            is_initialized: false,
+            starting_location: BoundPoint {
+                size: lat.size.clone(),
+                location: Point{x: 0, y: 0}
+            }
         }
     }
     /// I think the HashMap `clustered` will only ever contain points that are clustered. Mostly

@@ -235,7 +235,7 @@ pub fn gui(ui: &mut conrod_core::UiCell,
            ids: &mut Ids,
            app: &mut DemoApp,
            lattice_dim: i64,
-           lattice: &Lattice,
+           lattice: &mut Lattice,
            winding_estimator: &mut WindingNumberCountEstimator,
            clustering_estimator: &mut ClusterSizeEstimator
            ) {
@@ -247,6 +247,9 @@ pub fn gui(ui: &mut conrod_core::UiCell,
     const SUBTITLE_SIZE: conrod_core::FontSize = 42;
 
     const TITLE: &'static str = "Stringnet";
+    if !clustering_estimator.is_initialized {
+        clustering_estimator.init_calculation_location(datamodel::Point::new(0, 0), lattice);
+    }
     widget::Canvas::new()
         .pad(MARGIN)
         .set(ids.canvas, ui);
@@ -413,7 +416,6 @@ pub fn gui(ui: &mut conrod_core::UiCell,
                 }
         }
     };
-
     for _press in widget::Button::new()
         .label("Clustering")
         .x_position(Absolute(-25.0)).y_position(Absolute(250.0))
