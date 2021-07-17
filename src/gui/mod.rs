@@ -22,6 +22,8 @@ use glium::{
 };
 use conrod_core::color::TRANSPARENT;
 use datamodel::cluster::increment_location;
+use std::thread::sleep;
+use std::time::Duration;
 
 
 // For conrod
@@ -122,8 +124,23 @@ fn draw_clustering_last_on_stack(
     ui: &mut conrod_core::UiCell,
     initial_offset: f64,
 ) {
+    let mut cluster_last_stack_id_iter= ids.clustering_current_avaliable_directions.iter();
     let len_stack = clust.cluster_size_est_current.stack.len();
     let direction_arr = clust.cluster_size_est_current.stack[len_stack - 1].clone();
+    let in_color = conrod_core::color::WHITE.alpha(0.2); //conrod_core::color::rgb(0.7, 0.0, 0.3);
+    for cur_direction in direction_arr {
+        let &next_id = match cluster_last_stack_id_iter.next() {
+            Some(id) => id,
+            None => panic!("Need a widget ID.")
+        };
+        draw_simple_filled_link_from_direction(
+            initial_offset,
+            clust.cluster_size_est_current.current_location.location.x,
+            clust.cluster_size_est_current.current_location.location.y,
+            &cur_direction,
+            next_id, ui, in_color, 1.5
+        );
+    }
 }
 
 pub fn draw_cluster_number_display(
@@ -143,7 +160,10 @@ pub fn draw_cluster_number_display(
     //    .x_position(Absolute(initial_offset + 0.0))
     //    .y_position(Absolute(initial_offset + 0.0))
     //    .color(in_color) .set(ids.clustering_start_location, ui);
-    draw_walk_path(clust, ids, ui, initial_offset);
+    if clust.cluster_size_est_current.is_initialized {
+        draw_walk_path(clust, ids, ui, initial_offset);
+        draw_clustering_last_on_stack(clust, ids, ui, initial_offset);
+    };
 }
 
 pub fn draw_winding_number_display(
@@ -345,6 +365,9 @@ pub fn gui(ui: &mut conrod_core::UiCell,
         (2 * lattice_dim * lattice_dim) as usize, &mut ui.widget_id_generator()
     );
     ids.clustering_walk_path.resize(
+        (2 * lattice_dim * lattice_dim) as usize, &mut ui.widget_id_generator()
+    );
+    ids.clustering_current_avaliable_directions.resize(
         (2 * lattice_dim * lattice_dim) as usize, &mut ui.widget_id_generator()
     );
 
