@@ -60,6 +60,32 @@ impl DemoApp {
     }
 }
 
+fn draw_simple_filled_link_from_direction(
+    initial_offset: f64,
+    x: i64,
+    y: i64,
+    direction_in: & Direction,
+    id_in: conrod_core::widget::Id,
+    ui: &mut conrod_core::UiCell,
+    in_color: conrod_core::Color,
+    adjust_width: f64
+) {
+    match direction_in {
+        Direction::N => {
+            add_in_lattice_link(initial_offset, x, y, id_in, ui, in_color, true, 1.0, adjust_width);
+        },
+        Direction::E => {
+            add_in_lattice_link(initial_offset, x, y, id_in, ui, in_color, false, 1.0, adjust_width);
+        },
+        Direction::S => {
+            add_in_lattice_link(initial_offset, x, y, id_in, ui, in_color, true, -1.0, adjust_width);
+        },
+        Direction::W => {
+            add_in_lattice_link(initial_offset, x, y, id_in, ui, in_color, false, -1.0, adjust_width);
+        },
+    }
+}
+
 fn draw_walk_path(
     clust: &ClusterSizeEstimatorDisplay,
     ids: &mut Ids,
@@ -69,7 +95,7 @@ fn draw_walk_path(
 {
     let mut cluster_walk_path_id_iter= ids.clustering_walk_path.iter();
 
-    let in_color = conrod_core::color::rgb(0.7, 0.0, 0.3);
+    let in_color = conrod_core::color::BLACK; //conrod_core::color::rgb(0.7, 0.0, 0.3);
     let mut relive_walk_point: BoundPoint = clust.cluster_size_est_current.starting_location.clone();
 
     for current_walk_direction in & clust.cluster_size_est_current.walk_list {
@@ -77,25 +103,27 @@ fn draw_walk_path(
             Some(id) => id,
             None => panic!("Need a widget ID.")
         };
+        draw_simple_filled_link_from_direction(
+            initial_offset, relive_walk_point.location.x, relive_walk_point.location.y, current_walk_direction,
+            next_id, ui, in_color, 0.5
+        );
         match current_walk_direction {
-            Direction::N => {
-                add_in_lattice_link(initial_offset, relive_walk_point.location.x, relive_walk_point.location.y, next_id, ui, in_color, true, 1.0);
-                relive_walk_point = increment_location(relive_walk_point, current_walk_direction);
-            },
-            Direction::E => {
-                add_in_lattice_link(initial_offset, relive_walk_point.location.x, relive_walk_point.location.y, next_id, ui, in_color, false, 1.0);
-                relive_walk_point = increment_location(relive_walk_point, current_walk_direction);
-            },
-            Direction::S => {
-                add_in_lattice_link(initial_offset, relive_walk_point.location.x, relive_walk_point.location.y, next_id, ui, in_color, true, -1.0);
-                relive_walk_point = increment_location(relive_walk_point, current_walk_direction);
-            },
-            Direction::W => {
-                add_in_lattice_link(initial_offset, relive_walk_point.location.x, relive_walk_point.location.y, next_id, ui, in_color, false, -1.0);
-                relive_walk_point = increment_location(relive_walk_point, current_walk_direction);
-            },
+            Direction::N => relive_walk_point = increment_location(relive_walk_point, current_walk_direction),
+            Direction::E => relive_walk_point = increment_location(relive_walk_point, current_walk_direction),
+            Direction::S => relive_walk_point = increment_location(relive_walk_point, current_walk_direction),
+            Direction::W => relive_walk_point = increment_location(relive_walk_point, current_walk_direction),
         }
     }
+}
+
+fn draw_clustering_last_on_stack(
+    clust: &ClusterSizeEstimatorDisplay,
+    ids: &mut Ids,
+    ui: &mut conrod_core::UiCell,
+    initial_offset: f64,
+) {
+    let len_stack = clust.cluster_size_est_current.stack.len();
+    let direction_arr = clust.cluster_size_est_current.stack[len_stack - 1].clone();
 }
 
 pub fn draw_cluster_number_display(
@@ -111,10 +139,10 @@ pub fn draw_cluster_number_display(
         .font_size(size).x_position(Absolute(150.0)).y_position(Absolute(250.0))
         .text_color(in_color).color(TRANSPARENT)
         .set(ids.clustering_text_box, ui);
-    widget::Circle::fill(10.0)
-        .x_position(Absolute(initial_offset + 0.0))
-        .y_position(Absolute(initial_offset + 0.0))
-        .color(in_color) .set(ids.clustering_start_location, ui);
+    //widget::Circle::fill(10.0)
+    //    .x_position(Absolute(initial_offset + 0.0))
+    //    .y_position(Absolute(initial_offset + 0.0))
+    //    .color(in_color) .set(ids.clustering_start_location, ui);
     draw_walk_path(clust, ids, ui, initial_offset);
 }
 
@@ -207,19 +235,21 @@ fn add_in_lattice_link(initial_offset: f64,
                        ui: &mut conrod_core::UiCell,
                        color: Color,
                        vertical: bool,
-                       shift_direction: f64) -> () {
-    let mut link_x = LINK_MINOR;
-    let mut link_y = LINK_MAJOR;
+                       shift_direction: f64,
+                       adjust_width: f64,
+) -> () {
+    let mut link_x = LINK_MINOR as f64 * adjust_width;
+    let mut link_y = LINK_MAJOR as f64;
     let mut x_pos_mod = 0.0;
     let mut y_pos_mod = LINK_MAJOR as f64 / 2.0 * shift_direction;
 
     if !vertical {
-        link_x = LINK_MAJOR;
-        link_y = LINK_MINOR;
+        link_x = LINK_MAJOR as f64;
+        link_y = LINK_MINOR as f64 * adjust_width;
         x_pos_mod = LINK_MAJOR as f64 / 2.0 * shift_direction;
         y_pos_mod = 0.0;
     }
-    let dimensions = [link_x as f64, link_y as f64];
+    let dimensions = [link_x, link_y];
     widget::RoundedRectangle::fill(dimensions, 8.0).x_position(
         Absolute(initial_offset + (x as f64) * (LINK_MAJOR as f64) + x_pos_mod)
     ).y_position(
@@ -347,15 +377,15 @@ pub fn gui(ui: &mut conrod_core::UiCell,
         };
         match cur_vertex.n {
             Link::In => {
-                add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, true, 1.0);
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, true, 1.0, 1.0);
                 draw_triangle([tri_x, tri_y], Compass::N, id1, id2, id3, ui, true);
             },
             Link::Out => {
-                add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, true, 1.0);
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, true, 1.0, 1.0);
                 draw_triangle([tri_x, tri_y], Compass::S, id1, id2, id3, ui, true);
             },
             Link::Blank => {
-                add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, true, 1.0)
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, true, 1.0, 1.0)
             }
         }
         let &next_id = match lattice_link_id_iter.next() {
@@ -376,15 +406,15 @@ pub fn gui(ui: &mut conrod_core::UiCell,
         };
         match cur_vertex.e {
             Link::In => {
-                add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, false, 1.0);
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, false, 1.0, 1.0);
                 draw_triangle([tri_x, tri_y], Compass::W, id1, id2, id3, ui, false);
             },
             Link::Out => {
-                add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, false, 1.0);
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, false, 1.0, 1.0);
                 draw_triangle([tri_x, tri_y], Compass::E, id1, id2, id3, ui, false);
             },
             Link::Blank => {
-                add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, false, 1.0)
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, false, 1.0, 1.0)
             }
         }
         let &next_id = match lattice_link_id_iter.next() {
@@ -405,15 +435,15 @@ pub fn gui(ui: &mut conrod_core::UiCell,
         };
         match cur_vertex.s {
             Link::In => {
-                add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, true, -1.0);
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, true, -1.0, 1.0);
                 draw_triangle([tri_x, tri_y], Compass::S, id1, id2, id3, ui, false);
             },
             Link::Out => {
-                add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, true, -1.0);
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, true, -1.0, 1.0);
                 draw_triangle([tri_x, tri_y], Compass::N, id1, id2, id3, ui, false);
             },
             Link::Blank => {
-                add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, true, -1.0);
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, true, -1.0, 1.0);
             }
         }
         let &next_id = match lattice_link_id_iter.next() {
@@ -434,15 +464,15 @@ pub fn gui(ui: &mut conrod_core::UiCell,
         };
         match cur_vertex.w {
             Link::In => {
-                add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, false, -1.0);
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, false, -1.0, 1.0);
                 draw_triangle([tri_x, tri_y], Compass::E, id1, id2, id3, ui, true);
             },
             Link::Out => {
-                add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, false, -1.0);
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, false, -1.0, 1.0);
                 draw_triangle([tri_x, tri_y], Compass::W, id1, id2, id3, ui, true);
             },
             Link::Blank => {
-                add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, false, -1.0)
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, false, -1.0, 1.0)
             }
         }
     }
