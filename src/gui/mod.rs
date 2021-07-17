@@ -7,7 +7,8 @@ use conrod_core::widget::grid::Lines;
 use conrod_core::position::Position::Absolute;
 use conrod_core::Color;
 use datamodel::lattice::Lattice;
-use datamodel::Link;
+use datamodel::{Link, BoundPoint};
+use datamodel::Direction;
 use conrod_core::widget;
 use conrod_core::widget::Id;
 use datamodel;
@@ -20,6 +21,7 @@ use glium::{
     Display,
 };
 use conrod_core::color::TRANSPARENT;
+use datamodel::cluster::increment_location;
 
 
 // For conrod
@@ -65,12 +67,35 @@ fn draw_walk_path(
     initial_offset: f64,
 )
 {
-    let dimensions = [(LINK_MINOR as f64)/2.0, LINK_MAJOR as f64];
-    for current_walk_direction in clust.walk_list
-    //widget::Rectangle::fill(dimensions)
-    //    .x_position(Absolute(initial_offset + ((wnd.position.x as f64) * 2.0 + 1.0) * (LINK_MINOR as f64)))
-    //    .y_position(Absolute(initial_offset + (wnd.position.y as f64) * ( LINK_MAJOR as f64)))
-    //    .color(in_color).set(ids.winding_link, ui);
+    let mut cluster_walk_path_id_iter= ids.clustering_walk_path.iter();
+
+    let in_color = conrod_core::color::rgb(0.7, 0.0, 0.3);
+    let mut relive_walk_point: BoundPoint = clust.cluster_size_est_current.starting_location.clone();
+
+    for current_walk_direction in & clust.cluster_size_est_current.walk_list {
+        let &next_id = match cluster_walk_path_id_iter.next() {
+            Some(id) => id,
+            None => panic!("Need a widget ID.")
+        };
+        match current_walk_direction {
+            Direction::N => {
+                add_in_lattice_link(initial_offset, relive_walk_point.location.x, relive_walk_point.location.y, next_id, ui, in_color, true, 1.0);
+                relive_walk_point = increment_location(relive_walk_point, current_walk_direction);
+            },
+            Direction::E => {
+                add_in_lattice_link(initial_offset, relive_walk_point.location.x, relive_walk_point.location.y, next_id, ui, in_color, false, 1.0);
+                relive_walk_point = increment_location(relive_walk_point, current_walk_direction);
+            },
+            Direction::S => {
+                add_in_lattice_link(initial_offset, relive_walk_point.location.x, relive_walk_point.location.y, next_id, ui, in_color, true, -1.0);
+                relive_walk_point = increment_location(relive_walk_point, current_walk_direction);
+            },
+            Direction::W => {
+                add_in_lattice_link(initial_offset, relive_walk_point.location.x, relive_walk_point.location.y, next_id, ui, in_color, false, -1.0);
+                relive_walk_point = increment_location(relive_walk_point, current_walk_direction);
+            },
+        }
+    }
 }
 
 pub fn draw_cluster_number_display(
@@ -86,6 +111,11 @@ pub fn draw_cluster_number_display(
         .font_size(size).x_position(Absolute(150.0)).y_position(Absolute(250.0))
         .text_color(in_color).color(TRANSPARENT)
         .set(ids.clustering_text_box, ui);
+    widget::Circle::fill(10.0)
+        .x_position(Absolute(initial_offset + 0.0))
+        .y_position(Absolute(initial_offset + 0.0))
+        .color(in_color) .set(ids.clustering_start_location, ui);
+    draw_walk_path(clust, ids, ui, initial_offset);
 }
 
 pub fn draw_winding_number_display(
@@ -242,7 +272,8 @@ widget_ids! {
         clustering_walk_path[],
         clustering_current_avaliable_directions[],
         clustering_detected[],
-        clustering_start_location
+        clustering_start_location,
+        clustering_current_location
     }
 }
 
@@ -280,8 +311,10 @@ pub fn gui(ui: &mut conrod_core::UiCell,
     );
     let mut triangle_line_iter = ids.lines.iter();
 
-    // For now just do the horizontal links. Add factor of 2 when you do all of them
     ids.lattice_links.resize(
+        (2 * lattice_dim * lattice_dim) as usize, &mut ui.widget_id_generator()
+    );
+    ids.clustering_walk_path.resize(
         (2 * lattice_dim * lattice_dim) as usize, &mut ui.widget_id_generator()
     );
 

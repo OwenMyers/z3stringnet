@@ -31,17 +31,17 @@ pub struct ClusterSizeEstimatorDisplay {
 
 #[derive(Debug, Clone)]
 pub struct ClusterSizeEstimator{
-    cluster_sizes: Vec<i64>,
-    clustered: HashMap<BoundPoint, u64>,
-    cluster_covered_points: Vec<BoundPoint>,
+    pub cluster_sizes: Vec<i64>,
+    pub clustered: HashMap<BoundPoint, u64>,
+    pub cluster_covered_points: Vec<BoundPoint>,
     // general stack to keep track of directions not gone in
-    stack: Vec<Vec<Direction>>,
+    pub stack: Vec<Vec<Direction>>,
     // initialize vector for direction path "walk list"
-    walk_list: Vec<Direction>,
-    current_location: BoundPoint,
-    available_cluster_num: u64,
+    pub walk_list: Vec<Direction>,
+    pub current_location: BoundPoint,
+    pub available_cluster_num: u64,
     pub is_initialized: bool,
-    starting_location: BoundPoint
+    pub starting_location: BoundPoint
 }
 
 
