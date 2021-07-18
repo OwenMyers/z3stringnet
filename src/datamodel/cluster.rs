@@ -87,7 +87,6 @@ mod tests {
     }
 }
 
-
 pub fn increment_location(location: BoundPoint, direction: &Direction) -> BoundPoint {
     let increment: Option<Point>;
     match *direction {
@@ -147,124 +146,6 @@ pub fn directions_of_filled_links(vertex: &Vertex) -> Option<Vec<Direction>> {
     else {
         None
     }
-}
-
-pub struct RecursiveishClusterOutput {
-    pub tmp: i8,
-}
-
-/// I think the HashMap `clustered` will only ever contain points that are clustered. Mostly
-/// we will just be checking to see if a key exists but I think it is nice to have the option
-/// of having a key that specifically denotes a point is not clustered. Until this
-/// algorithm is complete I won't really know. Just making that note in case there ends up
-/// being a much better way to handle that in the future.
-///
-/// # Arguments:
-/// * `vertex` -
-/// * `lat_size` -
-/// * `clustered` -
-/// * `available_cluster_num` - Every time we successfully find a cluster we need to give it
-///   a unique name. That identifier will just be an incrementing integer. We need to keep track
-///   of the value for adding new clusters to the `HashMap` `clustered`.
-///   The "available" cluster number passed in is a cluster number that has "NOT BEEN USED YET".
-///   It will become the cluster number of the cluster we are trying to cluster in this function.
-pub fn recusiveish_cluster(vertex: &Vertex,
-                           lat_size: &Point,
-                           clustered: &mut HashMap<BoundPoint, u64>,
-                           available_cluster_num: &u64,
-                           lattice: &Lattice
-                           ) -> Option<RecursiveishClusterOutput> {//-> Option<&mut HashMap<BoundPoint, u64>> {
-
-    // general stack to keep track of directions not gone in
-    let mut stack: Vec<Vec<Direction>> = Vec::new();
-    // initialize vector for direction path "walk list"
-    let mut walk_list: Vec<Direction> = Vec::new();
-    let mut current_location: BoundPoint = BoundPoint {
-        size: lat_size.clone(),
-        location: vertex.xy.clone()
-    };
-
-    //let mut clustered: HashMap<BoundPoint, u64> = HashMap::new();
-    let vertex_available: Vec<Direction> = match directions_of_filled_links(vertex) {
-        Some(to_return_directions) => to_return_directions,
-        None => return None
-    };
-
-    // If we got some directions add direction vec to stack
-    stack.push(vertex_available);
-    while stack.len() > 0 {
-        // pop off vec off stack
-        let mut filled_directions: Vec<Direction> = match stack.pop() {
-            Some(to_return_directions) => to_return_directions,
-            None => panic!("Stack should not be empty right after len > 0 check.")
-        };
-        // if vec empty:
-        if filled_directions.len() == 0 {
-            // pop direction from walk list
-            let reverse_step_dir: Direction = match walk_list.pop() {
-                Some(to_return_direction) => to_return_direction,
-                None => panic!("If the stack is not empty neither should the walk list be empty")
-            };
-            //  -> reverse step direction (change current location)
-            //  This function handles flipping the direction to reverse the step.
-            current_location = decrement_location(current_location, &reverse_step_dir);
-        }
-        else {
-            // pop direction off vec
-            let direction: Direction = match filled_directions.pop() {
-                Some(to_return_direction) => to_return_direction,
-                None => panic!("Filled directions should be full")
-            };
-            // push modified vec to stack even if empty
-            stack.push(filled_directions);
-            // step direction
-            current_location = increment_location(current_location, &direction);
-            // push direction to walk list
-            walk_list.push(direction);
-            // check if vertex belongs to other cluster
-            // if yes:
-            if clustered.contains_key(&current_location) {
-                let cur_loc_cluster_num: u64 = match clustered.get(&current_location) {
-                    Some(to_return_cluster_num) => *to_return_cluster_num,
-                    None => panic!("There should be something because we just checked contains_key.")
-                };
-                // if it belong to the current cluster:
-                //    Thats good. Time to start backtracking
-                //    pop direction from walk list and
-                //    -> reverse step direction (change current location)
-                if cur_loc_cluster_num == *available_cluster_num {
-                    let last_direction: Direction = match walk_list.pop() {
-                        Some(to_return_direction) => to_return_direction,
-                        None => panic!("Walk list should not be empty at this point.")
-                    };
-                    current_location = decrement_location(current_location, &last_direction);
-                }
-                // else if not the current cluster but part of a cluster
-                //    panic because you did something wrong
-                else {
-                    panic!("Something has gone horribly wrong in the clustering algorithm. A link
-                           has been found that belongs to a different cluster. This should not
-                           be possible.");
-                }
-            }
-            // else:
-            //   mark new vertex as this cluster
-            //   call direction_of_filled_links
-            //   if not none: add to stack
-            //   if none: panic
-            //else {
-            //    clustered.insert(current_location, available_cluster_num);
-            //    match directions_of_filled_links(TODO) {
-            //        Some(to_return_directions) => stack.push(to_return_directions),
-            //        None => panic!("If we moved in this direction we expect there to be at least
-            //                       two filled links at this vertex.")
-            //    };
-            //}
-        }
-        // assert len stack == len walk list
-    }
-    //Some(clustered)
-    Some(RecursiveishClusterOutput{ tmp: 2})
 }
 
 // gotten_map = map verticies to "gotten"
