@@ -162,7 +162,9 @@ pub fn draw_cluster_number_display(
     //    .color(in_color) .set(ids.clustering_start_location, ui);
     if clust.cluster_size_est_current.is_initialized {
         draw_walk_path(clust, ids, ui, initial_offset);
-        draw_clustering_last_on_stack(clust, ids, ui, initial_offset);
+        if clust.cluster_size_est_current.stack.len() > 0 {
+            draw_clustering_last_on_stack(clust, ids, ui, initial_offset);
+        }
     };
 }
 

@@ -41,7 +41,8 @@ pub struct ClusterSizeEstimator{
     pub current_location: BoundPoint,
     pub available_cluster_num: u64,
     pub is_initialized: bool,
-    pub starting_location: BoundPoint
+    pub starting_location: BoundPoint,
+    lat: Lattice
 }
 
 
@@ -49,6 +50,7 @@ impl Iterator for ClusterSizeEstimator {
     type Item = ClusterSizeEstimatorDisplay;
 
     fn next(&mut self) -> Option<ClusterSizeEstimatorDisplay>{
+        let mut local_text = "Running Cluster Estimator";
         // pop off vec off stack
         let mut filled_directions: Vec<Direction> = match self.stack.pop() {
             Some(to_return_directions) => to_return_directions,
@@ -56,23 +58,38 @@ impl Iterator for ClusterSizeEstimator {
         };
         // if vec empty:
         if filled_directions.len() == 0 {
-            if self.current_location == self.starting_location {
-                return Some(
-                    ClusterSizeEstimatorDisplay {
-                        local_text: "Done with this cluster".to_string(),
-                        tmp: 19,
-                        cluster_size_est_current: self.clone()
-                    }
-                )
-            }
+            //if self.current_location == self.starting_location {
+            //    return Some(
+            //        ClusterSizeEstimatorDisplay {
+            //            local_text: "Done with this cluster".to_string(),
+            //            tmp: 19,
+            //            cluster_size_est_current: self.clone()
+            //        }
+            //    )
+            //}
             // pop direction from walk list
             let reverse_step_dir: Direction = match self.walk_list.pop() {
                 Some(to_return_direction) => to_return_direction,
-                None => panic!("If the stack is not empty neither should the walk list be empty")
+                None => {
+                    if self.stack.len() != 0 {
+                        panic!("If the stack is not empty neither should the walk list be empty")
+                    }
+                    else {
+                        return Some(
+                            ClusterSizeEstimatorDisplay {
+                                local_text: "Completed sizing of this cluster!".to_string(),
+                                tmp: 17,
+                                cluster_size_est_current: self.clone()
+                            }
+                        )
+                    }
+                }
             };
             //  -> reverse step direction (change current location)
             //  This function handles flipping the direction to reverse the step.
             self.current_location = decrement_location(self.current_location, &reverse_step_dir);
+            local_text = "Hit a reverse condition.\nNo directions, or at start loc.\nto Backing up\nExpect \
+                no visualization of available directions.";
         }
         else {
             // pop direction off vec
@@ -103,6 +120,7 @@ impl Iterator for ClusterSizeEstimator {
                         None => panic!("Walk list should not be empty at this point.")
                     };
                     self.current_location = decrement_location(self.current_location, &last_direction);
+                    local_text = "Hit a reverse condition.\nFound vertex already part of a cluster";
                 }
                 // else if not the current cluster but part of a cluster
                 //    panic because you did something wrong
@@ -117,18 +135,19 @@ impl Iterator for ClusterSizeEstimator {
             //   call direction_of_filled_links
             //   if not none: add to stack
             //   if none: panic
-            //else {
-            //    clustered.insert(current_location, available_cluster_num);
-            //    match directions_of_filled_links(TODO) {
-            //        Some(to_return_directions) => stack.push(to_return_directions),
-            //        None => panic!("If we moved in this direction we expect there to be at least
-            //                       two filled links at this vertex.")
-            //    };
-            //}
+            else {
+                self.clustered.insert(self.current_location, self.available_cluster_num);
+                match directions_of_filled_links(&self.lat.get_vertex_from_point(&self.current_location)) {
+                    Some(to_return_directions) => self.stack.push(to_return_directions),
+                    None => panic!("If we moved in this direction we expect there to be at least
+                                   two filled links at this vertex.")
+                };
+                local_text = "Found un-marked vertex."
+            }
         }
         return Some(
             ClusterSizeEstimatorDisplay {
-                local_text: "Running Cluster Estimator".to_string(),
+                local_text: local_text.to_string(),
                 tmp: 18,
                 cluster_size_est_current: self.clone()
             }
@@ -147,6 +166,7 @@ impl ClusterSizeEstimator {
             size: lat.size.clone(),
             location: point
         };
+        self.clustered.insert(self.current_location, self.available_cluster_num);
         self.starting_location = BoundPoint {
             size: lat.size.clone(),
             location: point
@@ -178,7 +198,8 @@ impl ClusterSizeEstimator {
             starting_location: BoundPoint {
                 size: lat.size.clone(),
                 location: Point{x: 0, y: 0}
-            }
+            },
+            lat: lat.clone()
         }
     }
     /// I think the HashMap `clustered` will only ever contain points that are clustered. Mostly
