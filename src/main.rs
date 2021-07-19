@@ -52,7 +52,7 @@ fn main() {
     let mut lat: Lattice = build_z3_striped_lat(size);
     //lat.vertices[0].e = lat.vertices[0].e.flip();
 
-    let equilibrate = false;
+    let equilibrate = true;
 
     let weights_arg_str = matches.value_of("weights").unwrap_or("1.0");
     let weights_arg: f64 = weights_arg_str.parse().unwrap();
@@ -120,8 +120,8 @@ fn main() {
     // Equilibrate
     if equilibrate {
         println!("Equilibrating");
-        //let equilibration_time = lat.size.x * lat.size.y;
-        let equilibration_time = 3;
+        let equilibration_time = lat.size.x * lat.size.y;
+        //let equilibration_time = 10;
 
         println!("Number of updates in equilibration: {}", equilibration_time);
         for _ in 0..equilibration_time {

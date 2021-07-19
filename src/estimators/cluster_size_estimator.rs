@@ -80,6 +80,7 @@ impl Iterator for ClusterSizeEstimator {
                         panic!("If the stack is not empty neither should the walk list be empty")
                     }
                     else {
+                        self.is_initialized = false;
                         return Some(
                             ClusterSizeEstimatorDisplay {
                                 local_text: "Completed sizing of this cluster!".to_string(),

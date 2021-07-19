@@ -347,6 +347,7 @@ pub fn gui(ui: &mut conrod_core::UiCell,
     const TITLE: &'static str = "Stringnet";
     if !clustering_estimator.is_initialized {
         clustering_estimator.init_calculation_location(datamodel::Point::new(0, 0), lattice);
+        app.clustering_estimator_display.cluster_size_est_current = clustering_estimator.clone();
     }
     widget::Canvas::new()
         .pad(MARGIN)
