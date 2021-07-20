@@ -61,19 +61,6 @@ mod tests {
         assert_eq!(vertex.n, Link::Blank);
         assert_eq!(vertex.s, Link::Blank);
     }
-    #[test]
-    fn test_get_messy_vertex_from_fake_point() {
-        let mut lat: Lattice = build_z3_messy_lat(Point{x: 4, y: 4});
-        let loc: BoundPoint = BoundPoint{
-            size: Point{x: 4, y: 4},
-            location: Point{x: 2, y: 0},
-        };
-        let vertex: Vertex = lat.get_vertex_from_point(&loc);
-        assert_eq!(vertex.w, Link::In);
-        assert_eq!(vertex.e, Link::Out);
-        assert_eq!(vertex.n, Link::Blank);
-        assert_eq!(vertex.s, Link::Blank);
-    }
 }
 
 /// Stores the representation of the sytem
@@ -452,12 +439,12 @@ pub fn build_z3_messy_lat(size: Point) -> Lattice {
     // lattice to completely define all links.
     println!("Filling vertex array:");
     for i in 0..half_n {
-        if ((i % 2 == 1) & (i < 4)) | (i == 0) {
+        if ((i % 2 == 0) & (i < 4)) {
             let cur_vertex: Vertex = Vertex{
                 n: Link::Out,
-                e: Link::Out,
+                e: Link::Blank,
                 s: Link::Blank,
-                w: Link::In,
+                w: Link::Out,
                 xy: Point{
                     x: x_from_vertex_vec_position(i, &lat.size),
                     y: y_from_vertex_vec_position(i, &lat.size),

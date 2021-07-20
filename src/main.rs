@@ -52,13 +52,13 @@ fn main() {
     };
     // lat now owns size -> That is good and intentional
     //let mut lat: Lattice = build_blank_lat(size);
-    //let mut lat: Lattice = build_z3_striped_lat(size);
-    let mut lat: Lattice = build_z3_messy_lat(size);
+    let mut lat: Lattice = build_z3_striped_lat(size);
+    //let mut lat: Lattice = build_z3_messy_lat(size);
     //let mut lat: Lattice = build_z3_striped_vertical_lat(size);
     //let mut lat: Lattice = build_z3_fully_packed_lat(size);
     //lat.vertices[0].e = lat.vertices[0].e.flip();
 
-    let equilibrate = false;
+    let equilibrate = true;
 
     let weights_arg_str = matches.value_of("weights").unwrap_or("1.0");
     let weights_arg: f64 = weights_arg_str.parse().unwrap();
@@ -126,8 +126,8 @@ fn main() {
     // Equilibrate
     if equilibrate {
         println!("Equilibrating");
-        let equilibration_time = lat.size.x * lat.size.y;
-        //let equilibration_time = 10;
+        //let equilibration_time = lat.size.x * lat.size.y;
+        let equilibration_time = 100;
 
         println!("Number of updates in equilibration: {}", equilibration_time);
         for _ in 0..equilibration_time {
@@ -212,7 +212,7 @@ fn main() {
                 }
                 Request::SetUi { needs_redraw } => {
                     gui(&mut ui.set_widgets(), &mut ids, &mut app, lattice_size_arg,
-                        &mut lat, &mut winding_count_estimator, &mut cluster_size_estimator);
+                        &mut lat, &mut winding_count_estimator);
                     // Instantiate a GUI demonstrating every widget type provided by conrod.
                     //conrod_example_shared::gui(&mut ui.set_widgets(), &ids, &mut app);
 

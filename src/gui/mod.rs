@@ -335,7 +335,6 @@ pub fn gui(ui: &mut conrod_core::UiCell,
            lattice_dim: i64,
            lattice: &mut Lattice,
            winding_estimator: &mut WindingNumberCountEstimator,
-           clustering_estimator: &mut ClusterSizeEstimator
            ) {
     use conrod_core::{widget, Colorable, Labelable, Positionable, Sizeable, Widget};
     use std::iter::once;
@@ -345,9 +344,9 @@ pub fn gui(ui: &mut conrod_core::UiCell,
     const SUBTITLE_SIZE: conrod_core::FontSize = 42;
 
     const TITLE: &'static str = "Stringnet";
-    if !clustering_estimator.is_initialized {
-        clustering_estimator.init_calculation_location(datamodel::Point::new(0, 0), lattice);
-        app.clustering_estimator_display.cluster_size_est_current = clustering_estimator.clone();
+    if !app.clustering_estimator_display.cluster_size_est_current.is_initialized {
+        app.clustering_estimator_display.cluster_size_est_current
+            .init_calculation_location(datamodel::Point::new(0, 0), lattice);
     }
     widget::Canvas::new()
         .pad(MARGIN)
@@ -528,7 +527,7 @@ pub fn gui(ui: &mut conrod_core::UiCell,
         //.down_from(ids.button_title, 60.0)
         .w_h(160.0, 40.0)
         .set(ids.button_clustering_est_step, ui) {
-        app.clustering_estimator_display = match clustering_estimator.next() {
+        app.clustering_estimator_display = match app.clustering_estimator_display.cluster_size_est_current.next() {
             Some(c) => c,
             None => ClusterSizeEstimatorDisplay {
                         tmp: 0,
