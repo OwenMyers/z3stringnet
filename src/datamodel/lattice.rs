@@ -104,9 +104,9 @@ impl Lattice {
     ///
     /// In a `Lattice` object verticies (`Vertex` objects) only belong to 1 sublattice because 
     /// that is the only necessary information you need to store to represent the lattice.
-    /// You can have a vertex of the other sublattice and it is really converniet to be able to
-    /// get the verticies of any sublattice as well as their constituent directions off the links.
-    /// This function will return a `Vertex` regardles of the sublattice. This is a fake vertex
+    /// You can have a vertex of the other sublattice and it is really convenient to be able to
+    /// get the vertices of any sublattice as well as their constituent directions of the links.
+    /// This function will return a `Vertex` regardless of the sublattice. This is a fake vertex
     /// because it may not belong to the sublattice that `Lattice` is made out of and most
     /// importantly changes to the links will not be reflected anywhere else. The returned
     /// `Vertex` does not (&) reference any "real" information of the lattice.
@@ -329,7 +329,7 @@ pub fn build_blank_lat(size: Point) -> Lattice {
 ///     0->-+->-1->-+->-
 ///
 pub fn build_z3_striped_lat(size: Point) -> Lattice {
-    println!("Building stagard lattice of size x {}, y {}",
+    println!("Building staggered lattice of size x {}, y {}",
              size.x, size.y);
 
     let mut lat: Lattice = Lattice {
@@ -341,7 +341,7 @@ pub fn build_z3_striped_lat(size: Point) -> Lattice {
     let half_n = (lat.size.x * lat.size.y)/2;
 
     // Only need half of N because we only need vertices from one sub
-    // lattice to compleatly define all links.
+    // lattice to completely define all links.
     println!("Filling vertex array:");
     for i in 0..half_n {
         let cur_vertex: Vertex = Vertex{
@@ -357,6 +357,69 @@ pub fn build_z3_striped_lat(size: Point) -> Lattice {
         lat.vertices.push(cur_vertex);
     }
 
+    lat
+}
+
+pub fn build_z3_striped_vertical_lat(size: Point) -> Lattice {
+    println!("Building staggered lattice of size x {}, y {}",
+             size.x, size.y);
+
+    let mut lat: Lattice = Lattice {
+        vertices: Vec::new(),
+        size,
+        number_filled_links: (size.y / 2 * size.x) as i64
+    };
+
+    let half_n = (lat.size.x * lat.size.y)/2;
+
+    // Only need half of N because we only need vertices from one sub
+    // lattice to completely define all links.
+    println!("Filling vertex array:");
+    for i in 0..half_n {
+        let cur_vertex: Vertex = Vertex{
+            n: Link::Out,
+            e: Link::Blank,
+            s: Link::In,
+            w: Link::Blank,
+            xy: Point{
+                x: x_from_vertex_vec_position(i, &lat.size),
+                y: y_from_vertex_vec_position(i, &lat.size),
+            }
+        };
+        lat.vertices.push(cur_vertex);
+    }
+
+    lat
+}
+
+pub fn build_z3_fully_packed_lat(size: Point) -> Lattice {
+    println!("Building staggered lattice of size x {}, y {}",
+             size.x, size.y);
+
+    let mut lat: Lattice = Lattice {
+        vertices: Vec::new(),
+        size,
+        number_filled_links: (size.y / 2 * size.x) as i64
+    };
+
+    let half_n = (lat.size.x * lat.size.y)/2;
+
+    // Only need half of N because we only need vertices from one sub
+    // lattice to completely define all links.
+    println!("Filling vertex array:");
+    for i in 0..half_n {
+        let cur_vertex: Vertex = Vertex{
+            n: Link::Out,
+            e: Link::Out,
+            s: Link::In,
+            w: Link::In,
+            xy: Point{
+                x: x_from_vertex_vec_position(i, &lat.size),
+                y: y_from_vertex_vec_position(i, &lat.size),
+            }
+        };
+        lat.vertices.push(cur_vertex);
+    }
     lat
 }
 
