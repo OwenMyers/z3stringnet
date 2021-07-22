@@ -134,6 +134,9 @@ impl Update {
         assert_eq!(z3string.cur_loc, z3string.start_loc);
         self.link_number_change = totatal_link_number_change;
         lat.number_filled_links += self.link_number_change;
+        if lat.number_filled_links < 0 {
+            println!("Problem HERE TODO. Not sure how this is possible right now");
+        };
         assert!(lat.number_filled_links >= 0);
     }
 
