@@ -329,6 +329,9 @@ widget_ids! {
     }
 }
 
+/// We will only ever pass in estimators that don't have display counterparts
+/// that refer to themselves. See the difference between the winding number estimator and the
+/// cluster size estimator
 pub fn gui(ui: &mut conrod_core::UiCell,
            ids: &mut Ids,
            app: &mut DemoApp,
