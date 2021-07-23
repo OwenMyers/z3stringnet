@@ -52,9 +52,9 @@ fn main() {
     };
     // lat now owns size -> That is good and intentional
     //let mut lat: Lattice = build_blank_lat(size);
-    let mut lat: Lattice = build_z3_striped_lat(size);
+    //let mut lat: Lattice = build_z3_striped_lat(size);
     //let mut lat: Lattice = build_z3_messy_lat(size);
-    //let mut lat: Lattice = build_z3_striped_vertical_lat(size);
+    let mut lat: Lattice = build_z3_striped_vertical_lat(size);
     //let mut lat: Lattice = build_z3_fully_packed_lat(size);
     //lat.vertices[0].e = lat.vertices[0].e.flip();
 

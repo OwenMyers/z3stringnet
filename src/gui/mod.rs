@@ -437,40 +437,44 @@ pub fn gui(ui: &mut conrod_core::UiCell,
             Link::In => {
                 add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, false, 1.0, 1.0);
                 draw_triangle([tri_x, tri_y], Compass::W, id1, id2, id3, ui, false);
-                if x == 0 {
+                if x == lattice.size.x - 1 {
                     // If it is a y boundary -> draw the periodic piece on the opposite side
                     let &next_id = match lattice_link_id_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
                     let &id1 =  match triangle_line_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
                     let &id2 =  match triangle_line_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
                     let &id3 =  match triangle_line_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
-                    add_in_lattice_link(initial_offset, lattice.size.x - 1, y, next_id, ui, in_color, false, 1.0, 1.0);
-                    //draw_triangle([tri_x, tri_y], Compass::N, id1, id2, id3, ui, true);
+                    add_in_lattice_link(initial_offset, 0, y, next_id, ui, in_color, false, -1.0, 1.0);
+                    let tri_x = initial_offset + (0 as u32 * LINK_MAJOR) as f64;
+                    draw_triangle([tri_x, tri_y], Compass::W, id1, id2, id3, ui, true);
                 }
             },
             Link::Out => {
                 add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, false, 1.0, 1.0);
                 draw_triangle([tri_x, tri_y], Compass::E, id1, id2, id3, ui, false);
+                if x == lattice.size.x - 1 {
+                    // If it is a y boundary -> draw the periodic piece on the opposite side
+                    let &next_id = match lattice_link_id_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
+                    let &id1 =  match triangle_line_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
+                    let &id2 =  match triangle_line_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
+                    let &id3 =  match triangle_line_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
+                    add_in_lattice_link(initial_offset, 0, y, next_id, ui, out_color, false, -1.0, 1.0);
+                    let tri_x = initial_offset + (0 as u32 * LINK_MAJOR) as f64;
+                    draw_triangle([tri_x, tri_y], Compass::E, id1, id2, id3, ui, true);
+                }
             },
             Link::Blank => {
-                add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, false, 1.0, 1.0)
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, false, 1.0, 1.0);
+                if x == lattice.size.x - 1 {
+                    // If it is a y boundary -> draw the periodic piece on the opposite side
+                    let &next_id = match lattice_link_id_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
+                    add_in_lattice_link(initial_offset, 0, y, next_id, ui, theme().shape_color, false, -1.0, 1.0);
+                }
             }
         }
-        let &next_id = match lattice_link_id_iter.next() {
-            Some(id) => id,
-            None => panic!("Need a widget ID.")
-        };
-        let &id1 =  match triangle_line_iter.next() {
-            Some(id) => id,
-            None => panic!("Need a widget ID.")
-        };
-        let &id2 =  match triangle_line_iter.next() {
-            Some(id) => id,
-            None => panic!("Need a widget ID.")
-        };
-        let &id3 =  match triangle_line_iter.next() {
-            Some(id) => id,
-            None => panic!("Need a widget ID.")
-        };
+        let &next_id = match lattice_link_id_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
+        let &id1 =  match triangle_line_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
+        let &id2 =  match triangle_line_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
+        let &id3 =  match triangle_line_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
         match cur_vertex.s {
             Link::In => {
                 add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, true, -1.0, 1.0);
@@ -495,7 +499,7 @@ pub fn gui(ui: &mut conrod_core::UiCell,
                     let &id1 =  match triangle_line_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
                     let &id2 =  match triangle_line_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
                     let &id3 =  match triangle_line_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
-                    add_in_lattice_link(initial_offset, x, lattice.size.y - 1, next_id, ui, in_color, true, 1.0, 1.0);
+                    add_in_lattice_link(initial_offset, x, lattice.size.y - 1, next_id, ui, out_color, true, 1.0, 1.0);
                     let tri_y = initial_offset + ((lattice.size.y) as u32 * LINK_MAJOR) as f64;
                     draw_triangle([tri_x, tri_y], Compass::S, id1, id2, id3, ui, true);
                 }
@@ -509,33 +513,46 @@ pub fn gui(ui: &mut conrod_core::UiCell,
                 }
             }
         }
-        let &next_id = match lattice_link_id_iter.next() {
-            Some(id) => id,
-            None => panic!("Need a widget ID (2).")
-        };
-        let &id1 =  match triangle_line_iter.next() {
-            Some(id) => id,
-            None => panic!("Need a widget ID.")
-        };
-        let &id2 =  match triangle_line_iter.next() {
-            Some(id) => id,
-            None => panic!("Need a widget ID.")
-        };
-        let &id3 =  match triangle_line_iter.next() {
-            Some(id) => id,
-            None => panic!("Need a widget ID.")
-        };
+        let &next_id = match lattice_link_id_iter.next() { Some(id) => id, None => panic!("Need a widget ID (2).") };
+        let &id1 =  match triangle_line_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
+        let &id2 =  match triangle_line_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
+        let &id3 =  match triangle_line_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
         match cur_vertex.w {
             Link::In => {
                 add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, false, -1.0, 1.0);
                 draw_triangle([tri_x, tri_y], Compass::E, id1, id2, id3, ui, true);
+                if x == 0 {
+                    // If it is a y boundary -> draw the periodic piece on the opposite side
+                    let &next_id = match lattice_link_id_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
+                    let &id1 =  match triangle_line_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
+                    let &id2 =  match triangle_line_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
+                    let &id3 =  match triangle_line_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
+                    add_in_lattice_link(initial_offset, lattice.size.x - 1, y, next_id, ui, in_color, false, 1.0, 1.0);
+                    let tri_x = initial_offset + ((lattice.size.x) as u32 * LINK_MAJOR) as f64;
+                    draw_triangle([tri_x, tri_y], Compass::E, id1, id2, id3, ui, true);
+                }
             },
             Link::Out => {
                 add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, false, -1.0, 1.0);
                 draw_triangle([tri_x, tri_y], Compass::W, id1, id2, id3, ui, true);
+                if x == 0 {
+                    // If it is a y boundary -> draw the periodic piece on the opposite side
+                    let &next_id = match lattice_link_id_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
+                    let &id1 =  match triangle_line_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
+                    let &id2 =  match triangle_line_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
+                    let &id3 =  match triangle_line_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
+                    add_in_lattice_link(initial_offset, lattice.size.x - 1, y, next_id, ui, out_color, false, 1.0, 1.0);
+                    let tri_x = initial_offset + ((lattice.size.x) as u32 * LINK_MAJOR) as f64;
+                    draw_triangle([tri_x, tri_y], Compass::W, id1, id2, id3, ui, true);
+                }
             },
             Link::Blank => {
-                add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, false, -1.0, 1.0)
+                add_in_lattice_link(initial_offset, x, y, next_id, ui, theme().shape_color, false, -1.0, 1.0);
+                if x == 0 {
+                    // If it is a y boundary -> draw the periodic piece on the opposite side
+                    let &next_id = match lattice_link_id_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
+                    add_in_lattice_link(initial_offset, lattice.size.x -1, y, next_id, ui, theme().shape_color, false, 1.0, 1.0);
+                }
             }
         }
     }

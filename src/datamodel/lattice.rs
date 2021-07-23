@@ -346,9 +346,9 @@ pub fn build_z3_striped_lat(size: Point) -> Lattice {
     for i in 0..half_n {
         let cur_vertex: Vertex = Vertex{
             n: Link::Blank,
-            e: Link::Out,
+            e: Link::In,
             s: Link::Blank,
-            w: Link::In,
+            w: Link::Out,
             xy: Point{
                 x: x_from_vertex_vec_position(i, &lat.size),
                 y: y_from_vertex_vec_position(i, &lat.size),
