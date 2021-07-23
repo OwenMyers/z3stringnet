@@ -338,10 +338,10 @@ fn draw_bounding_box(
 ) {
     let mut bound_box_id_iter= ids.bounding_box_edges.iter();
     let &next_id = match bound_box_id_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
-
-    let x: f64 = (lattice_size as f64) * (LINK_MAJOR as f64);
-    widget::Line::abs([*initial_offset, *initial_offset], [*initial_offset, *initial_offset + x])
-        .thickness(5.0)
+    let float_lm = LINK_MAJOR as f64;
+    let x: f64 = (lattice_size as f64) * float_lm;
+    widget::Line::abs([*initial_offset - float_lm, *initial_offset - float_lm], [*initial_offset - float_lm, *initial_offset + x - float_lm])
+        .thickness(float_lm/1.5)
         .set(next_id, ui);
 }
 
@@ -394,8 +394,6 @@ pub fn gui(ui: &mut conrod_core::UiCell,
     ids.bounding_box_edges.resize(4, &mut ui.widget_id_generator());
 
     let mut lattice_link_id_iter = ids.lattice_links.iter();
-
-    draw_bounding_box(ids, ui, &initial_offset, lattice.size.x);
 
     let in_color = conrod_core::color::rgb(0.7, 0.0, 0.3);
     let out_color = conrod_core::color::rgb(3.0, 0.0, 0.7);
@@ -625,6 +623,7 @@ pub fn gui(ui: &mut conrod_core::UiCell,
         ),
         None => println!("Got no winding number display")
     };
+    draw_bounding_box(ids, ui, &initial_offset, lattice.size.x);
 }
 
 
