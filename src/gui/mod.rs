@@ -325,8 +325,24 @@ widget_ids! {
         clustering_current_avaliable_directions[],
         clustering_detected[],
         clustering_start_location,
-        clustering_current_location
+        clustering_current_location,
+        bounding_box_edges[]
     }
+}
+
+fn draw_bounding_box(
+    ids: &Ids,
+    ui: &mut conrod_core::UiCell,
+    initial_offset: &f64,
+    lattice_size: i64
+) {
+    let mut bound_box_id_iter= ids.bounding_box_edges.iter();
+    let &next_id = match bound_box_id_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
+
+    let x: f64 = (lattice_size as f64) * (LINK_MAJOR as f64);
+    widget::Line::abs([*initial_offset, *initial_offset], [*initial_offset, *initial_offset + x])
+        .thickness(5.0)
+        .set(next_id, ui);
 }
 
 /// We will only ever pass in estimators that don't have display counterparts
@@ -375,8 +391,12 @@ pub fn gui(ui: &mut conrod_core::UiCell,
     ids.clustering_current_avaliable_directions.resize(
         (2 * lattice_dim * lattice_dim) as usize, &mut ui.widget_id_generator()
     );
+    ids.bounding_box_edges.resize(4, &mut ui.widget_id_generator());
 
     let mut lattice_link_id_iter = ids.lattice_links.iter();
+
+    draw_bounding_box(ids, ui, &initial_offset, lattice.size.x);
+
     let in_color = conrod_core::color::rgb(0.7, 0.0, 0.3);
     let out_color = conrod_core::color::rgb(3.0, 0.0, 0.7);
 
