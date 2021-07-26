@@ -341,7 +341,7 @@ fn draw_bounding_box(
     let float_lm = LINK_MAJOR as f64;
     let x: f64 = (lattice_size as f64) * float_lm;
 
-    widget::Line::abs([*initial_offset - float_lm, *initial_offset - float_lm], [*initial_offset - float_lm, *initial_offset + x + float_lm/2.0])
+    widget::Line::abs([*initial_offset - float_lm, *initial_offset - float_lm], [*initial_offset - float_lm, *initial_offset + x + float_lm/3.0])
         .thickness(float_lm/1.5)
         .set(next_id, ui);
     let &next_id = match bound_box_id_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
@@ -349,7 +349,7 @@ fn draw_bounding_box(
         .thickness(float_lm/1.5)
         .set(next_id, ui);
     let &next_id = match bound_box_id_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
-    widget::Line::abs([*initial_offset + x, *initial_offset - float_lm], [*initial_offset + x, *initial_offset + x - float_lm])
+    widget::Line::abs([*initial_offset + x, *initial_offset - float_lm], [*initial_offset + x, *initial_offset + x + float_lm/3.0])
         .thickness(float_lm/1.5)
         .set(next_id, ui);
     let &next_id = match bound_box_id_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
