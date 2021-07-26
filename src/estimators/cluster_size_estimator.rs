@@ -1,3 +1,7 @@
+use std::io::BufWriter;
+use std::path::Path;
+use std::fs::File;
+use super::Measurable;
 use super::super::datamodel::Point;
 use super::super::datamodel::Direction;
 use super::super::datamodel::Vertex;
@@ -31,6 +35,7 @@ pub struct ClusterSizeEstimatorDisplay {
 
 #[derive(Debug, Clone)]
 pub struct ClusterSizeEstimator{
+    result_file_buffer: BufWriter<File>,
     pub cluster_sizes: Vec<i64>,
     pub clustered: HashMap<BoundPoint, u64>,
     pub cluster_covered_points: Vec<BoundPoint>,
@@ -45,6 +50,11 @@ pub struct ClusterSizeEstimator{
     lat: Lattice
 }
 
+impl Measurable for ClusterSizeEstimator {
+    fn measure(&mut self, lat: &Lattice) {}
+    fn finalize_bin_and_write(&mut self, size: u64) {}
+    fn clear(&mut self) {}
+}
 
 impl Iterator for ClusterSizeEstimator {
     type Item = ClusterSizeEstimatorDisplay;
@@ -161,10 +171,6 @@ impl Iterator for ClusterSizeEstimator {
     }
 }
 
-pub struct RecursiveishClusterOutput {
-    pub tmp: i8,
-}
-
 impl ClusterSizeEstimator {
     /// Set the working location, push that vertex to the stack, add it to the covered points
     pub fn init_calculation_location(&mut self, point: Point, lat: &mut Lattice) {
@@ -187,7 +193,18 @@ impl ClusterSizeEstimator {
         self.is_initialized = true;
     }
     pub fn new(lat: &Lattice) -> ClusterSizeEstimator {
+        println!("Opening WindingNumberCountEstimator file");
+        let path = Path::new("winding_number_count_estimator.csv");
+        let display = path.display();
+        let file = match File::create(&path) {
+            Err(err) => panic!("could not create {}: {}",
+                               display,
+                               err),
+            Ok(good_file) => good_file,
+        };
+        let result_file_buffer = BufWriter::new(file);
         ClusterSizeEstimator{
+            result_file_buffer,
             cluster_sizes: Vec::new(),
             clustered: Default::default(),
             cluster_covered_points: Vec::new(),
