@@ -51,9 +51,19 @@ pub struct ClusterSizeEstimator{
 }
 
 impl Measurable for ClusterSizeEstimator {
-    fn measure(&mut self, lat: &Lattice) {}
-    fn finalize_bin_and_write(&mut self, size: u64) {}
-    fn clear(&mut self) {}
+    fn measure(&mut self, lat: &Lattice) {
+        for i in 0..lat.size.x{
+            for j in 0..lat.size.y{
+                println!("Looking at vertex x: {}, y: {}", i, j)
+            }
+        }
+    }
+    fn finalize_bin_and_write(&mut self, size: u64) {
+        println!("Cluster size est finalize_bin_and_write does nothing")
+    }
+    fn clear(&mut self) {
+        println!("Cluster size est clear() does nothing")
+    }
 }
 
 impl Iterator for ClusterSizeEstimator {

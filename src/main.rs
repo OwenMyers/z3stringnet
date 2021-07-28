@@ -255,6 +255,7 @@ fn main() {
                 correlation_origin_estimator.measure(&lat);
                 total_link_count_estimator.measure(&lat);
                 winding_variance_estimator.measure(&lat);
+                cluster_size_estimator.measure(&lat);
             }
 
             density_estimator.finalize_bin_and_write(number_measure);
