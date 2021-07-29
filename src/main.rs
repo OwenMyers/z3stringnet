@@ -17,7 +17,7 @@ use z3stringnet::datamodel::lattice::build_z3_striped_lat;
 use z3stringnet::datamodel::lattice::build_z3_striped_vertical_lat;
 use z3stringnet::datamodel::lattice::build_blank_lat;
 use z3stringnet::datamodel::lattice::build_z3_fully_packed_lat;
-use z3stringnet::datamodel::lattice::build_z3_messy_lat;
+//use z3stringnet::datamodel::lattice::build_z3_messy_lat;
 use z3stringnet::lattice_updates::Update;
 use z3stringnet::lattice_updates::UpdateType;
 use z3stringnet::estimators::density_estimator::DensityEstimator;
@@ -51,10 +51,10 @@ fn main() {
         y: lattice_size_arg,
     };
     // lat now owns size -> That is good and intentional
-    //let mut lat: Lattice = build_blank_lat(size);
+    let mut lat: Lattice = build_blank_lat(size);
     //let mut lat: Lattice = build_z3_striped_lat(size);
     //let mut lat: Lattice = build_z3_messy_lat(size);
-    let mut lat: Lattice = build_z3_striped_vertical_lat(size);
+    //let mut lat: Lattice = build_z3_striped_vertical_lat(size);
     //let mut lat: Lattice = build_z3_fully_packed_lat(size);
     //lat.vertices[0].e = lat.vertices[0].e.flip();
 
@@ -126,8 +126,7 @@ fn main() {
     // Equilibrate
     if equilibrate {
         println!("Equilibrating");
-        //let equilibration_time = lat.size.x * lat.size.y;
-        let equilibration_time = 100;
+        let equilibration_time = lat.size.x * lat.size.y * 2.0;
 
         println!("Number of updates in equilibration: {}", equilibration_time);
         for _ in 0..equilibration_time {
@@ -262,11 +261,13 @@ fn main() {
             correlation_origin_estimator.finalize_bin_and_write(number_measure);
             total_link_count_estimator.finalize_bin_and_write(number_measure);
             winding_variance_estimator.finalize_bin_and_write(number_measure);
+            cluster_size_estimator.finalize_bin_and_write(number_measure);
 
             density_estimator.clear();
             correlation_origin_estimator.clear();
             total_link_count_estimator.clear();
             winding_variance_estimator.clear();
+            cluster_size_estimator.clear();
 
             winding_count_estimator.measure(&mut lat);
             winding_count_estimator.finalize_bin_and_write(1);

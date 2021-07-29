@@ -83,7 +83,6 @@ impl Update {
                         panic!("Blank link can't change to Blank from raise or lower")
                     }
                 }
-
             },
         }
     }

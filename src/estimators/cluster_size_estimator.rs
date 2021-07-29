@@ -1,6 +1,7 @@
+use std::io::prelude::*;
+use std::fs::File;
 use std::io::BufWriter;
 use std::path::Path;
-use std::fs::File;
 use super::Measurable;
 use super::super::datamodel::Point;
 use super::super::datamodel::Direction;
@@ -43,7 +44,7 @@ impl FullClusterSizeEstimator {
     pub fn new(lat: &Lattice) -> FullClusterSizeEstimator {
         println!("Initializing FullClusterSizeEstimator");
         println!("Opening FullClusterSizeEstimator file");
-        let path = Path::new("winding_number_count_estimator.csv");
+        let path = Path::new("cluster_size_estimator.csv");
         let display = path.display();
         let file = match File::create(&path) {
             Err(err) => panic!("could not create {}: {}",
@@ -82,14 +83,20 @@ impl Measurable for FullClusterSizeEstimator {
     fn measure(&mut self, lat: &mut Lattice) {
         for i in 0..lat.size.x{
             for j in 0..lat.size.y{
-                println!("Looking at vertex x: {}, y: {}", i, j);
+                //println!("Looking at vertex x: {}, y: {}", i, j);
                 let cur_point = Point::new(i, j);
                 if self.cluster_size_estimator.clustered.contains_key(&BoundPoint{size: lat.size, location: cur_point}) {
                     continue
-                }
-                self.cluster_size_estimator.init_calculation_location(cur_point, lat);
-                while self.cluster_size_estimator.is_initialized {
-                    self.cluster_size_estimator.next();
+                } else {
+                    match directions_of_filled_links(&lat.get_vertex_from_point(&BoundPoint { size: lat.size, location: cur_point })) {
+                        Some(_)=> {
+                            self.cluster_size_estimator.init_calculation_location(cur_point, lat);
+                            while self.cluster_size_estimator.is_initialized {
+                                self.cluster_size_estimator.next();
+                            }
+                        }
+                        None => continue
+                    }
                 }
             }
         }
@@ -101,7 +108,6 @@ impl Measurable for FullClusterSizeEstimator {
                     Some(cur_label_num) => {
                         let addition = label_to_vertex_size.entry(*cur_label_num).or_insert(0);
                         *addition += 1;
-                        println!("addition: {:?}", addition);
                     },
                     None => ()
                 }
@@ -110,26 +116,27 @@ impl Measurable for FullClusterSizeEstimator {
         let mut count: f64 = 0.0;
         let mut avg: f64 = 0.0;
         for (k, v) in label_to_vertex_size {
-            count += 1;
-            avg += v;
+            count += 1.0;
+            avg += v as f64;
         }
         avg = avg/count;
         self.current_num_vertex_per_cluster_avg += avg;
     }
     fn finalize_bin_and_write(&mut self, denominator: u64) {
-        self.current_num_vertex_per_cluster_avg /= denominator as f64;
+        let avg_for_out = self.current_num_vertex_per_cluster_avg / denominator as f64;
         let mut out_string: String = String::new();
-        out_string.push_str(&format!("{},{}\n",&avg_count_horizontal,&avg_count_vertical));
+        out_string.push_str(&format!("{}\n",&avg_for_out));
 
         match self.result_file_buffer.write(out_string.as_bytes()) {
-            Err(err) => panic!("Can not write to winding count estimator file {}",
+            Err(err) => panic!("Can not write to cluster size estimator file {}",
                                err
             ),
             Ok(_) => (),
         }
     }
     fn clear(&mut self) {
-        println!("Cluster size est clear() does nothing")
+        self.current_num_vertex_per_cluster_avg = 0.0;
+        self.cluster_size_estimator = ClusterSizeEstimator::new(&self.cluster_size_estimator.lat);
     }
 }
 
@@ -268,6 +275,7 @@ impl ClusterSizeEstimator {
         self.stack.push(vertex_available);
         self.cluster_covered_points.push(self.current_location);
         self.is_initialized = true;
+        self.lat = lat.clone();
     }
     pub fn new(lat: &Lattice) -> ClusterSizeEstimator {
 
