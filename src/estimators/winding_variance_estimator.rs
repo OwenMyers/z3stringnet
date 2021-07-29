@@ -56,7 +56,7 @@ impl WindingNumberVarianceEstimator {
 
 impl Measurable for WindingNumberVarianceEstimator {
 
-    fn measure(&mut self, lat: &Lattice) {
+    fn measure(&mut self, lat: &mut Lattice) {
         // First count winding number in vertical direction along column at origin.
         // Also count winding number in vertical direction along column at origin + 1.
         // We can assert that this needs to be the same winding number as that found from the

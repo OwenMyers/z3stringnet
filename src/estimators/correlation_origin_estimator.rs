@@ -186,7 +186,7 @@ impl Measurable for CorrelationOriginEstimator {
         }
     }
 
-    fn measure(&mut self, lat: &Lattice) {
+    fn measure(&mut self, lat: &mut Lattice) {
         // First check each of the origin links.
         let origin_vertex: &Vertex = &lat.vertices[0];
         let origin_horizontal_link: &Link = &origin_vertex.e;

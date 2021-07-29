@@ -26,7 +26,7 @@ pub fn write_standard_header(writer: &mut BufWriter<File>) {
 
 
 pub trait Measurable {
-    fn measure(&mut self, lat: &Lattice);
+    fn measure(&mut self, lat: &mut Lattice);
     /// Divide the counts by the number of measurements
     /// per bin and write the file.
     fn finalize_bin_and_write(&mut self, denominator: u64);

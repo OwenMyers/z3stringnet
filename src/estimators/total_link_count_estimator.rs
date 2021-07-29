@@ -65,7 +65,7 @@ impl Measurable for TotalLinkCountEstimator {
         }
     }
 
-    fn measure(&mut self, lat: &Lattice){
+    fn measure(&mut self, lat: &mut Lattice){
         for (_i, cur_vertex) in lat.vertices.iter().enumerate(){
             match cur_vertex.n {
                 Link::In => {

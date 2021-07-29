@@ -134,7 +134,7 @@ impl Measurable for DensityEstimator {
 
     // We are just going to count "in" and "out" for each link of
     // the real vertices.
-    fn measure(&mut self, lat: &Lattice){
+    fn measure(&mut self, lat: &mut Lattice){
         // for each direction add to the cur_in_count, cur_out_count
         // vectors if you find those directions.
         // loop over real vertices

@@ -30,7 +30,7 @@ use z3stringnet::oio::*;
 use z3stringnet::gui::*;
 use glium::Surface;
 use conrod_core::widget::Image;
-use z3stringnet::estimators::cluster_size_estimator::ClusterSizeEstimator;
+use z3stringnet::estimators::cluster_size_estimator::FullClusterSizeEstimator;
 
 
 fn main() {
@@ -121,7 +121,7 @@ fn main() {
     let mut total_link_count_estimator = TotalLinkCountEstimator::new();
     let mut winding_count_estimator = WindingNumberCountEstimator::new(lat.clone());
     let mut winding_variance_estimator = WindingNumberVarianceEstimator::new();
-    let mut cluster_size_estimator = ClusterSizeEstimator::new(&lat);
+    let mut cluster_size_estimator = FullClusterSizeEstimator::new(&lat);
 
     // Equilibrate
     if equilibrate {
@@ -251,11 +251,11 @@ fn main() {
                     updater.main_update(&mut lat, &update_type);
                     total_update_count += 1;
                 }
-                density_estimator.measure(&lat);
-                correlation_origin_estimator.measure(&lat);
-                total_link_count_estimator.measure(&lat);
-                winding_variance_estimator.measure(&lat);
-                cluster_size_estimator.measure(&lat);
+                density_estimator.measure(&mut lat);
+                correlation_origin_estimator.measure(&mut lat);
+                total_link_count_estimator.measure(&mut lat);
+                winding_variance_estimator.measure(&mut lat);
+                cluster_size_estimator.measure(&mut lat);
             }
 
             density_estimator.finalize_bin_and_write(number_measure);
@@ -268,7 +268,7 @@ fn main() {
             total_link_count_estimator.clear();
             winding_variance_estimator.clear();
 
-            winding_count_estimator.measure(&lat);
+            winding_count_estimator.measure(&mut lat);
             winding_count_estimator.finalize_bin_and_write(1);
         }
     }

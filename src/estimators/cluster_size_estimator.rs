@@ -33,9 +33,37 @@ pub struct ClusterSizeEstimatorDisplay {
     pub cluster_size_est_current: ClusterSizeEstimator
 }
 
-#[derive(Debug, Clone)]
-pub struct ClusterSizeEstimator{
+pub struct FullClusterSizeEstimator {
     result_file_buffer: BufWriter<File>,
+    cluster_size_estimator: ClusterSizeEstimator,
+    current_num_vertex_per_cluster_avg: f64
+}
+
+impl FullClusterSizeEstimator {
+    pub fn new(lat: &Lattice) -> FullClusterSizeEstimator {
+        println!("Initializing FullClusterSizeEstimator");
+        println!("Opening FullClusterSizeEstimator file");
+        let path = Path::new("winding_number_count_estimator.csv");
+        let display = path.display();
+        let file = match File::create(&path) {
+            Err(err) => panic!("could not create {}: {}",
+                               display,
+                               err),
+            Ok(good_file) => good_file,
+        };
+        let result_file_buffer = BufWriter::new(file);
+        FullClusterSizeEstimator {
+            result_file_buffer,
+            cluster_size_estimator: ClusterSizeEstimator::new(lat),
+            current_num_vertex_per_cluster_avg: 0.0
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+/// Full cluster size estimator is what is actually used in the runs but the smaller
+/// version has to be cloneable for the GUI
+pub struct ClusterSizeEstimator{
     pub cluster_sizes: Vec<i64>,
     pub clustered: HashMap<BoundPoint, u64>,
     pub cluster_covered_points: Vec<BoundPoint>,
@@ -50,16 +78,55 @@ pub struct ClusterSizeEstimator{
     lat: Lattice
 }
 
-impl Measurable for ClusterSizeEstimator {
-    fn measure(&mut self, lat: &Lattice) {
+impl Measurable for FullClusterSizeEstimator {
+    fn measure(&mut self, lat: &mut Lattice) {
         for i in 0..lat.size.x{
             for j in 0..lat.size.y{
-                println!("Looking at vertex x: {}, y: {}", i, j)
+                println!("Looking at vertex x: {}, y: {}", i, j);
+                let cur_point = Point::new(i, j);
+                if self.cluster_size_estimator.clustered.contains_key(&BoundPoint{size: lat.size, location: cur_point}) {
+                    continue
+                }
+                self.cluster_size_estimator.init_calculation_location(cur_point, lat);
+                while self.cluster_size_estimator.is_initialized {
+                    self.cluster_size_estimator.next();
+                }
             }
         }
+        let mut label_to_vertex_size:HashMap<u64, u64> = HashMap::new();
+        for i in 0..lat.size.x {
+            for j in 0..lat.size.y {
+                let cur_point = Point::new(i, j);
+                match self.cluster_size_estimator.clustered.get(&BoundPoint{size: lat.size, location: cur_point}){
+                    Some(cur_label_num) => {
+                        let addition = label_to_vertex_size.entry(*cur_label_num).or_insert(0);
+                        *addition += 1;
+                        println!("addition: {:?}", addition);
+                    },
+                    None => ()
+                }
+            }
+        }
+        let mut count: f64 = 0.0;
+        let mut avg: f64 = 0.0;
+        for (k, v) in label_to_vertex_size {
+            count += 1;
+            avg += v;
+        }
+        avg = avg/count;
+        self.current_num_vertex_per_cluster_avg += avg;
     }
-    fn finalize_bin_and_write(&mut self, size: u64) {
-        println!("Cluster size est finalize_bin_and_write does nothing")
+    fn finalize_bin_and_write(&mut self, denominator: u64) {
+        self.current_num_vertex_per_cluster_avg /= denominator as f64;
+        let mut out_string: String = String::new();
+        out_string.push_str(&format!("{},{}\n",&avg_count_horizontal,&avg_count_vertical));
+
+        match self.result_file_buffer.write(out_string.as_bytes()) {
+            Err(err) => panic!("Can not write to winding count estimator file {}",
+                               err
+            ),
+            Ok(_) => (),
+        }
     }
     fn clear(&mut self) {
         println!("Cluster size est clear() does nothing")
@@ -203,18 +270,8 @@ impl ClusterSizeEstimator {
         self.is_initialized = true;
     }
     pub fn new(lat: &Lattice) -> ClusterSizeEstimator {
-        println!("Opening WindingNumberCountEstimator file");
-        let path = Path::new("winding_number_count_estimator.csv");
-        let display = path.display();
-        let file = match File::create(&path) {
-            Err(err) => panic!("could not create {}: {}",
-                               display,
-                               err),
-            Ok(good_file) => good_file,
-        };
-        let result_file_buffer = BufWriter::new(file);
+
         ClusterSizeEstimator{
-            result_file_buffer,
             cluster_sizes: Vec::new(),
             clustered: Default::default(),
             cluster_covered_points: Vec::new(),
