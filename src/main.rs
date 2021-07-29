@@ -126,7 +126,7 @@ fn main() {
     // Equilibrate
     if equilibrate {
         println!("Equilibrating");
-        let equilibration_time = lat.size.x * lat.size.y * 2.0;
+        let equilibration_time = lat.size.x * lat.size.y * 2;
 
         println!("Number of updates in equilibration: {}", equilibration_time);
         for _ in 0..equilibration_time {
