@@ -113,14 +113,19 @@ impl Measurable for FullClusterSizeEstimator {
                 }
             }
         }
-        let mut count: f64 = 0.0;
+        let mut count: i64 = 0;
         let mut avg: f64 = 0.0;
         for (k, v) in label_to_vertex_size {
-            count += 1.0;
+            count += 1;
             avg += v as f64;
         }
-        avg = avg/count;
-        self.current_num_vertex_per_cluster_avg += avg;
+        if count == 0 {
+            self.current_num_vertex_per_cluster_avg += 0.0;
+        }
+        else {
+            avg = avg/(count as f64);
+            self.current_num_vertex_per_cluster_avg += avg;
+        }
     }
     fn finalize_bin_and_write(&mut self, denominator: u64) {
         let avg_for_out = self.current_num_vertex_per_cluster_avg / denominator as f64;
