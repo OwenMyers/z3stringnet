@@ -17,6 +17,7 @@ use std::collections::HashMap;
 #[cfg(test)]
 mod tests {
     use super::*;
+    use datamodel::lattice::build_z3_striped_lat;
 
     #[test]
     fn test_cluster_size_estimator_constructor() {
@@ -24,6 +25,23 @@ mod tests {
         let cluster_size_est = ClusterSizeEstimator::new(&lat);
         assert_eq!(cluster_size_est.current_location.location.x, 0);
         assert_eq!(cluster_size_est.current_location.location.y, 0);
+    }
+    #[test]
+    fn test_cluster_size_estimator_striped_lat() {
+        let mut lat: Lattice = build_z3_striped_lat(Point { x: 4, y: 4 });
+        let mut cluster_size_est = ClusterSizeEstimator::new(&lat);
+        cluster_size_est.init_calculation_location(Point::new(0, 0), &mut lat);
+        while cluster_size_est.is_initialized {
+            cluster_size_est.next();
+        }
+        assert_eq!(cluster_size_est.clustered.len(), 4);
+        for i in 0..4 {
+            assert!(
+                cluster_size_est.clustered.contains_key(
+                    &BoundPoint { size: lat.size, location: Point { x: i, y: 0 } }
+                )
+            );
+        }
     }
 }
 
