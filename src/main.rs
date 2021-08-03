@@ -17,7 +17,7 @@ use z3stringnet::datamodel::lattice::build_z3_striped_lat;
 use z3stringnet::datamodel::lattice::build_z3_striped_vertical_lat;
 use z3stringnet::datamodel::lattice::build_blank_lat;
 use z3stringnet::datamodel::lattice::build_z3_fully_packed_lat;
-//use z3stringnet::datamodel::lattice::build_z3_messy_lat;
+use z3stringnet::datamodel::lattice::build_z3_messy_lat;
 use z3stringnet::lattice_updates::Update;
 use z3stringnet::lattice_updates::UpdateType;
 use z3stringnet::estimators::density_estimator::DensityEstimator;
@@ -51,9 +51,9 @@ fn main() {
         y: lattice_size_arg,
     };
     // lat now owns size -> That is good and intentional
-    let mut lat: Lattice = build_blank_lat(size);
+    //let mut lat: Lattice = build_blank_lat(size);
     //let mut lat: Lattice = build_z3_striped_lat(size);
-    //let mut lat: Lattice = build_z3_messy_lat(size);
+    let mut lat: Lattice = build_z3_messy_lat(size);
     //let mut lat: Lattice = build_z3_striped_vertical_lat(size);
     //let mut lat: Lattice = build_z3_fully_packed_lat(size);
     //lat.vertices[0].e = lat.vertices[0].e.flip();

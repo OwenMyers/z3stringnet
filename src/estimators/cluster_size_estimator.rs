@@ -48,7 +48,8 @@ mod tests {
 
 pub struct ClusterSizeEstimatorDisplay {
     pub local_text: String,
-    pub tmp: i8,
+    // Temporarily using this as a starting boolean
+    pub tmp: bool,
     pub cluster_size_est_current: ClusterSizeEstimator
 }
 
@@ -201,7 +202,7 @@ impl Iterator for ClusterSizeEstimator {
                         return Some(
                             ClusterSizeEstimatorDisplay {
                                 local_text: "Completed sizing of this cluster!".to_string(),
-                                tmp: 17,
+                                tmp: true,
                                 cluster_size_est_current: self.clone()
                             }
                         )
@@ -271,7 +272,7 @@ impl Iterator for ClusterSizeEstimator {
         return Some(
             ClusterSizeEstimatorDisplay {
                 local_text: local_text.to_string(),
-                tmp: 18,
+                tmp: true,
                 cluster_size_est_current: self.clone()
             }
         )

@@ -424,51 +424,51 @@ pub fn build_z3_fully_packed_lat(size: Point) -> Lattice {
 }
 
 // Need to fix the number of filled links
-//pub fn build_z3_messy_lat(size: Point) -> Lattice {
-//    println!("Building staggered lattice of size x {}, y {}",
-//             size.x, size.y);
-//
-//    let mut lat: Lattice = Lattice {
-//        vertices: Vec::new(),
-//        size,
-//        number_filled_links: (size.y / 2 * size.x) as i64
-//    };
-//
-//    let half_n = (lat.size.x * lat.size.y)/2;
-//
-//    // Only need half of N because we only need vertices from one sub
-//    // lattice to completely define all links.
-//    println!("Filling vertex array:");
-//    for i in 0..half_n {
-//        if ((i % 2 == 0) & (i < 4)) {
-//            let cur_vertex: Vertex = Vertex{
-//                n: Link::Out,
-//                e: Link::Blank,
-//                s: Link::Blank,
-//                w: Link::Out,
-//                xy: Point{
-//                    x: x_from_vertex_vec_position(i, &lat.size),
-//                    y: y_from_vertex_vec_position(i, &lat.size),
-//                }
-//            };
-//            lat.vertices.push(cur_vertex);
-//        }
-//        else {
-//            let cur_vertex: Vertex = Vertex{
-//                n: Link::Blank,
-//                e: Link::Blank,
-//                s: Link::Blank,
-//                w: Link::Blank,
-//                xy: Point{
-//                    x: x_from_vertex_vec_position(i, &lat.size),
-//                    y: y_from_vertex_vec_position(i, &lat.size),
-//                }
-//            };
-//            lat.vertices.push(cur_vertex);
-//        }
-//    }
-//    lat
-//}
+pub fn build_z3_messy_lat(size: Point) -> Lattice {
+    println!("Building staggered lattice of size x {}, y {}",
+             size.x, size.y);
+
+    let mut lat: Lattice = Lattice {
+        vertices: Vec::new(),
+        size,
+        number_filled_links: (size.y / 2 * size.x) as i64
+    };
+
+    let half_n = (lat.size.x * lat.size.y)/2;
+
+    // Only need half of N because we only need vertices from one sub
+    // lattice to completely define all links.
+    println!("Filling vertex array:");
+    for i in 0..half_n {
+        if ((i % 2 == 0) & (i < 4)) {
+            let cur_vertex: Vertex = Vertex{
+                n: Link::Out,
+                e: Link::Blank,
+                s: Link::Blank,
+                w: Link::Out,
+                xy: Point{
+                    x: x_from_vertex_vec_position(i, &lat.size),
+                    y: y_from_vertex_vec_position(i, &lat.size),
+                }
+            };
+            lat.vertices.push(cur_vertex);
+        }
+        else {
+            let cur_vertex: Vertex = Vertex{
+                n: Link::Blank,
+                e: Link::Blank,
+                s: Link::Blank,
+                w: Link::Blank,
+                xy: Point{
+                    x: x_from_vertex_vec_position(i, &lat.size),
+                    y: y_from_vertex_vec_position(i, &lat.size),
+                }
+            };
+            lat.vertices.push(cur_vertex);
+        }
+    }
+    lat
+}
 
 //TODO: check these
 pub fn x_from_vertex_vec_position(position: i64, size: &Point) -> i64 {

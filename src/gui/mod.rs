@@ -54,7 +54,7 @@ impl DemoApp {
                 position: datamodel::Point { x: -1, y: -1 },
             },
             clustering_estimator_display: ClusterSizeEstimatorDisplay {
-                tmp: 0,
+                tmp: false,
                 local_text: String::from("C Not Started"),
                 cluster_size_est_current: ClusterSizeEstimator::new(lat)
             }
@@ -160,12 +160,14 @@ pub fn draw_cluster_number_display(
     //    .x_position(Absolute(initial_offset + 0.0))
     //    .y_position(Absolute(initial_offset + 0.0))
     //    .color(in_color) .set(ids.clustering_start_location, ui);
-    if clust.cluster_size_est_current.is_initialized {
-        draw_walk_path(clust, ids, ui, initial_offset);
-        if clust.cluster_size_est_current.stack.len() > 0 {
-            draw_clustering_last_on_stack(clust, ids, ui, initial_offset);
-        }
-    };
+    if clust.tmp {
+        if clust.cluster_size_est_current.is_initialized {
+            draw_walk_path(clust, ids, ui, initial_offset);
+            if clust.cluster_size_est_current.stack.len() > 0 {
+                draw_clustering_last_on_stack(clust, ids, ui, initial_offset);
+            }
+        };
+    }
 }
 
 pub fn draw_winding_number_display(
@@ -616,7 +618,7 @@ pub fn gui(ui: &mut conrod_core::UiCell,
         app.clustering_estimator_display = match app.clustering_estimator_display.cluster_size_est_current.next() {
             Some(c) => c,
             None => ClusterSizeEstimatorDisplay {
-                        tmp: 0,
+                        tmp: false,
                         local_text: String::from("Failed to start clustering display"),
                         cluster_size_est_current: ClusterSizeEstimator::new(lattice)
                     }
