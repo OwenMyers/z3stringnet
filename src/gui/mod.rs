@@ -278,7 +278,7 @@ fn add_in_lattice_link(initial_offset: f64,
         Absolute(initial_offset + (x as f64) * (LINK_MAJOR as f64) + x_pos_mod)
     ).y_position(
         Absolute(initial_offset + (y as f64) * (LINK_MAJOR as f64) + y_pos_mod)
-    ).color(color.alpha(0.3)).set(next_id, ui)
+    ).color(color.alpha(1.0)).set(next_id, ui)
 }
 
 /// A set of reasonable stylistic defaults that works for the `gui` below.
@@ -427,7 +427,7 @@ pub fn gui(ui: &mut conrod_core::UiCell,
         match cur_vertex.n {
             Link::In => {
                 add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, true, 1.0, 1.0);
-                draw_triangle([tri_x, tri_y], Compass::S, id1, id2, id3, ui, true);
+                draw_triangle([tri_x, tri_y], Compass::S, id1, id2, id3, ui, false);
                 if y == lattice.size.y - 1{
                     // If it is a y boundary -> draw the periodic piece on the opposite side
                     let &next_id = match lattice_link_id_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
@@ -441,7 +441,7 @@ pub fn gui(ui: &mut conrod_core::UiCell,
             },
             Link::Out => {
                 add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, true, 1.0, 1.0);
-                draw_triangle([tri_x, tri_y], Compass::N, id1, id2, id3, ui, true);
+                draw_triangle([tri_x, tri_y], Compass::N, id1, id2, id3, ui, false);
                 if y == lattice.size.y - 1 {
                     // If it is a y boundary -> draw the periodic piece on the opposite side
                     let &next_id = match lattice_link_id_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
@@ -511,7 +511,7 @@ pub fn gui(ui: &mut conrod_core::UiCell,
         match cur_vertex.s {
             Link::In => {
                 add_in_lattice_link(initial_offset, x, y, next_id, ui, in_color, true, -1.0, 1.0);
-                draw_triangle([tri_x, tri_y], Compass::N, id1, id2, id3, ui, false);
+                draw_triangle([tri_x, tri_y], Compass::N, id1, id2, id3, ui, true);
                 if y == 0 {
                     // If it is a y boundary -> draw the periodic piece on the opposite side
                     let &next_id = match lattice_link_id_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
@@ -525,7 +525,7 @@ pub fn gui(ui: &mut conrod_core::UiCell,
             },
             Link::Out => {
                 add_in_lattice_link(initial_offset, x, y, next_id, ui, out_color, true, -1.0, 1.0);
-                draw_triangle([tri_x, tri_y], Compass::S, id1, id2, id3, ui, false);
+                draw_triangle([tri_x, tri_y], Compass::S, id1, id2, id3, ui, true);
                 if y == 0 {
                     // If it is a y boundary -> draw the periodic piece on the opposite side
                     let &next_id = match lattice_link_id_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };

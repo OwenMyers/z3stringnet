@@ -442,9 +442,9 @@ pub fn build_z3_messy_lat(size: Point) -> Lattice {
     for i in 0..half_n {
         if ((i % 2 == 0) & (i < 4)) {
             let cur_vertex: Vertex = Vertex{
-                n: Link::Out,
+                n: Link::Blank,
                 e: Link::Blank,
-                s: Link::Blank,
+                s: Link::In,
                 w: Link::Out,
                 xy: Point{
                     x: x_from_vertex_vec_position(i, &lat.size),
