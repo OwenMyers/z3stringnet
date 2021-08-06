@@ -273,12 +273,13 @@ fn add_in_lattice_link(initial_offset: f64,
         x_pos_mod = LINK_MAJOR as f64 / 2.0 * shift_direction;
         y_pos_mod = 0.0;
     }
-    let dimensions = [link_x, link_y];
-    widget::RoundedRectangle::fill(dimensions, 8.0).x_position(
+    let dimensions = [link_x*0.8, link_y*0.8];
+    //widget::RoundedRectangle::fill(dimensions, 16.0).x_position(
+    widget::Oval::fill(dimensions).x_position(
         Absolute(initial_offset + (x as f64) * (LINK_MAJOR as f64) + x_pos_mod)
     ).y_position(
         Absolute(initial_offset + (y as f64) * (LINK_MAJOR as f64) + y_pos_mod)
-    ).color(color.alpha(1.0)).set(next_id, ui)
+    ).color(color.alpha(0.8)).set(next_id, ui)
 }
 
 /// A set of reasonable stylistic defaults that works for the `gui` below.
@@ -343,20 +344,22 @@ fn draw_bounding_box(
     let float_lm = LINK_MAJOR as f64;
     let x: f64 = (lattice_size as f64) * float_lm;
 
+    let box_color = conrod_core::color::rgb(0.0, 0.1, 0.1);
+
     widget::Line::abs([*initial_offset - float_lm, *initial_offset - float_lm], [*initial_offset - float_lm, *initial_offset + x + float_lm/3.0])
-        .thickness(float_lm/1.5)
+        .thickness(float_lm/1.5).color(box_color)
         .set(next_id, ui);
     let &next_id = match bound_box_id_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
     widget::Line::abs([*initial_offset - float_lm * 1.3333, *initial_offset - float_lm], [*initial_offset + x + float_lm/3.0, *initial_offset - float_lm])
-        .thickness(float_lm/1.5)
+        .thickness(float_lm/1.5).color(box_color)
         .set(next_id, ui);
     let &next_id = match bound_box_id_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
     widget::Line::abs([*initial_offset + x, *initial_offset - float_lm], [*initial_offset + x, *initial_offset + x + float_lm/3.0])
-        .thickness(float_lm/1.5)
+        .thickness(float_lm/1.5).color(box_color)
         .set(next_id, ui);
     let &next_id = match bound_box_id_iter.next() { Some(id) => id, None => panic!("Need a widget ID.") };
     widget::Line::abs([*initial_offset - float_lm * 1.3333, *initial_offset + x], [*initial_offset + x + float_lm/3.0, *initial_offset + x])
-        .thickness(float_lm/1.5)
+        .thickness(float_lm/1.5).color(box_color)
         .set(next_id, ui);
 }
 
