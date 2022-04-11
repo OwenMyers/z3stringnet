@@ -21,10 +21,26 @@ You don't need to use the GUI to run, but there are some additional dependencies
 
 Make sure you have up-to-date apt (or brew): `sudo apt update`
 
+and make sure you have gcc
 ```
 sudo apt install gcc
 ```
 
+If you are on ubuntu (shouldn't happen on Mac), you might get an error that looks like:
+
+```
+  = note: /usr/bin/ld: cannot find -lxcb
+          /usr/bin/ld: cannot find -lxcb-render
+          /usr/bin/ld: cannot find -lxcb-shape
+          /usr/bin/ld: cannot find -lxcb-xfixes
+          collect2: error: ld returned 1 exit status
+```
+
+In which case you need:
+
+```
+sudo apt install libxcb-xfixes0-dev
+```
 
 # Compile
 
