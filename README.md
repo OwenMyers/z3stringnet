@@ -15,6 +15,17 @@ You may need to manually source the cargo env file to add it to your path
 source $HOME/.cargo/env
 ```
 
+# Additional Steps as of 2022-04
+I recently added a GUI for visualizing estimators.
+You don't need to use the GUI to run, but there are some additional dependencies because of it.
+
+Make sure you have up-to-date apt (or brew): `sudo apt update`
+
+```
+sudo apt install gcc
+```
+
+
 # Compile
 
 Move into the repo root directory and run:
