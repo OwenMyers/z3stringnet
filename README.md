@@ -1,4 +1,4 @@
-# Installation
+# Installation 
 
 Installing the compiler and the package manager (`cargo`)
 can be done with a script online. Run:
@@ -15,18 +15,37 @@ You may need to manually source the cargo env file to add it to your path
 source $HOME/.cargo/env
 ```
 
-# Additional Steps as of 2022-04
+# Additional Steps as of 2022-04 
+## (Ubuntu)
 I recently added a GUI for visualizing estimators.
 You don't need to use the GUI to run, but there are some additional dependencies because of it.
 
-Make sure you have up-to-date apt: `sudo apt update`
+Make sure you have up-to-date apt: 
+```
+sudo apt update
+```
 
 and make sure you have gcc
 ```
 sudo apt install gcc
 ```
 
-and see the possible error in the compile section
+When you compile (see below section) you might get an error that looks like:
+
+```
+  = note: /usr/bin/ld: cannot find -lxcb
+          /usr/bin/ld: cannot find -lxcb-render
+          /usr/bin/ld: cannot find -lxcb-shape
+          /usr/bin/ld: cannot find -lxcb-xfixes
+          collect2: error: ld returned 1 exit status
+```
+
+In which case you will need:
+
+```
+sudo apt install libxcb-xfixes0-dev
+```
+
 
 # Compile
 ```
@@ -37,22 +56,6 @@ Move into the repo root directory and run:
 
 ```
 cargo build
-```
-
-If you are on ubuntu (shouldn't happen on Mac), you might get an error that looks like:
-
-```
-  = note: /usr/bin/ld: cannot find -lxcb
-          /usr/bin/ld: cannot find -lxcb-render
-          /usr/bin/ld: cannot find -lxcb-shape
-          /usr/bin/ld: cannot find -lxcb-xfixes
-          collect2: error: ld returned 1 exit status
-```
-
-In which case you need:
-
-```
-sudo apt install libxcb-xfixes0-dev
 ```
 
 This compiles for debugging. If you want to compile and optimize:
@@ -66,42 +69,41 @@ cargo build --release
 From the root:
 
 ```
-target/debug/z3stringnet --size <int> --weights <float> --nbins 200000 \
-   --nmeasure 500 --nupdate 5 --loop-update
+./target/debug/z3stringnet 
+    --size <lattice edge length>
+    --weights 0.5 
+    --nbins <number of bins>
+    --nmeasure <number of measurements per bin>
+    --nupdate <number of updates per measurement asdfsd 
+    --write-update-confs false
+    --loop-update
+    --gui false
 ```
 
-or if you compiled with the `--release` flag
+A working example:
+```
+./target/debug/z3stringnet 
+    --size 4
+    --weights 0.5 
+    --nbins 10
+    --nmeasure 5
+    --nupdate 100
+    --write-update-confs false
+    --loop-update
+    --gui false
+```
+
+For some more detail on each of the flags:
+```
+./target/debug/z3stringnet --help
+```
+
+Or you can find the same information in human readable form in `src/cli.yml`
+
+If you compiled with the `--release` flag and want to run fast
 
 ```
 target/release/z3stringnet <flags>
-```
-
-The options are both specified and found in human readable form in `src/cli.yml`
-
-an example of a run would be
-
-```
-target/debug/z3stringnet --size 4 --weights 0.3
-```
-
-or if you compiled with the `--release` flag
-
-```
-target/release/z3stringnet <flags>
-```
-
-The options are both specified and found in human readable form in `src/cli.yml`
-
-You will notice the the number of bins can't be set with a flag. I can fix this shortly.
-right now you will have to change the following lines in `main.rs` and recompile
-
-```
-// number_bins: The number of lines in the data file (10000)
-let number_bins: u64 = 200000;
-// number_measure: How many measurements to average over per bin (500)
-let number_measure: u64 = 500;
-// number_update: How many updated before a measurement (5)
-let number_update: u64 = 5;
 ```
 
 # Results
