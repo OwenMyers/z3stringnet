@@ -143,6 +143,5 @@ The values in the example are
 * The bottom link is blank
 * The left link is blank
 
-# Conrod
-
-You need to `apt` install `libxcb-composite0-dev`
+# GUI Example
+[here](https://youtube.com/shorts/WQlkjqrTRCM?feature=share)
