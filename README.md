@@ -19,11 +19,24 @@ source $HOME/.cargo/env
 I recently added a GUI for visualizing estimators.
 You don't need to use the GUI to run, but there are some additional dependencies because of it.
 
-Make sure you have up-to-date apt (or brew): `sudo apt update`
+Make sure you have up-to-date apt: `sudo apt update`
 
 and make sure you have gcc
 ```
 sudo apt install gcc
+```
+
+and see the possible error in the compile section
+
+# Compile
+```
+git clone https://github.com/OwenMyers/z3stringnet.git
+```
+
+Move into the repo root directory and run:
+
+```
+cargo build
 ```
 
 If you are on ubuntu (shouldn't happen on Mac), you might get an error that looks like:
@@ -40,14 +53,6 @@ In which case you need:
 
 ```
 sudo apt install libxcb-xfixes0-dev
-```
-
-# Compile
-
-Move into the repo root directory and run:
-
-```
-cargo build
 ```
 
 This compiles for debugging. If you want to compile and optimize:
