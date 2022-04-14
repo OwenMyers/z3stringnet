@@ -88,6 +88,10 @@ fn main() {
     let write_bin_configurations: bool = write_bin_configurations_str.parse().unwrap();
     println!("Write bin configs: {}", write_bin_configurations);
 
+    let write_configuration_style_str: &str = matches.value_of("write-configuration-style").unwrap_or("flat");
+    let write_configuration_style: u8 = write_configuration_style_str.parse().unwrap();
+    println!("Write configuration style: {}", write_configuration_style);
+
     let update_type: &UpdateType = &UpdateType::Local;
     if matches.is_present("loop-update") {
         let update_type: &UpdateType = &UpdateType::Walk;
@@ -235,17 +239,17 @@ fn main() {
         for _i in 0..number_bins {
             println!("Working on bin {}", _i);
             if write_bin_configurations {
-                write_lattice(String::from(format!("lattice_bin_{}.csv", total_update_count)), &lat);
+                write_lattice(String::from(format!("lattice_bin_{}.csv", total_update_count)), &mut lat, write_configuration_style);
             }
             for _j in 0..number_measure {
                 //println!("j {}", _j);
                 if write_measure_configurations {
-                    write_lattice(String::from(format!("lattice_measure_{}.csv", total_update_count)), &lat);
+                    write_lattice(String::from(format!("lattice_measure_{}.csv", total_update_count)), &mut lat, write_configuration_style);
                 }
                 for _k in 0..number_update {
                     //println!("k {}", _k);
                     if write_update_configurations {
-                        write_lattice(String::from(format!("lattice_{}.csv", total_update_count)), &lat);
+                        write_lattice(String::from(format!("lattice_{}.csv", total_update_count)), &mut lat, write_configuration_style);
                     }
                     updater.main_update(&mut lat, &update_type);
                     total_update_count += 1;

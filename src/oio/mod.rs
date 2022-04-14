@@ -7,6 +7,7 @@ use super::datamodel::Vertex;
 use super::datamodel::Point;
 use super::datamodel::BoundPoint;
 use super::datamodel::lattice::Lattice;
+use std::slice::range;
 
 /// real_bool: If true this is link from a real vertex (lower left of plaquett)
 /// If false this is link from a fake vertex (upper right of plaquett)
@@ -73,7 +74,55 @@ pub fn increment_loc(direction: &Direction, location_in: &BoundPoint) -> BoundPo
     }
 }
 
-pub fn write_lattice(f_str: String, lat: &Lattice) -> std::io::Result<()> {
+pub fn write_lattice(f_str: String, lat: &mut Lattice, style: u8) -> std::io::Result<()> {
+    if style == 1 {
+        write_lattice_style_1(f_str, lat)
+    }
+    else if style == 2 {
+        write_lattice_style_2(lat)
+    }
+}
+
+pub fn write_lattice_style_2(lat: &mut Lattice) -> std::io::Result<()> {
+    let file_and_path = Path::new("lattice_configurations.csv");
+    let mut line_out_str= String::new();
+    let mut file_obj = File::create(&vertex_path)?;
+
+    for y in 0..lat.size.y {
+        for x in 0..lat.size.x {
+            let is_this_point_real = lat.point_real(&Point{x, y});
+
+            let current_vertex: Vertex = lat.get_vertex_from_point(
+                &BoundPoint{
+                    size: Point{
+                        x: lat.size.x, y: lat.size.y
+                    },
+                    location: Point{x, y}
+                }
+            );
+            // Next step is to change the strings into numbers using the "is_this_point_real"
+            // variable to determine how "In" "Out" map to numbers
+            line_out_str.push_str(
+                &format!("{},{}",
+                    match current_vertex.e{
+                        Link::In => "In",
+                        Link::Out => "Out",
+                        Link::Blank => "Blank",
+                    },
+                    match current_vertex.e{
+                        Link::In => "In",
+                        Link::Out => "Out",
+                        Link::Blank => "Blank",
+                    }
+                )
+            )
+        }
+    }
+    Ok(())
+}
+
+/// Style 1 <- read the cli.yml file for verbose description
+pub fn write_lattice_style_1(f_str: String, lat: &Lattice) -> std::io::Result<()> {
     let vertex_f_str: String = format!("{}_{}", "vertex", f_str);
     let plaquett_f_str: String = format!("{}_{}", "plaquett", f_str);
     let vertex_path = Path::new(&vertex_f_str);
