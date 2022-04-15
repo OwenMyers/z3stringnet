@@ -76,6 +76,7 @@ args:
           sublatice. (2) will write all configurations to a single file. Each row will be a list of all
           link values for the whole configuration. The first column will be the (x=0,y=0) vertex E(ast) link. The
           second column will be the (0,0) vertex N(orth) link. The third column will be the (1,0) vertex E link... etc.
+          ((0) will write every option for comparison)
     - loop-update:
         long: loop-update
         help: Boolean to trigger the use of loop updates instead of local
