@@ -96,7 +96,6 @@ pub fn write_lattice_style_2(lat: &mut Lattice) {
 
     for y in 0..lat.size.y {
         for x in 0..lat.size.x {
-            let is_this_point_real = lat.point_real(&Point{x, y});
 
             let current_vertex: Vertex = lat.get_vertex_from_point(
                 &BoundPoint{
@@ -112,42 +111,22 @@ pub fn write_lattice_style_2(lat: &mut Lattice) {
                 final_comma_str = "";
             }
 
-            if is_this_point_real {
-                line_out_str.push_str(
-                    &format!(
-                        "{},{}{}",
-                         match current_vertex.e{
-                             Link::In => 1,
-                             Link::Out => 2,
-                             Link::Blank => 0,
-                         },
-                         match current_vertex.n{
-                             Link::In => 1,
-                             Link::Out => 2,
-                             Link::Blank => 0,
-                         },
-                        final_comma_str
-                    )
+            line_out_str.push_str(
+                &format!(
+                    "{},{}{}",
+                     match current_vertex.e{
+                         Link::In => 2,
+                         Link::Out => 1,
+                         Link::Blank => 0,
+                     },
+                     match current_vertex.n{
+                         Link::In => 2,
+                         Link::Out => 1,
+                         Link::Blank => 0,
+                     },
+                    final_comma_str
                 )
-            }
-            else {
-                line_out_str.push_str(
-                    &format!(
-                        "{},{}{}",
-                         match current_vertex.e{
-                             Link::In => 2,
-                             Link::Out => 1,
-                             Link::Blank => 0,
-                         },
-                         match current_vertex.n{
-                             Link::In => 2,
-                             Link::Out => 1,
-                             Link::Blank => 0,
-                         },
-                        final_comma_str
-                    )
-                )
-            }
+            )
         }
     }
     line_out_str.push_str("\n");
