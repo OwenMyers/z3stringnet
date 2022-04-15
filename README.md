@@ -71,7 +71,7 @@ From the root:
 ```
 ./target/debug/z3stringnet 
     --size <lattice edge length>
-    --weights 0.5 
+    --weights 1.0 
     --nbins <number of bins>
     --nmeasure <number of measurements per bin>
     --nupdate <number of updates per measurement asdfsd 
@@ -84,7 +84,7 @@ A working example:
 ```
 ./target/debug/z3stringnet 
     --size 4
-    --weights 0.5 
+    --weights 1.0 
     --nbins 10
     --nmeasure 5
     --nupdate 100
@@ -134,7 +134,7 @@ An example of a full working command for the single file option:
 ```
 ./target/debug/z3stringnet 
     --size 4
-    --weights 0.5 
+    --weights 1.0 
     --nbins 1
     --nmeasure 1
     --nupdate 1
