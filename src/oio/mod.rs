@@ -73,14 +73,85 @@ pub fn increment_loc(direction: &Direction, location_in: &BoundPoint) -> BoundPo
     }
 }
 
-pub fn write_lattice(f_str: String, lat: &Lattice) -> std::io::Result<()> {
+pub fn write_lattice(f_str: String, lat: &mut Lattice, style: u8) {
+    if style == 1 {
+        write_lattice_style_1(f_str, lat);
+    }
+    else if style == 2 {
+        write_lattice_style_2(lat);
+    }
+    else if style == 0 {
+        write_lattice_style_1(f_str, lat);
+        write_lattice_style_2(lat);
+    }
+}
+
+pub fn write_lattice_style_2(lat: &mut Lattice) {
+    let file_and_path = Path::new("lattice_configurations.csv");
+    let mut line_out_str= String::new();
+    let mut file_obj = match File::create(&file_and_path) {
+        Ok(f) => f,
+        Err(e) => panic!("Problem creating file to write configurations: {}", e)
+    };
+
+    for y in 0..lat.size.y {
+        for x in 0..lat.size.x {
+
+            let current_vertex: Vertex = lat.get_vertex_from_point(
+                &BoundPoint{
+                    size: Point{
+                        x: lat.size.x, y: lat.size.y
+                    },
+                    location: Point{x, y}
+                }
+            );
+
+            let mut final_comma_str = ",";
+            if x == lat.size.x {
+                final_comma_str = "";
+            }
+
+            line_out_str.push_str(
+                &format!(
+                    "{},{}{}",
+                     match current_vertex.e{
+                         Link::In => 2,
+                         Link::Out => 1,
+                         Link::Blank => 0,
+                     },
+                     match current_vertex.n{
+                         Link::In => 2,
+                         Link::Out => 1,
+                         Link::Blank => 0,
+                     },
+                    final_comma_str
+                )
+            )
+        }
+    }
+    line_out_str.push_str("\n");
+
+    match file_obj.write_all(line_out_str.as_bytes()) {
+        Ok(()) => println!("Wrote configuration to file (2)"),
+        Err(_) => panic!("Problem writing configuration (2)")
+    }
+}
+
+/// Style 1 <- read the cli.yml file for verbose description
+pub fn write_lattice_style_1(f_str: String, lat: &Lattice) {
     let vertex_f_str: String = format!("{}_{}", "vertex", f_str);
     let plaquett_f_str: String = format!("{}_{}", "plaquett", f_str);
     let vertex_path = Path::new(&vertex_f_str);
     let plaquett_path = Path::new(&plaquett_f_str);
 
-    let mut vertex_file = File::create(&vertex_path)?;
-    let mut plaquett_file = File::create(&plaquett_path)?;
+    let mut vertex_file = match File::create(&vertex_path) {
+        Ok(f) => f,
+        Err(e) => panic!("Problem creating vertex config file: {}", e)
+    };
+    let mut plaquett_file = match File::create(&plaquett_path) {
+        Ok(f) => f,
+        Err(e) => panic!("Problem creating plaquett config file: {}", e)
+    };
 
     let mut vertex_out_str= String::new();
     vertex_out_str.push_str("x,y,N,E,S,W\n");
@@ -175,10 +246,15 @@ pub fn write_lattice(f_str: String, lat: &Lattice) -> std::io::Result<()> {
     vertex_out_str.push_str("\n");
     plaquett_out_str.push_str("\n");
 
-    vertex_file.write_all(vertex_out_str.as_bytes())?;
-    plaquett_file.write_all(plaquett_out_str.as_bytes())?;
+    match vertex_file.write_all(vertex_out_str.as_bytes()) {
+        Ok(()) => println!("Wrote vertex configuration to file (1)"),
+        Err(_) => panic!("Problem vertex writing configuration (1)")
+    }
+    match plaquett_file.write_all(plaquett_out_str.as_bytes()) {
+        Ok(()) => println!("Wrote plaquett configuration to file (1)"),
+        Err(_) => panic!("Problem plaquett writing configuration (1)")
+    }
 
-    Ok(())
 }
 
 pub fn write_vec(f_str: String, vec: &Vec<u8>) {
