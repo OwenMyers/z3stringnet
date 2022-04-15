@@ -122,9 +122,11 @@ using the  `--write-configuration-style <choice 1 or 2>` which lets you select t
 to be written (provide integer 1 or 2).
 
 * `1` which will write a single file per configuration. That file will have columns for the x, y
-   coordinates of each vertex (from a single sublattice) and the "value" of the links around that sublattice.
+   coordinates of each vertex (from a single sublattice) and the "value" of the links around that sublattice. Each file 
+   will be named `vertex_lattice_<configuation number>.csv`
 * `2` will write all configurations to a single file. Each row will be a list of all link values for the whole 
-  onfiguration. The first column will be the (x=0,y=0) vertex E(ast) link. The second column will be the (0,0)
+  onfiguration. The first column will be the (x=0,y=0) vertex E(ast) link. The second column will be the (0,0).
+  The output file will be `lattice_configurations.csv`
  vertex N(orth) link. The third column will be the (1,0) vertex E link... etc.
 * (`0` will write every option for comparison)
 
@@ -141,6 +143,7 @@ An example of a full working command for the single file option:
     --loop-update
     --gui false
 ```
+
 
 
 ### Vertex Configurations
