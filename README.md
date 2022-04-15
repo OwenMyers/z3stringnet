@@ -110,6 +110,39 @@ target/release/z3stringnet <flags>
 
 ## Configuration Outputs
 
+if you want to write configurations you can use any of the following options:
+* `--write-update-confs true`
+* `--write-measure-confs true`
+* `--write-bin-confs true`
+
+Which will write the configurations at the respective stage
+
+There are 2 options for how the configurations are written which can be chosen
+using the  `--write-configuration-style <choice 1 or 2>` which lets you select the way you would like configurations
+to be written (provide integer 1 or 2).
+
+* `1` which will write a single file per configuration. That file will have columns for the x, y
+   coordinates of each vertex (from a single sublattice) and the "value" of the links around that sublattice.
+* `2` will write all configurations to a single file. Each row will be a list of all link values for the whole 
+  onfiguration. The first column will be the (x=0,y=0) vertex E(ast) link. The second column will be the (0,0)
+ vertex N(orth) link. The third column will be the (1,0) vertex E link... etc.
+* (`0` will write every option for comparison)
+
+An example of a full working command for the single file option:
+```
+./target/debug/z3stringnet 
+    --size 4
+    --weights 0.5 
+    --nbins 1
+    --nmeasure 1
+    --nupdate 1
+    --write-update-confs true
+    --write-configuration-style 2
+    --loop-update
+    --gui false
+```
+
+
 ### Vertex Configurations
 Link orientations are specified with respect to the **vertex**..
 
