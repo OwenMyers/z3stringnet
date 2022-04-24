@@ -88,7 +88,7 @@ fn main() {
     let write_bin_configurations: bool = write_bin_configurations_str.parse().unwrap();
     println!("Write bin configs: {}", write_bin_configurations);
 
-    let write_configuration_style_str: &str = matches.value_of("write-configuration-style").unwrap_or("flat");
+    let write_configuration_style_str: &str = matches.value_of("write-configuration-style").unwrap_or("2");
     let write_configuration_style: u8 = write_configuration_style_str.parse().unwrap();
     println!("Write configuration style: {}", write_configuration_style);
 
