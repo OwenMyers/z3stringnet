@@ -103,16 +103,6 @@ pub fn write_lattice_style_2(lat: &mut Lattice) {
         Err(e) => panic!("Problem creating/opening file to write configurations: {}", e)
     };
 
-    //let mut file_obj = File::open(&file_and_path);
-    //if ! Path::new(&file_and_path).exists()
-    //{
-    //    let mut file_obj = match File::create(&file_and_path) {
-    //        Ok(f) => f,
-    //        Err(e) => panic!("Problem creating file to write configurations: {}", e)
-    //    };
-    //}
-    //else
-
     for y in 0..lat.size.y {
         for x in 0..lat.size.x {
 
@@ -126,7 +116,7 @@ pub fn write_lattice_style_2(lat: &mut Lattice) {
             );
 
             let mut final_comma_str = ",";
-            if x == lat.size.x {
+            if (y == lat.size.y - 1) && (x == lat.size.x - 1) {
                 final_comma_str = "";
             }
 
