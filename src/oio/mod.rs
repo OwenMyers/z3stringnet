@@ -1,5 +1,6 @@
 use std::io::prelude::*;
 use std::fs::File;
+use std::fs::OpenOptions;
 use std::path::Path;
 use super::datamodel::Link;
 use super::datamodel::Direction;
@@ -89,10 +90,28 @@ pub fn write_lattice(f_str: String, lat: &mut Lattice, style: u8) {
 pub fn write_lattice_style_2(lat: &mut Lattice) {
     let file_and_path = Path::new("lattice_configurations.csv");
     let mut line_out_str= String::new();
-    let mut file_obj = match File::create(&file_and_path) {
+
+    if !Path::new(&file_and_path).exists() {
+        let mut file_obj = match File::create(&file_and_path) {
+            Ok(f) => f,
+            Err(e) => panic!("Problem creating file to write configurations: {}", e)
+        };
+    }
+    let mut file_obj = match OpenOptions::new().write(true).append(true).open(&file_and_path)
+    {
         Ok(f) => f,
-        Err(e) => panic!("Problem creating file to write configurations: {}", e)
+        Err(e) => panic!("Problem creating/opening file to write configurations: {}", e)
     };
+
+    //let mut file_obj = File::open(&file_and_path);
+    //if ! Path::new(&file_and_path).exists()
+    //{
+    //    let mut file_obj = match File::create(&file_and_path) {
+    //        Ok(f) => f,
+    //        Err(e) => panic!("Problem creating file to write configurations: {}", e)
+    //    };
+    //}
+    //else
 
     for y in 0..lat.size.y {
         for x in 0..lat.size.x {
